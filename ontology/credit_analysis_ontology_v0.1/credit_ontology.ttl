@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cacm_ont: <http://example.com/ontology/cacm_credit_ontology/0.1#> .
+
+# Base URI for this ontology
+<http://example.com/ontology/cacm_credit_ontology/0.1>
+    a owl:Ontology ;
+    rdfs:label "Credit Analysis Capability Module Ontology (CACM-Ont)" ;
+    rdfs:comment "Preliminary ontology for defining terms, concepts, and relationships in the domain of credit analysis for CACMs. Version 0.1 (Initial Draft)" ;
+    owl:versionInfo "0.1.0" .
+
+# Example Class
+cacm_ont:CreditActivity
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Credit Activity"@en ;
+    rdfs:comment "A general concept representing any activity or process related to credit analysis."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+# Example Property
+cacm_ont:hasInputParameter
+    a rdf:Property, owl:ObjectProperty ; # Assuming it links to a parameter definition, could be DatatypeProperty too
+    rdfs:label "has input parameter"@en ;
+    rdfs:comment "Relates a CACM or a step within it to an input parameter it requires."@en ;
+    rdfs:domain cacm_ont:CreditActivity ; # Example domain
+    # rdfs:range cacm_ont:Parameter ; # Example range (Parameter class would need to be defined)
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .

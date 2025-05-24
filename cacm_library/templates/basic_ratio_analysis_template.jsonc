@@ -1,0 +1,73 @@
+// CACM Template: Basic Ratio Analysis
+// Version: 0.1.0
+// Description: A starting template for a CACM that performs basic financial ratio analysis.
+{
+  // "$schema": "../../cacm_standard/cacm_schema_v0.1.json", // Optional: points to the schema for validation and IDE support
+  "cacmId": "urn:uuid:generate-new-uuid", // Placeholder: A new UUID should be generated when this template is instantiated
+  "version": "0.1.0-template",
+  "name": "Basic Financial Ratio Analysis",
+  "description": "Calculates fundamental financial ratios (e.g., Current Ratio, Debt-to-Equity) based on provided financial statements.",
+  "metadata": {
+    "author": "CACM Template Library",
+    "creationDate": "2023-10-27T10:00:00Z", // Should be updated on instantiation
+    "tags": ["financial_ratio", "template", "sme_lending"],
+    "templateDetails": {
+      "templateName": "Basic Ratio Analysis",
+      "templateVersion": "0.1.0",
+      "intendedUsage": "As a starting point for common ratio calculations. Customize input/output schemas and specific ratios as needed."
+    }
+  },
+  "inputs": {
+    // Placeholder: Define input schema, e.g., referencing concepts from the ontology
+    // "financialStatement": {
+    //   "type": "object",
+    //   "properties": {
+    //     "currentAssets": { "type": "number", "description": "Total Current Assets" },
+    //     "currentLiabilities": { "type": "number", "description": "Total Current Liabilities" }
+    //   },
+    //  "required": ["currentAssets", "currentLiabilities"]
+    // }
+  },
+  "outputs": {
+    // Placeholder: Define output schema
+    // "ratios": {
+    //   "type": "object",
+    //   "properties": {
+    //     "currentRatio": { "type": "number", "description": "Current Assets / Current Liabilities" }
+    //   }
+    // }
+  },
+  "workflow": {
+    "steps": [
+      // Placeholder: Define logical workflow steps
+      // {
+      //   "stepId": "calculate_current_ratio",
+      //   "description": "Calculate the Current Ratio",
+      //   "computeCapability": "compute:CalculateRatio", // Logical capability reference
+      //   "parameters": {
+      //     "numerator": "inputs.financialStatement.currentAssets",
+      //     "denominator": "inputs.financialStatement.currentLiabilities"
+      //   },
+      //   "outputs": ["outputs.ratios.currentRatio"]
+      // }
+    ]
+  },
+  "parameters": [
+    // Placeholder: Define configurable parameters for this CACM
+    // {
+    //   "paramId": "roundingPrecision",
+    //   "name": "Rounding Precision",
+    //   "description": "Number of decimal places for calculated ratios.",
+    //   "type": "integer",
+    //   "defaultValue": 2
+    // }
+  ],
+  "validationRules": [
+    // Placeholder: Define validation rules for inputs, outputs, or parameters
+    // {
+    //   "ruleId": "current_assets_positive",
+    //   "description": "Current Assets must be a positive number.",
+    //   "expression": "inputs.financialStatement.currentAssets > 0"
+    // }
+  ]
+}
