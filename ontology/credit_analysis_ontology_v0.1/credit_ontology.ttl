@@ -26,3 +26,102 @@ cacm_ont:hasInputParameter
     rdfs:domain cacm_ont:CreditActivity ; # Example domain
     # rdfs:range cacm_ont:Parameter ; # Example range (Parameter class would need to be defined)
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+# --- Core Concepts (Classes) ---
+
+cacm_ont:FinancialInstrument
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Financial Instrument"@en ;
+    rdfs:comment "A financial instrument, such as a loan, bond, or line of credit, relevant to credit analysis."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:FinancialStatement
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Financial Statement"@en ;
+    rdfs:comment "A formal record of the financial activities and position of a business, person, or other entity (e.g., balance sheet, income statement)."@en ;
+    rdfs:subClassOf cacm_ont:DataInput ; # Example of subclassing
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:Metric
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Metric"@en ;
+    rdfs:comment "A quantifiable measure used to track and assess the status of a specific business process, financial characteristic, or risk exposure."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:Ratio
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Ratio"@en ;
+    rdfs:comment "A type of metric that represents the relationship between two numbers or quantities, often used in financial analysis."@en ;
+    rdfs:subClassOf cacm_ont:Metric ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:RiskScore
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Risk Score"@en ;
+    rdfs:comment "A numerical representation of the creditworthiness or risk associated with an entity or financial instrument."@en ;
+    rdfs:subClassOf cacm_ont:Metric ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:EligibilityRule
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Eligibility Rule"@en ;
+    rdfs:comment "A specific criterion or condition that must be met for a credit application or process to proceed or be approved."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:DataInput # Renamed from DataInputSource for broader applicability
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Data Input"@en ;
+    rdfs:comment "Represents any piece of data or information used as an input for a credit analysis capability."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:Policy
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Policy"@en ;
+    rdfs:comment "A guiding principle or rule, often related to regulations or internal credit policies, that influences credit decisions."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+# --- Core Properties (Relationships) ---
+
+cacm_ont:hasDataSource
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has data source"@en ;
+    rdfs:comment "Relates an entity (e.g., a Metric) to the source of its underlying data (e.g., a specific FinancialStatement or external DataInput)."@en ;
+    # rdfs:domain could be cacm_ont:Metric or other relevant classes
+    # rdfs:range cacm_ont:DataInput ; # Or a more specific data source type
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:calculatesMetric
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "calculates metric"@en ;
+    rdfs:comment "Relates a process or capability to a metric it computes."@en ;
+    # rdfs:domain cacm_ont:CreditActivity ; # Or a more specific capability class
+    rdfs:range cacm_ont:Metric ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:appliesRule
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "applies rule"@en ;
+    rdfs:comment "Relates a process or capability to an eligibility rule or policy it enforces/checks."@en ;
+    # rdfs:domain cacm_ont:CreditActivity ;
+    rdfs:range cacm_ont:EligibilityRule ; # Or cacm_ont:Policy
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:requiresInput
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "requires input"@en ;
+    rdfs:comment "Specifies that a capability, metric, or rule requires a particular type of data input."@en ;
+    # rdfs:domain [ owl:unionOf ( cacm_ont:CreditActivity cacm_ont:Metric cacm_ont:EligibilityRule ) ] ; # Example complex domain
+    rdfs:range cacm_ont:DataInput ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+cacm_ont:producesOutput
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "produces output"@en ;
+    rdfs:comment "Specifies that a capability or step produces a particular type of data as output."@en ;
+    # rdfs:domain cacm_ont:CreditActivity;
+    # rdfs:range cacm_ont:DataInput; # Outputs can also be considered data inputs for subsequent processes
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.1> .
+
+# Make sure the existing cacm_ont:CreditActivity and cacm_ont:hasInputParameter are compatible
+# or update them if necessary. For now, assuming they are.
+# If cacm_ont:hasInputParameter was specific, cacm_ont:requiresInput is more general.

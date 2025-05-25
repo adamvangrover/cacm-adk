@@ -1,0 +1,111 @@
+{
+  "cacmId": "urn:uuid:generate-new-uuid",
+  "version": "0.1.0-template",
+  "name": "Simplified SME Credit Scoring Model",
+  "description": "Calculates a basic credit score for an SME based on financial data and qualitative assessments.",
+  "metadata": {
+    "author": "CACM Template Library",
+    "creationDate": "2023-10-28T10:00:00Z",
+    "tags": ["scoring_model", "sme", "credit_risk", "template"],
+    "templateDetails": {
+      "templateName": "SME Scoring Model (Simplified)",
+      "intendedUsage": "As a starting point for building SME credit scoring capabilities. Customize inputs, outputs, scoring logic, and parameters."
+    }
+  },
+  "inputs": {
+    "smeFinancials": {
+      "description": "Financial statements for the SME.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#FinancialStatement",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "balanceSheet": { "type": "object", "description": "Key balance sheet figures." },
+          "incomeStatement": { "type": "object", "description": "Key income statement figures." }
+        },
+        "required": ["balanceSheet", "incomeStatement"]
+      }
+    },
+    "qualitativeData": {
+      "description": "Qualitative assessment data for the SME.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "managementExperienceYears": { "type": "integer", "description": "Years of management experience." },
+          "industryOutlook": { "type": "string", "enum": ["positive", "neutral", "negative"], "description": "Outlook for the SME's industry."}
+        }
+      }
+    }
+  },
+  "outputs": {
+    "creditScore": {
+      "description": "The calculated credit score for the SME.",
+      "type": "number",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#RiskScore"
+    },
+    "riskSegment": {
+      "description": "The risk segment assigned based on the score.",
+      "type": "string",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Metric"
+    }
+  },
+  "parameters": [
+    {
+      "paramId": "scoreWeightFinancial",
+      "name": "Financial Score Weight",
+      "description": "The weight (0.0-1.0) given to financial data in the overall score.",
+      "type": "number",
+      "defaultValue": 0.7,
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#RiskParameter"
+    },
+    {
+      "paramId": "industryNegativeAdjustment",
+      "name": "Industry Negative Outlook Adjustment",
+      "description": "Points to deduct if industry outlook is negative.",
+      "type": "number",
+      "defaultValue": 10
+    }
+  ],
+  "workflow": [
+    {
+      "stepId": "s1_calculate_financial_component_score",
+      "description": "Calculate score component from financial data.",
+      "computeCapabilityRef": "model:FinancialMetricsScorer_v1",
+      "inputBindings": { "financial_data": "cacm.inputs.smeFinancials"},
+      "outputBindings": {"financial_score_component": "steps.s1_calculate_financial_component_score.outputs.component_score"}
+    },
+    {
+      "stepId": "s2_calculate_qualitative_component_score",
+      "description": "Calculate score component from qualitative data.",
+      "computeCapabilityRef": "model:QualitativeMetricsScorer_v1",
+      "inputBindings": { "qualitative_data": "cacm.inputs.qualitativeData"},
+      "outputBindings": {"qualitative_score_component": "steps.s2_calculate_qualitative_component_score.outputs.component_score"}
+    },
+    {
+      "stepId": "s3_combine_scores",
+      "description": "Combine component scores and apply adjustments.",
+      "computeCapabilityRef": "logic:WeightedAverageAdjuster_v1",
+      "inputBindings": {
+        "score1": "steps.s1_calculate_financial_component_score.outputs.component_score",
+        "weight1": "cacm.parameters.scoreWeightFinancial",
+        "score2": "steps.s2_calculate_qualitative_component_score.outputs.component_score",
+        "base_score_params": {"industryOutlook": "cacm.inputs.qualitativeData.industryOutlook", "negativeAdjustment": "cacm.parameters.industryNegativeAdjustment"}
+      },
+      "outputBindings": {
+        "final_score": "cacm.outputs.creditScore",
+        "calculated_segment": "cacm.outputs.riskSegment"
+      }
+    }
+  ],
+  "validationRules": [
+    {
+      "ruleId": "financial_weight_range",
+      "description": "Financial score weight must be between 0 and 1.",
+      "expression": "cacm.parameters.scoreWeightFinancial >= 0 && cacm.parameters.scoreWeightFinancial <= 1",
+      "appliesTo": "parameters.scoreWeightFinancial",
+      "severity": "error"
+    }
+  ]
+}
