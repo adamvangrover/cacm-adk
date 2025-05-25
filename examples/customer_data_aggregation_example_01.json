@@ -1,0 +1,96 @@
+{
+  "cacmId": "c0f3e9a2-6b4c-4b1f-889a-1b9b7a5b0f2e",
+  "version": "1.0.1",
+  "name": "Customer Data Aggregation - Retail Banking Example",
+  "description": "Aggregates customer data from CRM and Core Banking systems.",
+  "metadata": {
+    "author": "Example Generator",
+    "creationDate": "2023-10-28T15:00:00Z",
+    "tags": ["data_aggregation", "customer_360", "example"],
+    "templateDetails": {
+      "templateName": "Data Aggregation Task",
+      "templateVersion": "0.1.0"
+    }
+  },
+  "inputs": {
+    "crmSystemData": {
+      "description": "Data extract from CRM system for a customer.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput",
+      "value": {
+        "customerId": "CUST12345",
+        "contactInfo": {"email": "john.doe@example.com", "phone": "555-1234"},
+        "lastInteractionDate": "2023-09-15"
+      }
+    },
+    "coreBankingData": {
+      "description": "Data extract from Core Banking system for the same customer.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput",
+      "value": {
+        "accountId": "ACC67890",
+        "balance": 15000.75,
+        "accountOpenDate": "2020-03-10",
+        "productTypes": ["Savings", "CreditCard"]
+      }
+    }
+  },
+  "outputs": {
+    "aggregatedCustomerView": {
+      "description": "A consolidated view of the customer's data.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput"
+    }
+  },
+  "parameters": [
+    {
+      "paramId": "aggregationFieldsMap",
+      "name": "Aggregation Fields Map",
+      "description": "Defines field mapping for aggregation.",
+      "type": "object", 
+      "value": {
+        "customerIdentifier": "crmSystemData.customerId",
+        "primaryEmail": "crmSystemData.contactInfo.email",
+        "accountNumber": "coreBankingData.accountId",
+        "currentBalance": "coreBankingData.balance",
+        "activeProducts": "coreBankingData.productTypes"
+      }
+    },
+    {
+      "paramId": "deduplicationStrategy",
+      "name": "Deduplication Strategy",
+      "description": "Strategy for deduplication.",
+      "type": "string",
+      "value": "error_on_duplicate"
+    }
+  ],
+  "workflow": [
+    {
+      "stepId": "s1_load_crm_data",
+      "description": "Load and preprocess CRM data.",
+      "computeCapabilityRef": "connector:LoadData_v1",
+      "inputBindings": {"source_config": "cacm.inputs.crmSystemData.value"},
+      "outputBindings": {"loaded_crm": "steps.s1_load_crm_data.outputs.data"}
+    },
+    {
+      "stepId": "s2_load_corebanking_data",
+      "description": "Load and preprocess Core Banking data.",
+      "computeCapabilityRef": "connector:LoadData_v1",
+      "inputBindings": {"source_config": "cacm.inputs.coreBankingData.value"},
+      "outputBindings": {"loaded_core": "steps.s2_load_corebanking_data.outputs.data"}
+    },
+    {
+      "stepId": "s3_aggregate_data",
+      "description": "Perform aggregation based on parameters.",
+      "computeCapabilityRef": "logic:AggregateFields_v2",
+      "inputBindings": {
+        "data1": "steps.s1_load_crm_data.outputs.data",
+        "data2": "steps.s2_load_corebanking_data.outputs.data",
+        "field_map_config": "cacm.parameters.aggregationFieldsMap.value",
+        "deduplication_rule": "cacm.parameters.deduplicationStrategy.value"
+      },
+      "outputBindings": {"aggregated_result": "cacm.outputs.aggregatedCustomerView"}
+    }
+  ],
+  "validationRules": []
+}

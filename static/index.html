@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CACM Authoring & Development Kit (ADK) - Demo</title>
+    <link rel="stylesheet" href="/static/style.css"> <!-- Updated path if needed -->
+</head>
+<body>
+    <div class="app-layout">
+        <aside id="sidebar">
+            <h2>CACM-ADK Demo</h2>
+            <nav id="TableOfContents">
+                <a href="#section_intro" class="active-nav-link">Introduction</a>
+                <a href="#section_foundations">Foundational Setup</a>
+                <a href="#section_simulation">Interactive Simulation</a>
+                <a href="#section_scoring_conceptual">Conceptual Scoring</a>
+                <a href="#section_advanced">Advanced Topics</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-title">
+                <h1>CACM-ADK: Interactive Walkthrough</h1>
+            </header>
+
+            <section id="section_intro">
+                <h2 class="section-title">Introduction to CACM-ADK</h2>
+                <p>Welcome to the Credit Analysis Capability Module (CACM) Authoring & Development Kit (ADK) demonstration.</p>
+                <p>This system is designed to help analysts create, manage, and utilize standardized, intelligent modules for credit analysis. This page provides a conceptual walkthrough of how such a system might work, using pre-canned scenarios to illustrate the workflow from prompt to report.</p>
+            </section>
+
+            <section id="section_foundations">
+                <h2 class="section-title">Foundational Setup</h2>
+                <p>The CACM-ADK relies on core standards and semantic definitions:</p>
+                <ul>
+                    <li><strong>CACM Schema:</strong> Defines the structure of a Credit Analysis Capability Module.
+                        <a href="/docs/cacm_standard/cacm_schema_v0.2.json" target="_blank">View Schema (JSON)</a></li>
+                    <li><strong>Credit Ontology:</strong> Provides the vocabulary for describing credit concepts.
+                        <a href="/docs/ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl" target="_blank">View Ontology (TTL)</a></li>
+                    <li><strong>Compute Capability Catalog:</strong> (Conceptual) Lists available logical functions for CACM workflows.
+                        <a href="/docs/config/compute_capability_catalog.json" target="_blank">View Example Catalog (JSON)</a></li>
+                </ul>
+            </section>
+
+            <section id="section_simulation">
+                <h2 class="section-title">Interactive Scenario Simulation</h2>
+                <p>Select a scenario to see how the ADK might process a request:</p>
+                <div class="scenario-selector">
+                    <select id="scenarioSelector">
+                        <option value="">-- Select a Scenario --</option>
+                        <option value="doordash_ma_balanced">DoorDash M&A - Balanced Funding</option>
+                        <!-- Add more scenarios here if created -->
+                    </select>
+                </div>
+
+                <div id="scenario_display_area">
+                    <!-- Content will be loaded here by JavaScript -->
+                    <p>Please select a scenario above to view details.</p>
+                </div>
+            </section>
+            
+            <section id="section_scoring_conceptual">
+                <h2 class="section-title">Conceptual Scoring & Comparison</h2>
+                <p>While not fully interactive in this demo, a complete ADK would involve sophisticated scoring mechanisms to evaluate credit quality based on CACM outputs. This could include both quantitative metrics and qualitative assessments, allowing for comparison between different analyses or against benchmarks. The generated reports (like the one in the simulation) would contain these scores and ratings.</p>
+            </section>
+
+            <section id="section_advanced">
+                <h2 class="section-title">Advanced Topics & Further Information</h2>
+                 <ul>
+                    <li><a href="/docs/README.md" target="_blank">Project README</a></li>
+                    <li><a href="/docs/docs/architecture.md" target="_blank">System Architecture</a></li>
+                    <li><a href="/docs/docs/api_usage.md" target="_blank">API Usage Guide</a></li>
+                    <li><a href="/docs/docs/deployment.md" target="_blank">Deployment Guide (Docker)</a></li>
+                    <li><a href="/docs/notebooks/Interactive_Credit_Report_Generator.ipynb" target="_blank">Jupyter Prompt Engineering Notebook (Conceptual Link)</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scenarioSelector = document.getElementById('scenarioSelector');
+            const scenarioDisplayArea = document.getElementById('scenario_display_area');
+            const tocLinks = document.querySelectorAll('#TableOfContents a');
+            const sections = document.querySelectorAll('main section[id]');
+
+            function changeActiveLink() {
+                let index = sections.length;
+                while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+                tocLinks.forEach((link) => link.classList.remove('active-nav-link'));
+                if (tocLinks[index]) { tocLinks[index].classList.add('active-nav-link'); }
+            }
+            window.addEventListener('scroll', changeActiveLink);
+            changeActiveLink(); // Initial check
+
+            scenarioSelector.addEventListener('change', async function() {
+                const scenarioName = this.value;
+                if (!scenarioName) {
+                    scenarioDisplayArea.innerHTML = '<p>Please select a scenario to view details.</p>';
+                    return;
+                }
+
+                scenarioDisplayArea.innerHTML = '<p>Loading scenario data...</p>';
+                
+                try {
+                    // 1. Fetch and display Blended Prompt
+                    const promptResponse = await fetch(`/static/content_scenarios/${scenarioName}/blended_prompt_example.txt`);
+                    if (!promptResponse.ok) throw new Error(`Failed to load prompt: ${promptResponse.statusText}`);
+                    const promptText = await promptResponse.text();
+                    
+                    // 2. Fetch and display Conceptual CACM Output (JSON-LD)
+                    const outputResponse = await fetch(`/static/content_scenarios/${scenarioName}/conceptual_cacm_output.jsonld`);
+                    if (!outputResponse.ok) throw new Error(`Failed to load CACM output: ${outputResponse.statusText}`);
+                    const outputJson = await outputResponse.json(); // Assuming it's valid JSON
+
+                    // 3. Fetch and display Synthesized Report (HTML)
+                    const reportResponse = await fetch(`/static/content_scenarios/${scenarioName}/synthesized_report_example.html`);
+                    if (!reportResponse.ok) throw new Error(`Failed to load synthesized report: ${reportResponse.statusText}`);
+                    const reportHtml = await reportResponse.text();
+
+                    scenarioDisplayArea.innerHTML = \`
+                        <h3>Scenario: ${this.options[this.selectedIndex].text}</h3>
+                        
+                        <h4>1. Conceptual Blended Prompt:</h4>
+                        <div class="scenario-output-box"><pre>\${promptText}</pre></div>
+                        
+                        <h4>2. Conceptual System Output (JSON-LD from CACM Execution):</h4>
+                        <div class="scenario-output-box"><pre>\${JSON.stringify(outputJson, null, 2)}</pre></div>
+                        
+                        <h4>3. Synthesized Human-Readable Report (Example):</h4>
+                        <div class="report-content">\${reportHtml}</div>
+                    \`;
+                } catch (error) {
+                    console.error('Error loading scenario:', error);
+                    scenarioDisplayArea.innerHTML = \`<p style="color:red;">Error loading scenario: \${error.message}. Check console and file paths.</p>\`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
