@@ -22,7 +22,8 @@
 This engine houses the primary logic for CACM authoring and processing.
 *   **Orchestrator (`orchestrator.py`):**
     *   Loads a compute capability catalog (e.g., `config/compute_capability_catalog.json`) to understand available logical compute functions.
-    *   Provides a `run_cacm` method that validates a CACM instance and then simulates its workflow execution. This includes logging each step, its capability reference, data bindings, and generating mocked-up outputs for the defined CACM outputs. Actual computation is currently simulated.
+    *   Provides a `run_cacm` method that validates a CACM instance and then simulates its workflow execution. This includes logging each step, its capability reference, data bindings, and generating mocked-up outputs for the defined CACM outputs. 
+    *   The `Orchestrator` can now execute actual Python functions for defined compute capabilities. It uses a function map, populated by dynamically importing functions specified in `config/compute_capability_catalog.json` (under `module` and `functionName` fields). This allows CACM workflows to perform real calculations (e.g., `basic_functions.calculate_ratio`). For capabilities not mapped to real functions, it falls back to the previously implemented output mocking logic. The Orchestrator resolves input bindings for these functions from CACM inputs or prior step outputs and makes their results available to subsequent steps or as final CACM outputs.
 *   **Template Engine (`template_engine.py`):**
     *   Allows listing available `.json` templates from a directory.
     *   Loads template content (pure JSON, no comment stripping needed).
@@ -31,8 +32,13 @@ This engine houses the primary logic for CACM authoring and processing.
     *   Initial implementation provides schema validation for CACM instances against the defined JSON schema (e.g., `cacm_schema_v0.2.json`) using the `jsonschema` library.
 *   **Report Generator (`report_generator.py`):**
     *   The `ReportGenerator` now incorporates a 'multi-persona' simulation approach. Internal methods generate text snippets from fundamental, regulatory (SNC), market, and strategic perspectives. These are synthesized to create a more detailed and nuanced `detailedRationale` and `keyRiskFactors_XAI` in the final JSON report. It also includes improved mapping for S&P and SNC rating equivalents.
+*   **Ontology Navigator (`cacm_adk_core/ontology_navigator/`):**
+    *   The `OntologyNavigator` component is responsible for interacting with the project's semantic definitions.
+    *   - **Loads Ontology:** It uses the `rdflib` library to parse and load the project's ontology defined in `ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl`.
+    *   - **Provides Accessors:** It offers methods to list all defined classes and properties, and to retrieve details (label, comment, superclasses, domains, ranges) for any specific ontology term (identified by URI or prefixed name).
+    *   - **API Exposure:** Its functionalities are exposed via REST API endpoints (see `docs/api_usage.md`) to allow programmatic querying of the ontology.
+    *   - **UI Integration:** The `index.html` landing page includes an "Ontology Explorer" that utilizes these APIs to make the ontology browsable.
 *   **(Future Components):**
-    *   Ontology Navigator & Expert
     *   Workflow Assistant
     *   Metric & Factor Advisor
     *   Parameterization Helper

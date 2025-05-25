@@ -29,9 +29,9 @@ This project aims to build the core infrastructure and software for the CACM-ADK
     *   Core concepts recently added include: `FinancialInstrument`, `FinancialStatement`, `Metric`, `Ratio`, `RiskScore`, `EligibilityRule`, `DataInput`, `Policy`.
     *   Core relationships include: `hasDataSource`, `calculatesMetric`, `appliesRule`, `requiresInput`, `producesOutput`.
 *   **CACM Templates (`cacm_library/templates/`):**
-    *   `sme_scoring_model_template.jsonc`: For simplified SME credit scoring.
-    *   `data_aggregation_task_template.jsonc`: For aggregating data from multiple sources.
-    *   `basic_ratio_analysis_template.jsonc`: (Updated) For basic financial ratio calculations.
+    *   `sme_scoring_model_template.json`: For simplified SME credit scoring.
+    *   `data_aggregation_task_template.json`: For aggregating data from multiple sources.
+    *   `basic_ratio_analysis_template.json`: (Updated) For basic financial ratio calculations.
     *   These templates now include `ontologyRef` fields linking to the defined ontology.
 *   **Examples (`examples/`):**
     *   `sme_credit_score_example_01.json`
@@ -109,16 +109,16 @@ python scripts/adk_cli.py [COMMAND] [OPTIONS] [ARGS]...
     ```
 
 *   **`instantiate <TEMPLATE_FILENAME> <OUTPUT_FILEPATH.json>`**: Instantiates a template.
-    *   `TEMPLATE_FILENAME`: The filename of the template from `cacm_library/templates` (e.g., `basic_ratio_analysis_template.jsonc`).
+    *   `TEMPLATE_FILENAME`: The filename of the template from `cacm_library/templates` (e.g., `basic_ratio_analysis_template.json`).
     *   `OUTPUT_FILEPATH.json`: Path where the instantiated CACM JSON file will be saved.
     *   Options:
         *   `--cacm-id TEXT`: Specific UUID for the new CACM.
         *   `--name TEXT`: Name for the new CACM (overrides template's default name).
         *   `--description TEXT`: Description for the new CACM.
     ```bash
-    python scripts/adk_cli.py instantiate basic_ratio_analysis_template.jsonc examples/my_ratio_cacm.json --name "My Custom Ratio Analysis"
+    python scripts/adk_cli.py instantiate basic_ratio_analysis_template.json examples/my_ratio_cacm.json --name "My Custom Ratio Analysis"
     ```
-    *(Note: CLI instantiation may currently be affected by TemplateEngine parsing issues.)*
+    *(Note: CLI instantiation should now work reliably with pure JSON templates.)*
 
 *   **`validate <CACM_FILEPATH.json>`**: Validates a CACM JSON file against the schema.
     ```bash
@@ -134,14 +134,15 @@ python scripts/adk_cli.py [COMMAND] [OPTIONS] [ARGS]...
 
 The CACM-ADK can be run as a web service, providing a REST API for its functionalities and a simple web-based landing page. It is also containerizable using Docker for easy deployment.
 
-*   **Landing Page:** The `index.html` landing page (accessible at `/` when the service is running) now serves as an interactive walkthrough of the CACM-ADK. It demonstrates a conceptual end-to-end scenario (e.g., DoorDash M&A analysis) by showcasing an example 'Blended Prompt', the conceptual structured JSON-LD output from CACM execution, and a synthesized human-readable report.
+*   **Landing Page:** The `index.html` landing page (accessible at `/` when the service is running) now serves as an interactive walkthrough of the CACM-ADK. It demonstrates a conceptual end-to-end scenario (e.g., DoorDash M&A analysis) by showcasing an example 'Blended Prompt', the conceptual structured JSON-LD output from CACM execution, a synthesized human-readable report, and an 'Ontology Explorer' section for browsing ontology terms live via API calls.
 *   **REST API:** For detailed API usage, see the [API Usage Guide](./docs/api_usage.md).
 *   **Deployment (Docker & Local):** For instructions on building/running the Docker container or running locally for development, see the [Deployment Guide](./docs/deployment.md).
 
 ## Features & Tools Overview (Highlights)
-*   The internal credit ontology (`ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl`) has been expanded with more granular terms.
-*   The report generator (`cacm_adk_core/report_generator/report_generator.py`) now simulates multiple analytical 'personas' for richer rationale in generated reports.
-*   All CACM templates in `cacm_library/templates/` now use the `.json` extension and expect pure JSON content.
+*   **Orchestrator Execution:** The Orchestrator is now capable of executing actual Python functions for some compute capabilities defined in a CACM workflow (e.g., basic ratio calculations), alongside its existing output mocking for other capabilities. This allows for a mix of real and simulated processing.
+*   **Ontology Navigator & API:** The internal credit ontology (`ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl`) has been expanded with more granular terms and is now explorable via new API endpoints (`/ontology/*`).
+*   **Enhanced Report Generator:** The report generator (`cacm_adk_core/report_generator/report_generator.py`) now simulates multiple analytical 'personas' for richer rationale in generated reports.
+*   **Pure JSON Templates:** All CACM templates in `cacm_library/templates/` now use the `.json` extension and expect pure JSON content.
 
 ### Jupyter Notebook for Interactive Prompting & Simulation
 Located in `notebooks/Interactive_Credit_Report_Generator.ipynb`, this Jupyter Notebook provides a hands-on tool for:
@@ -149,7 +150,6 @@ Located in `notebooks/Interactive_Credit_Report_Generator.ipynb`, this Jupyter N
 *   Dynamically generating a detailed LLM prompt based on these inputs and a predefined report structure.
 *   Locally simulating (without actual LLM calls) the generation of a Markdown-based credit report from the provided inputs.
 This is useful for prompt engineering, understanding input-to-report mapping, and iterative development of report structures.
-
 
 ## Contributing
 Please see `CONTRIBUTING.md`.

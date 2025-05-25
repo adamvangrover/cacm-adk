@@ -49,6 +49,35 @@
       "description": "Calculates a ratio from numerator and denominator.",
       "inputs": {"numerator": "number", "denominator": "number"},
       "outputs": {"result": "number"}
+    },
+    {
+      "id": "cc:CalculateRatio_v1",
+      "name": "Basic Ratio Calculator",
+      "description": "Calculates numerator / denominator. Handles zero denominator.",
+      "module": "cacm_adk_core.compute_capabilities.basic_functions",
+      "functionName": "calculate_ratio",
+      "inputs": [
+        {"name": "numerator", "type": "float", "description": "The numerator value."},
+        {"name": "denominator", "type": "float", "description": "The denominator value."}
+      ],
+      "outputs": [
+        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator), or null if error."}
+      ]
+    },
+    {
+      "id": "cc:SimpleScorer_v1",
+      "name": "Simple Metric Scorer",
+      "description": "Compares a metric against a threshold with an operator.",
+      "module": "cacm_adk_core.compute_capabilities.basic_functions",
+      "functionName": "simple_scorer",
+      "inputs": [
+        {"name": "financial_metric", "type": "float", "description": "The metric value to score."},
+        {"name": "threshold", "type": "float", "description": "The threshold value to compare against."},
+        {"name": "operator", "type": "string", "description": "Comparison operator (e.g., '>', '<', '=='). Defaults to '>' if not provided.", "optional": true}
+      ],
+      "outputs": [
+        {"name": "assessment", "type": "string", "description": "String indicating the result of the comparison (e.g., 'Above Threshold')."}
+      ]
     }
   ]
 }

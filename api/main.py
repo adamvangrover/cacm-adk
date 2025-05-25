@@ -23,6 +23,7 @@ try:
     from cacm_adk_core.validator.validator import Validator
     from cacm_adk_core.orchestrator.orchestrator import Orchestrator
     from cacm_adk_core.report_generator.report_generator import ReportGenerator
+    from cacm_adk_core.ontology_navigator.ontology_navigator import OntologyNavigator
 except ImportError as e:
     print(f"Critical Import Error: {e}. Ensure PYTHONPATH includes the project root or run with 'python -m api.main'.")
     # Optionally, re-raise or exit if core components cannot be loaded. For now, FastAPI might start but endpoints will fail.
@@ -76,6 +77,9 @@ orchestrator_instance = Orchestrator(validator=validator_instance, catalog_filep
 # ReportGenerator instance
 report_generator_instance = ReportGenerator()
 
+# OntologyNavigator instance
+ontology_navigator_instance = OntologyNavigator() # Uses default path
+
 
 # --- Pydantic Models for Request/Response Bodies ---
 class TemplateOverride(BaseModel):
@@ -104,11 +108,12 @@ class ValidationResponse(BaseModel):
     errors: Optional[List[Dict[str, Any]]] = None
     message: Optional[str] = None
     
-class RunResponse(BaseModel): # Will be enhanced later
+# (In api/main.py, within Pydantic models section)
+class RunResponse(BaseModel):
     success: bool
     message: str
-    # log_messages: Optional[List[str]] = None # To be added when Orchestrator returns them
-    # mocked_outputs: Optional[Dict[str, Any]] = None # To be added
+    log_messages: Optional[List[str]] = None
+    outputs: Optional[Dict[str, Any]] = None # Holds final_cacm_outputs
 
 # (Within api/main.py)
 class ReportHeaderModel(BaseModel):
@@ -194,23 +199,35 @@ async def validate_cacm_api(cacm_payload: CacmInstance = Body(...)):
 async def run_cacm_api(cacm_payload: CacmInstance = Body(...)):
     """
     Simulates the execution of a CACM instance's workflow.
-    (Note: Actual computation is mocked. Orchestrator will be updated to return logs and mocked outputs).
+    Validates and then executes (simulates real functions where available, 
+    mocks others) a CACM instance's workflow. 
+    Returns execution status, detailed logs, and final outputs.
     """
     if not orchestrator_instance:
          raise HTTPException(status_code=503, detail="Orchestrator not initialized on server.")
     if not validator_instance or not validator_instance.schema: # Orchestrator needs validator
         raise HTTPException(status_code=503, detail="Validator for Orchestrator not initialized on server.")
 
-    # Orchestrator's run_cacm currently returns bool. Will be updated to return (bool, logs, mocked_outputs)
-    success = orchestrator_instance.run_cacm(cacm_payload.cacm_data)
+    success, logs, final_outputs = orchestrator_instance.run_cacm(cacm_payload.cacm_data)
     
+    message = ""
     if success:
-        # Placeholder until Orchestrator returns more details
-        return RunResponse(success=True, message="CACM workflow simulation initiated and completed (simulated).")
+        message = "CACM workflow execution (simulated/actual) completed successfully."
     else:
-        # Orchestrator's run_cacm prints validation errors to console if validation fails.
-        # We might want to capture those errors here if Orchestrator is refactored.
-        return RunResponse(success=False, message="CACM workflow simulation failed or did not run (e.g., due to validation errors).")
+        # Check logs for specific error types if possible, otherwise generic message
+        if any("ERROR: Orchestrator: CACM instance is invalid" in log for log in logs):
+            message = "CACM instance is invalid. Execution halted."
+        elif not logs: # Should not happen if validation fails, as orchestrator adds logs
+            message = "CACM workflow execution failed. No detailed logs available (unexpected)."
+        else:
+            message = "CACM workflow execution failed or encountered errors. See logs."
+    
+    return RunResponse(
+        success=success,
+        message=message,
+        log_messages=logs,
+        outputs=final_outputs
+    )
 
 
 @app.post("/reports/generate/sme_credit_score/", response_model=ReportResponse, summary="Generate Enhanced SME Credit Score Report")
@@ -220,9 +237,7 @@ async def generate_sme_report_api(sme_data: SmeInputData = Body(...)):
     Takes SME financial and qualitative data, instantiates the SME scoring template,
     simulates its run via the Orchestrator, and then formats a detailed report.
     """
-
-    template_filename = "sme_scoring_model_template.json" # Changed to .json from .jsonc
-
+    template_filename = "sme_scoring_model_template.json" # Changed to .json
     
     # Prepare overrides for instantiation (same as before)
     instantiation_overrides = {
@@ -295,3 +310,30 @@ async def serve_index():
         return HTMLResponse(content="<html><body><h1>CACM-ADK</h1><p>Welcome. Index.html not found in static directory.</p></body></html>", status_code=404)
     except Exception as e:
         return HTMLResponse(content=f"<html><body><h1>Error</h1><p>Could not load index.html: {e}</p></body></html>", status_code=500)
+
+# --- Ontology Endpoints ---
+@app.get("/ontology/classes/", summary="List Ontology Classes")
+async def list_ontology_classes_api():
+    if not ontology_navigator_instance or not ontology_navigator_instance.graph:
+        raise HTTPException(status_code=503, detail="Ontology not loaded or navigator not available.")
+    return ontology_navigator_instance.list_classes()
+
+@app.get("/ontology/properties/", summary="List Ontology Properties")
+async def list_ontology_properties_api():
+    if not ontology_navigator_instance or not ontology_navigator_instance.graph:
+        raise HTTPException(status_code=503, detail="Ontology not loaded or navigator not available.")
+    return ontology_navigator_instance.list_properties()
+
+@app.get("/ontology/terms/{namespace_prefix}/{term_name}", summary="Get Ontology Term Details")
+async def get_ontology_term_details_api(namespace_prefix: str, term_name: str):
+    if not ontology_navigator_instance or not ontology_navigator_instance.graph:
+        raise HTTPException(status_code=503, detail="Ontology not loaded or navigator not available.")
+    
+    term_qname = f"{namespace_prefix}:{term_name}"
+    details = ontology_navigator_instance.get_term_details(term_qname)
+    
+    # The navigator's get_term_details now attempts to resolve prefixed names and full URIs.
+    # If it returns None, the term genuinely wasn't found or resolved.
+    if not details:
+        raise HTTPException(status_code=404, detail=f"Term '{term_qname}' not found, prefix not recognized, or resolution failed.")
+    return details

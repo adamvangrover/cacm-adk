@@ -44,5 +44,6 @@ These ontology terms are primarily used in:
 *   **CACM Templates (`cacm_library/templates/`):** In `ontologyRef` fields to semantically define inputs, outputs, and parameters.
 *   **Report Generator (`cacm_adk_core/report_generator/`):** To inform the structure and language of generated reports.
 *   **CACM Schema (`cacm_standard/cacm_schema_v0.2.json`):** Referenced conceptually in descriptions for schema elements.
+*   **Interactive Exploration**: The ontology can be interactively explored via the 'Ontology Explorer' section on the main web landing page (`index.html`) or programmatically through the `/ontology/*` API endpoints.
 
 (This guide will be expanded as the ontology matures.)
