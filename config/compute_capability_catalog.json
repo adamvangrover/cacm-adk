@@ -1,0 +1,54 @@
+{
+  "computeCapabilities": [
+    {
+      "id": "model:FinancialMetricsScorer_v1",
+      "name": "Financial Metrics Scorer",
+      "description": "Calculates a score component from financial data.",
+      "inputs": {"financial_data": "object"},
+      "outputs": {"component_score": "number"}
+    },
+    {
+      "id": "model:QualitativeMetricsScorer_v1",
+      "name": "Qualitative Metrics Scorer",
+      "description": "Calculates a score component from qualitative data.",
+      "inputs": {"qualitative_data": "object"},
+      "outputs": {"component_score": "number"}
+    },
+    {
+      "id": "logic:WeightedAverageAdjuster_v1",
+      "name": "Weighted Average Adjuster",
+      "description": "Combines component scores using weights and applies adjustments.",
+      "inputs": {
+        "score1": "number", "weight1": "number", 
+        "score2": "number", 
+        "base_score_params": "object"
+      },
+      "outputs": {"final_score": "number", "calculated_segment": "string"}
+    },
+    {
+      "id": "connector:LoadData_v1",
+      "name": "Data Loader",
+      "description": "Loads data from a specified source configuration.",
+      "inputs": {"source_config": "object"},
+      "outputs": {"data": "object"}
+    },
+    {
+      "id": "logic:AggregateFields_v2",
+      "name": "Field Aggregator",
+      "description": "Aggregates fields from multiple data inputs based on a map.",
+      "inputs": {
+        "data1": "object", "data2": "object",
+        "field_map_config": "string",
+        "deduplication_rule": "string"
+      },
+      "outputs": {"aggregated_result": "object"}
+    },
+    {
+      "id": "compute:CalculateRatio",
+      "name": "Ratio Calculator",
+      "description": "Calculates a ratio from numerator and denominator.",
+      "inputs": {"numerator": "number", "denominator": "number"},
+      "outputs": {"result": "number"}
+    }
+  ]
+}

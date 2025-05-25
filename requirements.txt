@@ -1,0 +1,4 @@
+jsonschema>=4.0.0,<5.0.0
+# python-dateutil can be useful for more complex date parsing if needed later
+python-dateutil>=2.8.0,<3.0.0
+click>=8.0.0,<9.0.0

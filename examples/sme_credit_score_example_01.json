@@ -1,0 +1,118 @@
+{
+  "cacmId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "version": "1.0.0",
+  "name": "SME Credit Score - Example AlphaCorp",
+  "description": "An example CACM instance for scoring AlphaCorp based on the Simplified SME Credit Scoring Model template.",
+  "metadata": {
+    "author": "Example Generator",
+    "creationDate": "2023-10-28T14:30:00Z",
+    "tags": ["sme_score", "alphacorp", "example"],
+    "templateDetails": {
+      "templateName": "SME Scoring Model (Simplified)",
+      "templateVersion": "0.1.0"
+    }
+  },
+  "inputs": {
+    "smeFinancials": {
+      "description": "Financial statements for AlphaCorp.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#FinancialStatement",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "balanceSheet": { "type": "object", "properties": {"totalAssets": {"type": "number"}, "totalLiabilities": {"type": "number"}}},
+          "incomeStatement": { "type": "object", "properties": {"revenue": {"type": "number"}, "netIncome": {"type": "number"}}}
+        },
+        "required": ["balanceSheet", "incomeStatement"]
+      },
+      "value": {
+         "balanceSheet": { "totalAssets": 500000, "totalLiabilities": 200000 },
+         "incomeStatement": { "revenue": 1200000, "netIncome": 150000 }
+      }
+    },
+    "qualitativeData": {
+      "description": "Qualitative assessment data for AlphaCorp.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "managementExperienceYears": { "type": "integer" },
+          "industryOutlook": { "type": "string", "enum": ["positive", "neutral", "negative"]}
+        }
+      },
+      "value": {
+        "managementExperienceYears": 10,
+        "industryOutlook": "positive"
+      }
+    }
+  },
+  "outputs": {
+    "creditScore": {
+      "description": "The calculated credit score for AlphaCorp.",
+      "type": "number",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#RiskScore"
+    },
+    "riskSegment": {
+      "description": "The risk segment assigned based on the score.",
+      "type": "string",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Metric"
+    }
+  },
+  "parameters": [
+    {
+      "paramId": "scoreWeightFinancial",
+      "name": "Financial Score Weight",
+      "description": "The weight (0.0-1.0) given to financial data.",
+      "type": "number",
+      "value": 0.75 
+    },
+    {
+      "paramId": "industryNegativeAdjustment",
+      "name": "Industry Negative Outlook Adjustment",
+      "description": "Points to deduct if industry outlook is negative.",
+      "type": "number",
+      "value": 5 
+    }
+  ],
+  "workflow": [
+    {
+      "stepId": "s1_calculate_financial_component_score",
+      "description": "Calculate score component from financial data.",
+      "computeCapabilityRef": "model:FinancialMetricsScorer_v1",
+      "inputBindings": { "financial_data": "cacm.inputs.smeFinancials.value"},
+      "outputBindings": {"financial_score_component": "steps.s1_calculate_financial_component_score.outputs.component_score"}
+    },
+    {
+      "stepId": "s2_calculate_qualitative_component_score",
+      "description": "Calculate score component from qualitative data.",
+      "computeCapabilityRef": "model:QualitativeMetricsScorer_v1",
+      "inputBindings": { "qualitative_data": "cacm.inputs.qualitativeData.value"},
+      "outputBindings": {"qualitative_score_component": "steps.s2_calculate_qualitative_component_score.outputs.component_score"}
+    },
+    {
+      "stepId": "s3_combine_scores",
+      "description": "Combine component scores and apply adjustments.",
+      "computeCapabilityRef": "logic:WeightedAverageAdjuster_v1",
+      "inputBindings": {
+        "score1": "steps.s1_calculate_financial_component_score.outputs.component_score",
+        "weight1": "cacm.parameters.scoreWeightFinancial.value",
+        "score2": "steps.s2_calculate_qualitative_component_score.outputs.component_score",
+        "base_score_params": {"industryOutlook": "cacm.inputs.qualitativeData.value.industryOutlook", "negativeAdjustment": "cacm.parameters.industryNegativeAdjustment.value"}
+      },
+      "outputBindings": {
+        "final_score": "cacm.outputs.creditScore",
+        "calculated_segment": "cacm.outputs.riskSegment"
+      }
+    }
+  ],
+  "validationRules": [
+    {
+      "ruleId": "financial_weight_range_instance",
+      "description": "Financial score weight must be between 0 and 1.",
+      "expression": "cacm.parameters.scoreWeightFinancial.value >= 0 && cacm.parameters.scoreWeightFinancial.value <= 1",
+      "appliesTo": "parameters.scoreWeightFinancial.value",
+      "severity": "error"
+    }
+  ]
+}
