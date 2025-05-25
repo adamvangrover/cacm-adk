@@ -150,5 +150,6 @@ Located in `notebooks/Interactive_Credit_Report_Generator.ipynb`, this Jupyter N
 *   Locally simulating (without actual LLM calls) the generation of a Markdown-based credit report from the provided inputs.
 This is useful for prompt engineering, understanding input-to-report mapping, and iterative development of report structures.
 
+
 ## Contributing
 Please see `CONTRIBUTING.md`.
