@@ -1,0 +1,105 @@
+{
+  "cacmId": "urn:uuid:generate-new-uuid",
+  "version": "0.1.0-template",
+  "name": "Basic Financial Ratio Analysis",
+  "description": "Calculates fundamental financial ratios (e.g., Current Ratio, Debt-to-Equity) based on provided financial statements.",
+  "metadata": {
+    "author": "CACM Template Library",
+    "creationDate": "2023-10-27T10:00:00Z",
+    "tags": ["financial_ratio", "template", "sme_lending"],
+    "templateDetails": {
+      "templateName": "Basic Ratio Analysis",
+      "templateVersion": "0.1.0",
+      "intendedUsage": "As a starting point for common ratio calculations. Customize input/output schemas and specific ratios as needed."
+    }
+  },
+  "inputs": {
+    "financialStatementData": {
+      "description": "Core financial statement figures needed for ratio calculation.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#FinancialStatement",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "currentAssets": { "type": "number", "description": "Total Current Assets" },
+          "currentLiabilities": { "type": "number", "description": "Total Current Liabilities" },
+          "totalDebt": { "type": "number", "description": "Total Debt" },
+          "totalEquity": { "type": "number", "description": "Total Equity" }
+        },
+        "required": ["currentAssets", "currentLiabilities", "totalDebt", "totalEquity"]
+      }
+    }
+  },
+  "outputs": {
+    "calculatedRatios": {
+      "description": "The set of calculated financial ratios.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Metric",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "currentRatio": { 
+            "type": "number", 
+            "description": "Current Assets / Current Liabilities",
+            "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Ratio"
+          },
+          "debtToEquityRatio": { 
+            "type": "number", 
+            "description": "Total Debt / Total Equity",
+            "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Ratio"
+          }
+        }
+      }
+    }
+  },
+  "workflow": {
+    "steps": [
+      {
+        "stepId": "calculate_current_ratio",
+        "description": "Calculate the Current Ratio",
+        "computeCapabilityRef": "logic:Divide", 
+        "inputBindings": {
+          "numerator": "cacm.inputs.financialStatementData.currentAssets",
+          "denominator": "cacm.inputs.financialStatementData.currentLiabilities"
+        },
+        "outputBindings": {"result": "cacm.outputs.calculatedRatios.currentRatio"}
+      },
+      {
+        "stepId": "calculate_debt_to_equity",
+        "description": "Calculate the Debt-to-Equity Ratio",
+        "computeCapabilityRef": "logic:Divide",
+        "inputBindings": {
+          "numerator": "cacm.inputs.financialStatementData.totalDebt",
+          "denominator": "cacm.inputs.financialStatementData.totalEquity"
+        },
+        "outputBindings": {"result": "cacm.outputs.calculatedRatios.debtToEquityRatio"}
+      }
+    ]
+  },
+  "parameters": [
+    {
+      "paramId": "roundingPrecision",
+      "name": "Rounding Precision",
+      "description": "Number of decimal places for calculated ratios.",
+      "type": "integer",
+      "defaultValue": 2,
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput"
+    }
+  ],
+  "validationRules": [
+    {
+      "ruleId": "current_liabilities_not_zero",
+      "description": "Current Liabilities must not be zero for Current Ratio calculation.",
+      "expression": "cacm.inputs.financialStatementData.currentLiabilities != 0",
+      "appliesTo": "inputs.financialStatementData.currentLiabilities",
+      "severity": "error"
+    },
+    {
+      "ruleId": "total_equity_not_zero",
+      "description": "Total Equity must not be zero for Debt-to-Equity Ratio calculation.",
+      "expression": "cacm.inputs.financialStatementData.totalEquity != 0",
+      "appliesTo": "inputs.financialStatementData.totalEquity",
+      "severity": "error"
+    }
+  ]
+}
