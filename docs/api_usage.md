@@ -35,12 +35,12 @@ Returns a JSON array of available templates, including their filename, name, and
 ```json
 [
   {
-    "filename": "basic_ratio_analysis_template.jsonc",
+    "filename": "basic_ratio_analysis_template.json",
     "name": "Basic Ratio Analysis",
     "description": "As a starting point for common ratio calculations. Customize input/output schemas and specific ratios as needed."
   },
   {
-    "filename": "sme_scoring_model_template.jsonc",
+    "filename": "sme_scoring_model_template.json",
     "name": "SME Scoring Model (Simplified)",
     "description": "As a starting point for building SME credit scoring capabilities. Customize inputs, outputs, scoring logic, and parameters."
   }
@@ -62,7 +62,7 @@ Instantiates a specified CACM template.
 
 **Path Parameters:**
 
-*   `template_filename` (string, required): The filename of the template to instantiate (e.g., `sme_scoring_model_template.jsonc`).
+*   `template_filename` (string, required): The filename of the template to instantiate (e.g., `sme_scoring_model_template.json`).
 
 **Request Body (Optional):**
 
@@ -87,14 +87,14 @@ Returns the fully instantiated CACM JSON object.
 
 *Example `curl` command:*
 ```bash
-curl -X POST "http://localhost:8000/templates/sme_scoring_model_template.jsonc/instantiate" \
+curl -X POST "http://localhost:8000/templates/sme_scoring_model_template.json/instantiate" \
      -H "Content-Type: application/json" \
      -d '{
            "name": "Instantiated SME Model via Curl",
            "metadata_overrides": { "author": "Curl Test User" }
          }'
 ```
-*(Note: Template instantiation may be affected by `TemplateEngine` parsing issues if template files have complex JSONC structures not handled by the basic comment stripper.)*
+*(Note: Template instantiation now expects pure JSON files.)*
 
 ---
 
@@ -233,7 +233,7 @@ Requires JSON payload with SME financial and qualitative data. See `SmeInputData
 
 **Response Body:**
 
-Returns a detailed JSON report. See `ReportResponse` Pydantic model in `api/main.py` and `ReportGenerator` class for the full structure. Key sections include `reportHeader`, `creditRating`, `executiveSummary`, `keyRiskFactors_XAI`, `detailedRationale`, `supportingMetrics`.
+Returns a highly detailed JSON report. The `detailedRationale` field now contains synthesized insights from multiple simulated analytical perspectives (fundamental, regulatory, market, strategic). The `keyRiskFactors_XAI` is also more comprehensive. See `ReportResponse` Pydantic model in `api/main.py` and the `ReportGenerator` class for the full structure, including S&P/SNC rating mappings.
 
 *Example `curl` command:*
 ```bash

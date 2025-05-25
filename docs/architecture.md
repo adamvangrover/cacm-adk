@@ -24,14 +24,13 @@ This engine houses the primary logic for CACM authoring and processing.
     *   Loads a compute capability catalog (e.g., `config/compute_capability_catalog.json`) to understand available logical compute functions.
     *   Provides a `run_cacm` method that validates a CACM instance and then simulates its workflow execution. This includes logging each step, its capability reference, data bindings, and generating mocked-up outputs for the defined CACM outputs. Actual computation is currently simulated.
 *   **Template Engine (`template_engine.py`):**
-    *   Initial implementation allows listing available `.jsonc` templates from a directory.
-    *   Loads template content (with basic comment stripping for JSONC).
+    *   Allows listing available `.json` templates from a directory.
+    *   Loads template content (pure JSON, no comment stripping needed).
     *   Instantiates templates with new UUIDs, creation timestamps, and custom overrides.
 *   **Semantic & Structural Validator (`validator.py`):**
     *   Initial implementation provides schema validation for CACM instances against the defined JSON schema (e.g., `cacm_schema_v0.2.json`) using the `jsonschema` library.
 *   **Report Generator (`report_generator.py`):**
-    *   The `ReportGenerator` component is responsible for taking the (simulated) outputs of a CACM execution from the Orchestrator and formatting them into a detailed, structured JSON report.
-    *   This report includes elements like mapped credit ratings (S&P, SNC scales), outlook, (mocked) XAI/rationale, and key supporting metrics.
+    *   The `ReportGenerator` now incorporates a 'multi-persona' simulation approach. Internal methods generate text snippets from fundamental, regulatory (SNC), market, and strategic perspectives. These are synthesized to create a more detailed and nuanced `detailedRationale` and `keyRiskFactors_XAI` in the final JSON report. It also includes improved mapping for S&P and SNC rating equivalents.
 *   **(Future Components):**
     *   Ontology Navigator & Expert
     *   Workflow Assistant
@@ -44,14 +43,22 @@ This engine houses the primary logic for CACM authoring and processing.
 *   **CACM Standard (`cacm_standard/cacm_schema_v0.2.json`):**
     *   Defines the JSON schema for CACM definitions.
 *   **Ontology (`ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl`):**
-    *   Provides semantic definitions for terms and concepts in credit analysis.
+    *   Provides semantic definitions for terms and concepts in credit analysis. The `credit_ontology.ttl` has been significantly expanded with new classes and properties (using `cacm_ont:`, `kgclass:`, `kgprop:` namespaces) from user feedback, focusing on more granular financial, risk, valuation, and regulatory concepts. These richer semantics are used in CACM templates and can inform report generation.
 *   **Compute Capability Catalog (`config/compute_capability_catalog.json`):**
     *   A simple JSON file listing logical compute capabilities referenced in CACM workflows.
 *   **CACM Templates (`cacm_library/templates/`):**
-    *   A library of predefined, reusable CACM structures.
+    *   A library of predefined, reusable CACM structures (now pure `.json` files).
 
 ### 4. External Dependencies & Services
 *   (Placeholder for future integration, e.g., LLMs, dedicated Ontology Store, external Compute Services, etc.)
+
+### 5. Developer/Analyst Tools
+#### Jupyter Notebook: Interactive Report Crafter
+The `notebooks/Interactive_Credit_Report_Generator.ipynb` provides a standalone environment for analysts to:
+*   Define inputs for a credit report using interactive widgets.
+*   Automatically generate a comprehensive prompt suitable for an advanced LLM, based on these inputs and a structured report template.
+*   Simulate the generation of a Markdown report locally, allowing for rapid iteration on report content and structure based on varying inputs.
+This tool aids in prompt engineering and understanding the linkage between input data and report output.
 
 ## Data Flows
 (Details on how data, CACM definitions, and control signals flow through the system, particularly between the API, Orchestrator, and other core components.)

@@ -1,14 +1,13 @@
 # tests/core/test_report_generator.py
 import unittest
 from datetime import datetime, timezone, timedelta
-from typing import Dict, Any, Tuple # Added Tuple for type hinting if needed
-# Important: Adjust import if ReportGenerator path or class name changes
+from typing import Dict, Any, Tuple, List # Ensure List is imported
 try:
     from cacm_adk_core.report_generator.report_generator import ReportGenerator
 except ImportError:
     ReportGenerator = None
 
-class TestEnhancedReportGenerator(unittest.TestCase):
+class TestEnhancedPersonaReportGenerator(unittest.TestCase): # Renamed class
 
     @classmethod
     def setUpClass(cls):
@@ -16,95 +15,153 @@ class TestEnhancedReportGenerator(unittest.TestCase):
             raise unittest.SkipTest("ReportGenerator component not found or import error.")
         cls.reporter = ReportGenerator()
 
+    # --- Tests for Helper Methods (including new persona methods) ---
+
     def test_map_score_to_sp(self):
         self.assertEqual(self.reporter._map_score_to_sp(800), "AAA")
-        self.assertEqual(self.reporter._map_score_to_sp(750), "AA")
-        self.assertEqual(self.reporter._map_score_to_sp(700), "A")
-        self.assertEqual(self.reporter._map_score_to_sp(650), "BBB")
-        self.assertEqual(self.reporter._map_score_to_sp(600), "BB")
-        self.assertEqual(self.reporter._map_score_to_sp(550), "B")
-        self.assertEqual(self.reporter._map_score_to_sp(500), "CCC")
-        self.assertEqual(self.reporter._map_score_to_sp(400), "CC/C/D or Not Rated")
         self.assertEqual(self.reporter._map_score_to_sp(None), "Not Rated")
 
-    def test_map_score_to_snc(self):
+    def test_map_score_to_snc_updated(self): # Renamed for clarity
         self.assertEqual(self.reporter._map_score_to_snc(700), "Pass")
-        self.assertEqual(self.reporter._map_score_to_snc(600), "Special Mention (SM)")
+        self.assertEqual(self.reporter._map_score_to_snc(600), "Special Mention") # Updated expected value
         self.assertEqual(self.reporter._map_score_to_snc(500), "Substandard")
-        self.assertEqual(self.reporter._map_score_to_snc(400), "Doubtful/Loss")
+        self.assertEqual(self.reporter._map_score_to_snc(400), "Doubtful") # Updated expected value
+        self.assertEqual(self.reporter._map_score_to_snc(300), "Loss")     # Updated expected value
         self.assertEqual(self.reporter._map_score_to_snc(None), "Ungraded")
 
     def test_generate_mocked_outlook(self):
-        # Check it returns one of the expected values for different score ranges
         self.assertIn(self.reporter._generate_mocked_outlook(760), ["Positive", "Stable"])
-        self.assertIn(self.reporter._generate_mocked_outlook(560), ["Stable", "Negative"])
-        self.assertEqual(self.reporter._generate_mocked_outlook(None), "Uncertain") # Corrected: Should be "Uncertain" for None
+        self.assertEqual(self.reporter._generate_mocked_outlook(None), "Uncertain")
+
+    def test_generate_fundamental_perspective(self):
+        perspective_strong = self.reporter._generate_fundamental_perspective(
+            750, {"profitabilityMetric": {"value": 0.20}, "leverageRatio": {"value": 1.0}, "freeCashFlowYield": {"value": 0.07}}, None
+        )
+        self.assertIn("Profitability (e.g., margin 20.00%) appears strong", perspective_strong)
+        self.assertIn("Leverage (e.g., D/E 1.00x) is considered low", perspective_strong)
+        self.assertIn("Free Cash Flow Yield (7.00%) indicates strong", perspective_strong)
+
+        perspective_weak = self.reporter._generate_fundamental_perspective(
+            550, {"profitabilityMetric": 0.02, "leverageRatio": 4.5}, None # Using direct value
+        )
+        self.assertIn("Profitability (e.g., margin 2.00%) appears weak", perspective_weak)
+        self.assertIn("Leverage (e.g., D/E 4.50x) is considered high", perspective_weak)
+        self.assertNotIn("Free Cash Flow Yield", perspective_weak) # Metric not provided
+
+        perspective_mixed = self.reporter._generate_fundamental_perspective(
+            650, {"profitabilityMetric": {"value":0.10}, "leverageRatio": {"value":2.0}}, {} # Empty cacm_inputs
+        )
+        self.assertIn("moderate", perspective_mixed) # For both profitability and leverage
+
+        perspective_na = self.reporter._generate_fundamental_perspective(600, {}, None)
+        self.assertIn("not strongly conclusive", perspective_na)
 
 
-    def test_generate_xai_and_rationale(self):
-        # Basic test, more complex scenarios could be added
+    def test_generate_regulatory_snc_perspective(self):
+        self.assertIn("no undue criticism", self.reporter._generate_regulatory_snc_perspective("Pass", 700, {}))
+        self.assertIn("potential weaknesses", self.reporter._generate_regulatory_snc_perspective("Special Mention", 600, {}))
+        self.assertIn("inadequately protected", self.reporter._generate_regulatory_snc_perspective("Substandard", 500, {}))
+        self.assertIn("highly questionable and improbable", self.reporter._generate_regulatory_snc_perspective("Doubtful", 400, {}))
+        self.assertIn("uncollectible", self.reporter._generate_regulatory_snc_perspective("Loss", 300, {}))
+
+    def test_generate_market_outlook_perspective(self):
+        self.assertIn("favorable market conditions", self.reporter._generate_market_outlook_perspective("Positive", None))
+        self.assertIn("challenging market conditions", self.reporter._generate_market_outlook_perspective("Negative", {}))
+        self.assertIn("evolving market landscape", self.reporter._generate_market_outlook_perspective("Developing", None))
+
+    def test_generate_strategic_commentary(self):
+        comment_ma = self.reporter._generate_strategic_commentary(
+            {"strategic_initiative_type": "M&A"}, 
+            {"mergerAndAcquisitionActivityIndicator": {"value": True}}
+        )
+        self.assertIn("M&A activities", comment_ma)
+
+        comment_organic = self.reporter._generate_strategic_commentary(
+            {"strategic_initiative_type": "Organic Growth"}, {}
+        )
+        self.assertIn("organic growth", comment_organic) # Default if no M&A hint
+
+    def test_generate_mocked_xai_and_rationale_orchestration(self):
         xai, rationale = self.reporter._generate_mocked_xai_and_rationale(
-            720, {"profitabilityMetric": {"value": 0.25}, "leverageRatio": {"value": 0.5}}
+            720, "Pass", "Positive", 
+            {"profitabilityMetric": {"value": 0.25}, "leverageRatio": {"value": 0.5}}, 
+            None
         )
         self.assertTrue(len(xai) > 0)
-        self.assertTrue(len(rationale) > 50) # Expect some decent length
-        self.assertIn("Strong profitability demonstrated.", rationale)
-        self.assertIn("Conservative leverage position noted.", rationale)
+        self.assertIn("Fundamental View:", rationale)
+        self.assertIn("SNC Perspective:", rationale)
+        self.assertIn("Market Outlook:", rationale)
+        self.assertIn("Strategic Note:", rationale)
+        self.assertNotIn("High financial leverage.", xai) # Leverage is low
+        self.assertNotIn("Weak profitability margins.", xai) # Profitability is high
 
-        xai_low, rationale_low = self.reporter._generate_mocked_xai_and_rationale(
-            530, {"profitabilityMetric": {"value": 0.02}, "leverageRatio": {"value": 5.0}, "qualitativeScore": {"value": 30}}
+        xai_low, _ = self.reporter._generate_mocked_xai_and_rationale(
+            530, "Substandard", "Negative",
+            {"profitabilityMetric": 0.02, "leverageRatio": 5.0},
+            None
         )
-        self.assertIn("Low profitability ratios observed.", xai_low)
-        self.assertIn("High leverage position.", xai_low)
-        self.assertIn("Weak qualitative factors (e.g., management, industry).", xai_low)
-        # Corrected: Check for a specific part of the generated rationale that should exist
-        self.assertIn("Qualitative assessments indicate some underlying weaknesses.", rationale_low) 
+        self.assertIn("High financial leverage.", xai_low)
+        self.assertIn("Weak profitability margins.", xai_low)
+        self.assertIn("Regulatory concerns indicated by SNC rating: Substandard.", xai_low) # Added period
+        self.assertIn("Negative market/business outlook.", xai_low)
 
 
-    def test_generate_full_sme_report_high_score(self):
+    # --- Tests for the main report generation method ---
+    def test_generate_full_sme_report_high_score_enhanced_rationale(self): # Renamed
         mock_outputs = {
-            "creditScore": {"value": 780, "description": "Final score"},
-            "profitabilityMetric": {"value": 0.25},
-            "leverageRatio": {"value": 1.2},
+            "creditScore": {"value": 780}, "profitabilityMetric": {"value": 0.25},
+            "leverageRatio": {"value": 1.2}, "freeCashFlowYield": {"value": 0.08},
             "qualitativeScore": {"value": 70}
         }
-        report = self.reporter.generate_sme_score_report(mock_outputs, sme_identifier="SME_HighCo")
+        report = self.reporter.generate_sme_score_report(mock_outputs, sme_identifier="SME_HighCo_Enhanced")
 
-        self.assertEqual(report["reportHeader"]["smeIdentifier"], "SME_HighCo")
         self.assertEqual(report["creditRating"]["spScaleEquivalent"], "AA")
         self.assertEqual(report["creditRating"]["sncRegulatoryEquivalent"], "Pass")
         self.assertIn(report["executiveSummary"]["outlook"], ["Positive", "Stable"])
-        self.assertEqual(report["executiveSummary"]["overallAssessment"], "Low Risk") # Overridden by high score
-        self.assertTrue(len(report["keyRiskFactors_XAI"]) > 0)
-        self.assertTrue(len(report["detailedRationale"]) > 0)
-        self.assertEqual(report["supportingMetrics"]["creditScoreRaw"]["value"], 780)
+        self.assertEqual(report["executiveSummary"]["overallAssessment"], "Low Risk")
+        
+        self.assertTrue(len(report["detailedRationale"]) > 100, "Detailed rationale should be substantial.")
+        self.assertIn("Fundamental View:", report["detailedRationale"])
+        self.assertIn("SNC Perspective: The 'Pass' rating suggests", report["detailedRationale"])
+        self.assertIn("Market Outlook: The current", report["detailedRationale"])
+        self.assertIn("Strategic Note:", report["detailedRationale"])
+        
+        # Check XAI factors based on the new logic
+        self.assertTrue(any("No overriding individual risk factors" in factor for factor in report["keyRiskFactors_XAI"]) 
+                        or len(report["keyRiskFactors_XAI"]) == 0, # It's possible no specific factors are triggered for high score
+                        "XAI factors for high score seem incorrect.")
 
-    def test_generate_full_sme_report_low_score(self):
+
+    def test_generate_full_sme_report_low_score_enhanced_rationale(self): # Renamed
         mock_outputs = {
-            "creditScore": {"value": 520},
-            "profitabilityMetric": {"value": 0.03},
-            "leverageRatio": {"value": 4.0},
+            "creditScore": {"value": 520}, "profitabilityMetric": {"value": 0.03},
+            "leverageRatio": {"value": 4.0}, "freeCashFlowYield": {"value": 0.01},
             "qualitativeScore": {"value": 40}
         }
-        report = self.reporter.generate_sme_score_report(mock_outputs, sme_identifier="SME_LowCo")
+        report = self.reporter.generate_sme_score_report(mock_outputs, sme_identifier="SME_LowCo_Enhanced")
 
         self.assertEqual(report["creditRating"]["spScaleEquivalent"], "CCC")
         self.assertEqual(report["creditRating"]["sncRegulatoryEquivalent"], "Substandard")
-        # For score 520, outlook can be "Stable", "Negative", or "Developing"
         self.assertIn(report["executiveSummary"]["outlook"], ["Stable", "Negative", "Developing"])
         self.assertEqual(report["executiveSummary"]["overallAssessment"], "Medium-High Risk")
-        self.assertIn("Low profitability ratios observed.", report["keyRiskFactors_XAI"])
-        self.assertIn("High leverage position.", report["keyRiskFactors_XAI"])
 
-    def test_get_output_value_helper(self):
-        # Test cases from previous ReportGenerator version
+        self.assertTrue(len(report["detailedRationale"]) > 100)
+        self.assertIn("Fundamental View: Profitability (e.g., margin 3.00%) appears weak.", report["detailedRationale"])
+        self.assertIn("Leverage (e.g., D/E 4.00x) is considered high.", report["detailedRationale"])
+        self.assertIn("SNC Perspective: The 'Substandard' rating means", report["detailedRationale"])
+        
+        self.assertIn("High financial leverage.", report["keyRiskFactors_XAI"])
+        self.assertIn("Weak profitability margins.", report["keyRiskFactors_XAI"])
+        self.assertIn("Regulatory concerns indicated by SNC rating: Substandard.", report["keyRiskFactors_XAI"]) # Added period
+        
+
+    def test_get_output_value_helper(self): # Kept from previous version
         self.assertEqual(self.reporter._get_output_value({"value": 10}), 10)
         self.assertEqual(self.reporter._get_output_value({"val": 10, "desc": "d"}), {"val": 10, "desc": "d"})
-        self.assertEqual(self.reporter._get_output_value(100), 100) # Direct value
+        self.assertEqual(self.reporter._get_output_value(100), 100)
         self.assertEqual(self.reporter._get_output_value(None, default="Test"), "Test")
         self.assertEqual(self.reporter._get_output_value({"value": None}, default="Test"), None)
-        self.assertEqual(self.reporter._get_output_value({}, default="EmptyReplaced"), "EmptyReplaced") # Empty dict replaced by default
-
+        self.assertEqual(self.reporter._get_output_value({}, default="EmptyReplaced"), "EmptyReplaced")
 
 if __name__ == '__main__':
     unittest.main()

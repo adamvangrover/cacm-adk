@@ -220,7 +220,9 @@ async def generate_sme_report_api(sme_data: SmeInputData = Body(...)):
     Takes SME financial and qualitative data, instantiates the SME scoring template,
     simulates its run via the Orchestrator, and then formats a detailed report.
     """
-    template_filename = "sme_scoring_model_template.jsonc"
+
+    template_filename = "sme_scoring_model_template.json" # Changed to .json from .jsonc
+
     
     # Prepare overrides for instantiation (same as before)
     instantiation_overrides = {

@@ -6,8 +6,7 @@ from datetime import datetime, timezone
 import copy
 import re
 
-# Recommendation: For production, use a robust JSONC parsing library.
-# This is a simplified implementation for stripping comments.
+# TemplateEngine now expects pure JSON files.
 
 class TemplateEngine:
     def __init__(self, templates_dir: str = "cacm_library/templates"):
@@ -15,28 +14,20 @@ class TemplateEngine:
         if not os.path.isdir(self.templates_dir):
             print(f"Warning: Templates directory not found: {self.templates_dir}")
 
-    def _strip_jsonc_comments(self, jsonc_string: str) -> str:
-        # Remove block comments /* ... */
-        jsonc_string = re.sub(r'/\*.*?\*/', '', jsonc_string, flags=re.DOTALL)
-        # Remove line comments // ...
-        jsonc_string = re.sub(r'//.*?(?:\r\n|\r|\n)', '', jsonc_string)
-        return jsonc_string
-
     def list_templates(self) -> list[dict]:
         templates_info = []
         if not os.path.isdir(self.templates_dir):
             return templates_info
         for filename in os.listdir(self.templates_dir):
-            if filename.endswith(".jsonc"):
+            if filename.endswith(".json"): # Changed from .jsonc
                 filepath = os.path.join(self.templates_dir, filename)
                 try:
                     with open(filepath, 'r', encoding='utf-8') as f:
                         content_raw = f.read()
-                    content_no_comments = self._strip_jsonc_comments(content_raw)
-                    data = json.loads(content_no_comments)
+                    data = json.loads(content_raw) # Directly parse raw content
                     metadata = data.get("metadata", {})
                     template_details = metadata.get("templateDetails", {})
-                    name = template_details.get("templateName", data.get("name", filename.replace(".jsonc", "")))
+                    name = template_details.get("templateName", data.get("name", filename.replace(".json", ""))) # Changed from .jsonc
                     description = template_details.get("intendedUsage", data.get("description", "No description available."))
                     templates_info.append({"filename": filename, "name": name, "description": description})
                 except Exception as e:
@@ -46,15 +37,14 @@ class TemplateEngine:
     def load_template(self, template_filename: str) -> dict | None:
         filepath = os.path.join(self.templates_dir, template_filename)
         if not os.path.isfile(filepath):
-            print(f"Error: Template file not found: {filepath}")
+            print(f"Error: Template file not found: {filepath}") # Error message already generic
             return None
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content_raw = f.read()
-            content_no_comments = self._strip_jsonc_comments(content_raw)
-            return json.loads(content_no_comments)
+            return json.loads(content_raw) # Directly parse raw content
         except Exception as e:
-            print(f"Error loading/parsing template {template_filename}: {e}")
+            print(f"Error loading/parsing template {template_filename}: {e}") # Error message already generic
             return None
 
     def _deep_merge_dicts(self, base: dict, updates: dict) -> dict:

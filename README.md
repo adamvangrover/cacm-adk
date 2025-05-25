@@ -134,9 +134,22 @@ python scripts/adk_cli.py [COMMAND] [OPTIONS] [ARGS]...
 
 The CACM-ADK can be run as a web service, providing a REST API for its functionalities and a simple web-based landing page. It is also containerizable using Docker for easy deployment.
 
-*   **Landing Page:** Access the main landing page at `http://localhost:8000/` when the service is running.
+*   **Landing Page:** The `index.html` landing page (accessible at `/` when the service is running) now serves as an interactive walkthrough of the CACM-ADK. It demonstrates a conceptual end-to-end scenario (e.g., DoorDash M&A analysis) by showcasing an example 'Blended Prompt', the conceptual structured JSON-LD output from CACM execution, and a synthesized human-readable report.
 *   **REST API:** For detailed API usage, see the [API Usage Guide](./docs/api_usage.md).
 *   **Deployment (Docker & Local):** For instructions on building/running the Docker container or running locally for development, see the [Deployment Guide](./docs/deployment.md).
+
+## Features & Tools Overview (Highlights)
+*   The internal credit ontology (`ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl`) has been expanded with more granular terms.
+*   The report generator (`cacm_adk_core/report_generator/report_generator.py`) now simulates multiple analytical 'personas' for richer rationale in generated reports.
+*   All CACM templates in `cacm_library/templates/` now use the `.json` extension and expect pure JSON content.
+
+### Jupyter Notebook for Interactive Prompting & Simulation
+Located in `notebooks/Interactive_Credit_Report_Generator.ipynb`, this Jupyter Notebook provides a hands-on tool for:
+*   Interactively inputting company data, financial metrics, and qualitative assessments.
+*   Dynamically generating a detailed LLM prompt based on these inputs and a predefined report structure.
+*   Locally simulating (without actual LLM calls) the generation of a Markdown-based credit report from the provided inputs.
+This is useful for prompt engineering, understanding input-to-report mapping, and iterative development of report structures.
+
 
 ## Contributing
 Please see `CONTRIBUTING.md`.
