@@ -14,6 +14,7 @@ Key components to be detailed:
     -   Metric & Factor Advisor
     -   Parameterization Helper
     -   Semantic & Structural Validator
+        -   - Initial implementation provides schema validation for CACM instances against the defined JSON schema (e.g., `cacm_schema_v0.2.json`) using the `jsonschema` library.
     -   Modular Design Prompter
     -   Documentation Generator
 -   External Dependencies & Services (LLM, Ontology Store, Template Repo, etc.)

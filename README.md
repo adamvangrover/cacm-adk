@@ -37,7 +37,45 @@ This project aims to build the core infrastructure and software for the CACM-ADK
 -   `interfaces/`: API definitions and schemas.
 
 ## Getting Started
-(To be added)
+
+### Prerequisites
+- Python 3.8+ (recommended)
+
+### Installation & Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd cacm-adk
+    ```
+
+2.  **Create and activate a virtual environment:**
+    (Recommended to avoid conflicts with global Python packages)
+    ```bash
+    python -m venv .venv
+    # On Windows
+    # .venv\Scripts\activate
+    # On macOS/Linux
+    # source .venv/bin/activate
+    ```
+
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Running Components (Examples)
+(Details to be added as components become more runnable)
+
+To run the example usage within `cacm_adk_core/validator/validator.py` (assuming you are in the project root):
+```bash
+python cacm_adk_core/validator/validator.py
+```
+To run the example usage within `cacm_adk_core/template_engine/template_engine.py`:
+```bash
+python cacm_adk_core/template_engine/template_engine.py
+```
+
 
 ## Contributing
 Please see `CONTRIBUTING.md`.
