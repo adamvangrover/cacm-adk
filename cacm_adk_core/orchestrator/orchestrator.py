@@ -1,22 +1,20 @@
 # cacm_adk_core/orchestrator/orchestrator.py
 import json
-from cacm_adk_core.validator.validator import Validator # Assuming Validator is in this path
+import random # Added
+from typing import List, Dict, Any, Tuple # Added
+
+from cacm_adk_core.validator.validator import Validator
 
 class Orchestrator:
+    # __init__ and load_compute_capability_catalog remain the same as before
     def __init__(self, validator: Validator, catalog_filepath="config/compute_capability_catalog.json"):
-        """
-        Initializes the Orchestrator.
-
-        Args:
-            validator: An instance of the Validator component.
-            catalog_filepath: Path to the compute capability catalog JSON file.
-        """
         self.validator = validator
         self.compute_catalog = None
         self.load_compute_capability_catalog(catalog_filepath)
 
     def load_compute_capability_catalog(self, catalog_filepath="config/compute_capability_catalog.json"):
-        """ Loads the compute capability catalog from a JSON file. """
+        # log_messages_temp = [] # Temporary for this method if it needs logging
+        # This method's print statements are for server console, not captured by run_cacm's logs.
         try:
             with open(catalog_filepath, 'r') as f:
                 data = json.load(f)
@@ -24,103 +22,131 @@ class Orchestrator:
             print(f"INFO: Orchestrator: Loaded {len(self.compute_catalog)} compute capabilities from {catalog_filepath}")
         except FileNotFoundError:
             print(f"ERROR: Orchestrator: Compute capability catalog not found at {catalog_filepath}")
-            self.compute_catalog = {} # Initialize to empty if not found
+            self.compute_catalog = {} 
         except json.JSONDecodeError:
             print(f"ERROR: Orchestrator: Could not decode JSON from catalog file {catalog_filepath}")
             self.compute_catalog = {}
 
-    def run_cacm(self, cacm_instance_data: dict) -> bool:
-        """
-        Validates and then simulates the execution of a CACM instance's workflow.
-        Actual computation is mocked; this method logs the steps and bindings.
-        """
+
+    def run_cacm(self, cacm_instance_data: dict) -> Tuple[bool, List[str], Dict[str, Any]]:
+        log_messages: List[str] = []
+        mocked_final_outputs: Dict[str, Any] = {}
+
         if not self.validator or not self.validator.schema:
-            print("ERROR: Orchestrator: Validator or schema not properly initialized.")
-            return False
+            log_messages.append("ERROR: Orchestrator: Validator or schema not properly initialized.")
+            return False, log_messages, mocked_final_outputs
 
         is_valid, errors = self.validator.validate_cacm_against_schema(cacm_instance_data)
         if not is_valid:
-            print("ERROR: Orchestrator: CACM instance is invalid. Cannot execute.")
+            log_messages.append("ERROR: Orchestrator: CACM instance is invalid. Cannot execute.")
             for error in errors:
-                print(f"  Validation Error: Path: {error.get('path', 'N/A')}, Message: {error.get('message', 'N/A')}")
-            return False
+                log_messages.append(f"  Validation Error: Path: {error.get('path', 'N/A')}, Message: {error.get('message', 'N/A')}")
+            return False, log_messages, mocked_final_outputs
 
-        print("INFO: Orchestrator: CACM instance is valid. Starting simulated execution...")
+        log_messages.append("INFO: Orchestrator: CACM instance is valid. Starting simulated execution...")
         
         workflow_steps = cacm_instance_data.get("workflow", [])
         if not workflow_steps:
-            print("INFO: Orchestrator: Workflow has no steps.")
+            log_messages.append("INFO: Orchestrator: Workflow has no steps.")
         
         for step in workflow_steps:
             step_id = step.get('stepId', 'Unknown Step')
             description = step.get('description', 'No description')
             capability_ref = step.get('computeCapabilityRef', 'No capability reference')
             
-            print(f"INFO: Orchestrator: --- Executing Step '{step_id}': {description} ---")
-            print(f"INFO: Orchestrator:   Compute Capability: {capability_ref}")
+            log_messages.append(f"INFO: Orchestrator: --- Executing Step '{step_id}': {description} ---")
+            log_messages.append(f"INFO: Orchestrator:   Compute Capability: {capability_ref}")
 
             if self.compute_catalog and capability_ref in self.compute_catalog:
-                print(f"INFO: Orchestrator:     (Capability '{capability_ref}' found in catalog: {self.compute_catalog[capability_ref].get('name')})")
-            elif self.compute_catalog:
-                print(f"WARN: Orchestrator:     (Capability '{capability_ref}' NOT found in catalog)")
+                log_messages.append(f"INFO: Orchestrator:     (Capability '{capability_ref}' found in catalog: {self.compute_catalog[capability_ref].get('name')})")
+            elif self.compute_catalog is not None: # Check if catalog was attempted to be loaded
+                log_messages.append(f"WARN: Orchestrator:     (Capability '{capability_ref}' NOT found in catalog)")
+            else: # Catalog is None
+                log_messages.append(f"ERROR: Orchestrator: Compute catalog not loaded. Cannot check capability reference.")
+
             
-            print(f"INFO: Orchestrator:   Input Bindings: {step.get('inputBindings', {})}")
-            # Future: Resolve actual data based on bindings
-            print(f"INFO: Orchestrator:   Output Bindings: {step.get('outputBindings', {})}")
-            # Future: Store/mock actual outputs
+            log_messages.append(f"INFO: Orchestrator:   Input Bindings: {step.get('inputBindings', {})}")
+            log_messages.append(f"INFO: Orchestrator:   Output Bindings: {step.get('outputBindings', {})}")
 
-        print("INFO: Orchestrator: Simulated execution completed.")
-        return True
+            # Mock outputs based on outputBindings
+            for _binding_name, cacm_output_ref in step.get('outputBindings', {}).items():
+                if isinstance(cacm_output_ref, str) and cacm_output_ref.startswith("cacm.outputs."):
+                    output_key = cacm_output_ref.split("cacm.outputs.")[-1]
+                    mocked_value = None
+                    description_text = f"Simulated output for {output_key}"
 
+                    if "score" in output_key.lower():
+                        mocked_value = random.randint(550, 820)
+                        description_text = f"Simulated score for {output_key}"
+                    elif "segment" in output_key.lower() or "category" in output_key.lower():
+                        mocked_value = random.choice(["Low Risk", "Medium Risk", "High Risk", "Category A", "Category B"])
+                        description_text = f"Simulated segment/category for {output_key}"
+                    elif "indicator" in output_key.lower() or "flag" in output_key.lower():
+                        mocked_value = random.choice([True, False])
+                        description_text = f"Simulated boolean indicator for {output_key}"
+                    else:
+                        mocked_value = f"Mocked String Value for {output_key}"
+                    
+                    mocked_final_outputs[output_key] = {"value": mocked_value, "description": description_text}
+                    log_messages.append(f"INFO: Orchestrator:     Mocked CACM Output '{output_key}' = {mocked_value}")
+
+
+        log_messages.append("INFO: Orchestrator: Simulated execution completed.")
+        return True, log_messages, mocked_final_outputs
+
+# Update the __main__ block if it exists, to handle the new return type
 if __name__ == '__main__':
-    # Example Usage (requires a valid CACM JSON instance and the schema)
-    # Setup validator
-    val = Validator(schema_filepath="cacm_standard/cacm_schema_v0.2.json") # Assumes schema is in this path relative to execution
+    # Corrected path for direct execution from project root: python cacm_adk_core/orchestrator/orchestrator.py
+    # For this to work, ensure cacm_standard and config are accessible from root.
+    # The __main__ block is primarily for dev testing of this specific module.
+    
+    # Determine base path for resources, assuming script is in cacm_adk_core/orchestrator/
+    import os
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # This should be project root
+    SCHEMA_FILE = os.path.join(BASE_DIR, "cacm_standard/cacm_schema_v0.2.json")
+    CATALOG_FILE = os.path.join(BASE_DIR, "config/compute_capability_catalog.json")
+
+    val = Validator(schema_filepath=SCHEMA_FILE) 
     if not val.schema:
         print("CRITICAL: Could not load CACM Schema for Orchestrator example. Exiting.")
     else:
-        orch = Orchestrator(validator=val)
-        if not orch.compute_catalog:
-             print("CRITICAL: Could not load Compute Capability Catalog for Orchestrator example. Check config/compute_capability_catalog.json. Exiting.")
+        orch = Orchestrator(validator=val, catalog_filepath=CATALOG_FILE) 
+        if orch.compute_catalog is None : 
+             print("CRITICAL: Compute Capability Catalog not loaded properly. Check path & file. Exiting.")
         else:
-            # Create a minimal valid CACM for testing run_cacm
-            # This should align with cacm_schema_v0.2.json and use capabilities from the catalog
             test_cacm = {
-                "cacmId": "orchestrator-test-001",
-                "version": "1.0.0",
-                "name": "Orchestrator Run Test CACM",
-                "description": "A minimal CACM to test the Orchestrator's run_cacm method.",
-                "metadata": {"creationDate": "2023-03-15T10:00:00Z"},
-                "inputs": {
-                    "param1": {"description": "A test parameter", "type": "number"}
+                "cacmId": "orchestrator-run-test-002", "version": "1.0.0", "name": "Orchestrator Output Test",
+                "description": "Testing mocked outputs from orchestrator.",
+                "metadata": {"creationDate": "2023-03-16T10:00:00Z"},
+                "inputs": {"param1": {"description": "d", "type": "number"}},
+                "outputs": { 
+                    "finalScore": {"description": "The final calculated score.", "type": "number"},
+                    "riskCategory": {"description": "The category of risk.", "type": "string"}
                 },
-                "outputs": {
-                    "result1": {"description": "A test result", "type": "number"}
-                },
-                "workflow": [
-                    {
-                        "stepId": "step_A",
-                        "description": "Load some initial data.",
-                        "computeCapabilityRef": "connector:LoadData_v1",
-                        "inputBindings": {"source_config": {"path": "/data/sourceA.csv"}},
-                        "outputBindings": {"loaded_data_A": "steps.step_A.outputs.data"}
-                    },
-                    {
-                        "stepId": "step_B",
-                        "description": "Calculate something based on input and previous step.",
-                        "computeCapabilityRef": "compute:CalculateRatio", 
-                        "inputBindings": {
-                            "numerator": "cacm.inputs.param1",
-                            "denominator": "steps.step_A.outputs.data.someValue" 
-                        },
-                        "outputBindings": {"final_output": "cacm.outputs.result1"}
+                "workflow": [{
+                    "stepId": "sA", "description": "Generate score and category",
+                    "computeCapabilityRef": "dummy:TestGenerateScoreAndCategory", # This dummy ref might not be in catalog
+                    "inputBindings": {"input_param": "cacm.inputs.param1"},
+                    "outputBindings": {
+                        "model_score_output": "cacm.outputs.finalScore",
+                        "model_segment_output": "cacm.outputs.riskCategory"
                     }
-                ]
+                }]
             }
-            print("\n--- Testing Orchestrator with a minimal valid CACM ---")
-            orch.run_cacm(test_cacm)
+            print("\n--- Testing Orchestrator with mocked outputs ---")
+            success, logs, outputs = orch.run_cacm(test_cacm)
+            print(f"Run Success: {success}")
+            print("Logs:")
+            for log_entry in logs: print(f"  {log_entry}")
+            print("Mocked Outputs:")
+            print(json.dumps(outputs, indent=2))
 
-            print("\n--- Testing Orchestrator with an invalid CACM (missing 'name') ---")
-            invalid_test_cacm = test_cacm.copy() # Use copy module for deepcopy if needed
+            # Test invalid case
+            invalid_test_cacm = test_cacm.copy() # shallow copy
             del invalid_test_cacm["name"]
-            orch.run_cacm(invalid_test_cacm)
+            success, logs, outputs = orch.run_cacm(invalid_test_cacm)
+            print(f"\nRun Success (Invalid CACM): {success}")
+            print("Logs (Invalid CACM):")
+            for log_entry in logs: print(f"  {log_entry}")
+            print("Mocked Outputs (Invalid CACM):")
+            print(json.dumps(outputs, indent=2))

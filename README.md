@@ -130,5 +130,13 @@ python scripts/adk_cli.py [COMMAND] [OPTIONS] [ARGS]...
     python scripts/adk_cli.py run examples/sme_credit_score_example_01.json
     ```
 
+## API, Web UI, and Dockerization
+
+The CACM-ADK can be run as a web service, providing a REST API for its functionalities and a simple web-based landing page. It is also containerizable using Docker for easy deployment.
+
+*   **Landing Page:** Access the main landing page at `http://localhost:8000/` when the service is running.
+*   **REST API:** For detailed API usage, see the [API Usage Guide](./docs/api_usage.md).
+*   **Deployment (Docker & Local):** For instructions on building/running the Docker container or running locally for development, see the [Deployment Guide](./docs/deployment.md).
+
 ## Contributing
 Please see `CONTRIBUTING.md`.
