@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CACM Authoring & Development Kit (ADK)</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CACM Authoring & Development Kit (ADK)</h1>
+            <nav>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#documentation">Documentation</a></li>
+                    <li><a href="#api-test">API Demo</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="overview">
+            <h2>Welcome to the CACM-ADK</h2>
+            <p>
+                The CACM Authoring & Development Kit is an intelligent system designed to help users 
+                (credit analysts, domain experts, developers) author standardized 
+                Credit Analysis Capability Modules (CACMs). 
+            </p>
+            <p>
+                This ADK provides tools and components to define, validate, simulate, and (eventually) 
+                execute these modular credit analysis capabilities. The goal is to promote standardization, 
+                reusability, and agility in developing and deploying credit analytics.
+            </p>
+            <p>This page serves as a simple entry point and proof-of-concept demonstration.</p>
+        </section>
+
+        <section id="documentation">
+            <h2>Project Documentation</h2>
+            <ul>
+                <li><a href="/docs/README.md" target="_blank">README</a> - General project overview and setup.</li>
+                <li><a href="/docs/docs/architecture.md" target="_blank">Architecture Document</a> - System architecture details.</li>
+                <li><a href="/docs/docs/api_usage.md" target="_blank">API Usage Guide</a> - How to use the REST API.</li>
+                <li><a href="/docs/cacm_standard/cacm_schema_v0.2.json" target="_blank">CACM JSON Schema (v0.2)</a> - The definition of a CACM.</li>
+                <li><a href="/docs/ontology/credit_analysis_ontology_v0.1/credit_ontology.ttl" target="_blank">Credit Ontology (TTL)</a> - Core semantic definitions.</li>
+            </ul>
+            <p><em>Note: The links above assume the API is running and documentation files are accessible relative to the project root. Direct file links might vary based on deployment. For full project docs, browse the repository.</em></p>
+        </section>
+
+        <section id="api-test">
+            <h2>Live API Demo (Optional)</h2>
+            <p>Fetch available CACM templates from the API:</p>
+            <button id="fetchTemplatesBtn">Fetch Templates</button>
+            <h3>API Response:</h3>
+            <pre id="apiResponseOutput">Click the button to fetch data...</pre>
+        </section>
+    </div>
+
+    <script>
+        // Optional Stretch Goal: Basic JavaScript fetch to an API endpoint
+        document.getElementById('fetchTemplatesBtn').addEventListener('click', function() {
+            const outputElement = document.getElementById('apiResponseOutput');
+            outputElement.textContent = 'Fetching...';
+
+            // Assuming the API is running on the same host/port
+            fetch('/templates/') // FastAPI endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    outputElement.textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    outputElement.textContent = 'Error fetching templates. See console for details.\nIs the API server running? Is there a CORS issue if running from file://?';
+                });
+        });
+    </script>
+</body>
+</html>

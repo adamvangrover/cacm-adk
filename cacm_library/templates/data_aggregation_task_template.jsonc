@@ -1,0 +1,88 @@
+{
+  "cacmId": "urn:uuid:generate-new-uuid",
+  "version": "0.1.0-template",
+  "name": "Generic Data Aggregation Task",
+  "description": "Aggregates specified data fields from multiple input sources into a consolidated output.",
+  "metadata": {
+    "author": "CACM Template Library",
+    "creationDate": "2023-10-28T11:00:00Z",
+    "tags": ["data_aggregation", "etl", "template"],
+    "templateDetails": {
+      "templateName": "Data Aggregation Task",
+      "intendedUsage": "For tasks that require combining data. Customize sources, fields to aggregate, and aggregation logic."
+    }
+  },
+  "inputs": {
+    "dataSource1": {
+      "description": "Primary data source.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput"
+    },
+    "dataSource2": {
+      "description": "Secondary data source.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput"
+    }
+  },
+  "outputs": {
+    "aggregatedData": {
+      "description": "The consolidated data output.",
+      "type": "object",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#DataInput"
+    }
+  },
+  "parameters": [
+    {
+      "paramId": "aggregationFieldsMap",
+      "name": "Aggregation Fields Map",
+      "description": "JSON string defining which fields to take from which source and how to map them to the output. E.g., {\"output_field_A\": \"dataSource1.input_field_X\", \"output_field_B\": \"dataSource2.input_field_Y\"}",
+      "type": "string",
+      "ontologyRef": "http://example.com/ontology/cacm_credit_ontology/0.1#Policy"
+    },
+    {
+      "paramId": "deduplicationStrategy",
+      "name": "Deduplication Strategy",
+      "description": "Strategy to use if duplicate keys/records are encountered ('source1_wins', 'source2_wins', 'merge_average', etc.).",
+      "type": "string",
+      "defaultValue": "source1_wins",
+      "allowedValues": ["source1_wins", "source2_wins", "error_on_duplicate"]
+    }
+  ],
+  "workflow": [
+    {
+      "stepId": "s1_load_data_source1",
+      "description": "Load and preprocess data from source 1.",
+      "computeCapabilityRef": "connector:LoadData_v1",
+      "inputBindings": {"source_config": "cacm.inputs.dataSource1"},
+      "outputBindings": {"loaded_data1": "steps.s1_load_data_source1.outputs.data"}
+    },
+    {
+      "stepId": "s2_load_data_source2",
+      "description": "Load and preprocess data from source 2.",
+      "computeCapabilityRef": "connector:LoadData_v1",
+      "inputBindings": {"source_config": "cacm.inputs.dataSource2"},
+      "outputBindings": {"loaded_data2": "steps.s2_load_data_source2.outputs.data"}
+    },
+    {
+      "stepId": "s3_aggregate_data",
+      "description": "Perform aggregation based on parameters.",
+      "computeCapabilityRef": "logic:AggregateFields_v2",
+      "inputBindings": {
+        "data1": "steps.s1_load_data_source1.outputs.data",
+        "data2": "steps.s2_load_data_source2.outputs.data",
+        "field_map_config": "cacm.parameters.aggregationFieldsMap",
+        "deduplication_rule": "cacm.parameters.deduplicationStrategy"
+      },
+      "outputBindings": {"aggregated_result": "cacm.outputs.aggregatedData"}
+    }
+  ],
+  "validationRules": [
+    {
+      "ruleId": "check_field_map_json",
+      "description": "Aggregation Fields Map should be valid JSON if provided as string.",
+      "expression": "isJson(cacm.parameters.aggregationFieldsMap)",
+      "appliesTo": "parameters.aggregationFieldsMap",
+      "severity": "error"
+    }
+  ]
+}
