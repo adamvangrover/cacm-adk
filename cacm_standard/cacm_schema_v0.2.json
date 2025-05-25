@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CACM Definition",
+  "description": "Schema for a Credit Analysis Capability Module (CACM). Version 0.2",
+  "type": "object",
+  "properties": {
+    "cacmId": {
+      "description": "Unique identifier for the CACM (e.g., UUID).",
+      "type": "string",
+      "format": "uuid"
+    },
+    "version": {
+      "description": "Semantic version of this CACM definition (e.g., 1.0.0, 0.2.1-alpha).",
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "name": {
+      "description": "Human-readable name for the CACM.",
+      "type": "string"
+    },
+    "description": {
+      "description": "A comprehensive description of what the CACM does, its purpose, and its scope.",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Descriptive metadata about the CACM.",
+      "type": "object",
+      "properties": {
+        "author": { "type": "string", "description": "The person or entity that authored this CACM." },
+        "creationDate": { "type": "string", "format": "date-time", "description": "The date and time when this CACM was created." },
+        "lastModifiedDate": { "type": "string", "format": "date-time", "description": "The date and time when this CACM was last modified." },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Keywords or tags for categorizing and finding the CACM." },
+        "ontologyMappings": {
+            "type": "array",
+            "description": "References to concepts in an external ontology that this CACM relates to.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "conceptUri": {"type": "string", "format": "uri"},
+                    "relationType": {"type": "string", "description": "e.g., implements, uses_data_from"}
+                },
+                "required": ["conceptUri"]
+            }
+        }
+      },
+      "required": ["creationDate"]
+    },
+    "inputs": {
+      "description": "Definition of the input data elements required by this CACM.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "integer", "boolean", "object", "array"] },
+          "schema": { "type": "object", "additionalProperties": true, "description": "Nested schema for complex objects or arrays, following JSON Schema structure."},
+          "ontologyRef": { "type": "string", "format": "uri", "description": "URI pointing to a concept in the ontology that defines this input."}
+        },
+        "required": ["description", "type"]
+      }
+    },
+    "outputs": {
+      "description": "Definition of the output data elements produced by this CACM.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "integer", "boolean", "object", "array"] },
+          "schema": { "type": "object", "additionalProperties": true, "description": "Nested schema for complex objects or arrays, following JSON Schema structure."},
+          "ontologyRef": { "type": "string", "format": "uri", "description": "URI pointing to a concept in the ontology that defines this output."}
+        },
+        "required": ["description", "type"]
+      }
+    },
+    "workflow": {
+      "description": "The sequence of logical steps that define the CACM's execution flow.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stepId": { "type": "string", "description": "Unique identifier for this step within the workflow." },
+          "description": { "type": "string", "description": "Description of what this step does." },
+          "computeCapabilityRef": { "type": "string", "description": "A logical reference to a registered compute capability (e.g., 'model:RiskModelX', 'service:DataEnrichmentY')." },
+          "inputBindings": {
+            "type": "object",
+            "description": "Maps inputs required by the compute capability to CACM inputs or outputs of previous steps. Keys are capability's expected inputs, values are references (e.g., 'cacm.inputs.customer_data', 'steps.previous_step_id.outputs.intermediate_result').",
+            "additionalProperties": { "type": "string" }
+          },
+          "outputBindings": {
+            "type": "object",
+            "description": "Maps outputs produced by the compute capability to CACM outputs or for use by subsequent steps. Keys are capability's outputs, values are references (e.g., 'cacm.outputs.final_score', 'steps.this_step_id.outputs.local_variable').",
+            "additionalProperties": { "type": "string" }
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Specific parameter values passed to this compute capability for this step, potentially overriding CACM-level parameters.",
+            "additionalProperties": true
+          },
+          "onError": { "type": "string", "enum": ["fail_fast", "continue_with_default", "log_and_skip"], "description": "Behavior if this step encounters an error."}
+        },
+        "required": ["stepId", "description", "computeCapabilityRef"]
+      }
+    },
+    "parameters": {
+      "description": "Configurable parameters that can be set at runtime to adapt the CACM's behavior.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "paramId": { "type": "string", "description": "Unique identifier for this parameter within the CACM." },
+          "name": { "type": "string", "description": "Human-readable name for the parameter." },
+          "description": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "integer", "boolean", "object", "array"] },
+          "defaultValue": { "description": "Default value for this parameter if not provided at runtime." },
+          "allowedValues": { "type": "array", "description": "An array of allowed values, if the parameter has a restricted set." },
+          "ontologyRef": { "type": "string", "format": "uri", "description": "URI pointing to a concept in the ontology that defines this parameter."}
+        },
+        "required": ["paramId", "name", "description", "type"]
+      }
+    },
+    "validationRules": {
+      "description": "Rules that define data quality checks, consistency constraints, or other validation logic for the CACM's inputs, outputs, or intermediate results.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": { "type": "string", "description": "Unique identifier for this validation rule." },
+          "description": { "type": "string" },
+          "expression": { "type": "string", "description": "The validation rule logic/expression (e.g., CEL, JSONPath with conditions, specific DSL TBD). For now, a string placeholder." },
+          "appliesTo": { "type": "string", "description": "Reference to the data element this rule applies to (e.g., 'inputs.field_name', 'outputs.another_field')." },
+          "severity": { "type": "string", "enum": ["error", "warning", "info"], "default": "error" }
+        },
+        "required": ["ruleId", "description", "expression", "appliesTo"]
+      }
+    }
+  },
+  "required": [
+    "cacmId",
+    "version",
+    "name",
+    "description",
+    "inputs",
+    "outputs",
+    "workflow"
+  ]
+}
