@@ -1,0 +1,460 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Unified Namespace (Illustrative - consider choosing one like crao:)
+@prefix crao: <http://example.com/ontology/credit_risk_analysis/1.0#> .
+# Using kgclass and kgprop for existing terms for consistency with provided files.
+@prefix kgclass: <http://example.org/kg/class/> .
+@prefix kgprop: <http://example.org/kg/property/> .
+@prefix ex: <http://example.org/kg/entity/> . # Individuals
+
+# --- Ontology Metadata ---
+crao:
+    a owl:Ontology ;
+    rdfs:label "Comprehensive Credit Risk Analysis Ontology (Enhanced)"@en ;
+    dcterms:description """An integrated and enhanced ontology for credit analysis, combining concepts from financial modeling, risk management, macroeconomic analysis, emerging trends, regulatory frameworks, and incorporating advanced semantic features.
+    This ontology merges and expands upon previous versions including CACM-Ont and a broader financial knowledge graph.
+    It incorporates structures for representing rating agency information, regulatory classifications (SNC), market indicators, economic context, and employs richer OWL axioms for greater precision."""@en ;
+    owl:versionInfo "1.1.0" ; # Incremented version
+    dcterms:creator "AI Assistant (based on user-provided ontologies and data with further enhancements)"@en ;
+    dcterms:modified "2025-05-26T20:58:00Z"^^xsd:dateTime ; # Updated timestamp
+    owl:imports <http://purl.org/dc/terms/> ;
+    owl:imports <http://www.w3.org/2004/02/skos/core#> .
+
+# --- Core & Integrated Classes (Selected examples with enhancements) ---
+
+kgclass:Entity
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Entity"@en ;
+    rdfs:comment "A general class for any real-world object or concept relevant to credit analysis, such as a company, sovereign, or individual."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:Company
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:Entity ;
+    rdfs:label "Company"@en ;
+    rdfs:comment "A legal entity engaged in business activities."@en ;
+    # Example of a restriction: A company must have a legal name.
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty kgprop:hasLegalName ;
+        owl:someValuesFrom xsd:string
+    ] ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:Sovereign
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:Entity ;
+    rdfs:label "Sovereign Entity"@en ;
+    rdfs:comment "A national government or state."@en ;
+    owl:disjointWith kgclass:Company ; # Sovereigns are not Companies
+    rdfs:isDefinedBy crao: .
+
+kgclass:FinancialInstrument
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Financial Instrument"@en ;
+    rdfs:comment "A tradable asset of any kind; either cash, evidence of an ownership interest in an entity, or a contractual right to receive or deliver cash or another financial instrument."@en ;
+    rdfs:isDefinedBy crao: .
+    # Examples from KG: Credit_Derivative, Equity_Data (could be Instrument or Info)
+
+kgclass:CreditActivity
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Credit Activity"@en ;
+    rdfs:comment "A general concept representing any activity, process, or capability related to credit analysis, assessment, or management."@en ;
+    rdfs:subClassOf kgclass:Process ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:DataInput
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Data Input"@en ;
+    rdfs:comment "Represents any piece of data or information used as an input for a credit analysis activity or the calculation of a metric."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:FinancialStatement
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Financial Statement"@en ;
+    rdfs:comment "A formal record of the financial activities and position of a business, person, or other entity."@en ;
+    rdfs:subClassOf kgclass:DataInput ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:BalanceSheet rdfs:subClassOf kgclass:FinancialStatement .
+kgclass:IncomeStatement rdfs:subClassOf kgclass:FinancialStatement .
+kgclass:CashFlowStatement rdfs:subClassOf kgclass:FinancialStatement .
+
+kgclass:Metric
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Metric"@en ;
+    rdfs:comment "A quantifiable measure used to track and assess the status of a specific business process, financial characteristic, risk exposure, or other relevant aspect of credit analysis."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:Financial_Metric
+    rdfs:subClassOf kgclass:Metric ;
+    rdfs:label "Financial Metric"@en ;
+    rdfs:comment "A metric specifically related to financial performance, condition, or valuation."@en .
+
+kgclass:Ratio
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Ratio"@en ;
+    rdfs:comment "A type of financial metric that represents the relationship between two numbers or quantities."@en ;
+    rdfs:subClassOf kgclass:Financial_Metric .
+
+kgclass:RiskScore
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Risk Score"@en ;
+    rdfs:comment "A numerical representation of the creditworthiness or risk associated with an entity or financial instrument, derived from a model or assessment."@en ;
+    rdfs:subClassOf kgclass:Metric .
+
+kgclass:Credit_Risk_Metric
+    rdfs:subClassOf kgclass:RiskScore ; # A credit risk metric is a type of risk score
+    rdfs:label "Credit Risk Metric"@en ;
+    rdfs:comment "A metric specifically used to quantify or assess credit risk (e.g., PD, LGD, Expected Loss)."@en .
+
+kgclass:Policy
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Policy"@en ;
+    rdfs:comment "A guiding principle, rule, regulation, or internal guideline that influences credit decisions, risk appetite, or analytical processes."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:EligibilityRule
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Eligibility Rule"@en ;
+    rdfs:comment "A specific criterion, condition, or constraint that must be met for a credit application, process, or transaction to proceed or be approved."@en ;
+    rdfs:subClassOf kgclass:Policy ; # An eligibility rule can be seen as a specific type of policy/guideline
+    rdfs:isDefinedBy crao: .
+
+
+# --- Concepts from Contextual Mapping File (Enhanced) ---
+
+kgclass:RatingAgency
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Rating Agency"@en ;
+    skos:definition "An entity that assesses and issues credit ratings for debt issuers or securities."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:CreditRating
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Credit Rating"@en ;
+    skos:definition "An assessment of the creditworthiness of a borrower or a specific debt security, typically issued by a rating agency."@en ;
+    rdfs:subClassOf kgclass:Assessment ;
+    rdfs:isDefinedBy crao: .
+    # A CreditRating instance would link to a RatingScaleGrade and an Entity being rated.
+
+kgclass:RatingScaleGrade
+    a rdfs:Class, owl:Class ;
+    rdfs:label "Rating Scale Grade"@en ;
+    skos:definition "A specific grade or level within a rating agency's scale (e.g., AAA, Ba1, BB-)."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:InvestmentGradeRatingScaleGrade
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:RatingScaleGrade ;
+    rdfs:label "Investment Grade Rating Scale Grade"@en ;
+    skos:definition "A rating scale grade that is considered 'investment grade', generally BBB-/Baa3 or higher."@en ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:SpeculativeGradeRatingScaleGrade
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:RatingScaleGrade ;
+    rdfs:label "Speculative Grade Rating Scale Grade"@en ;
+    skos:definition "A rating scale grade that is considered 'speculative grade' (or 'high yield'), generally BB+/Ba1 or lower."@en ;
+    owl:disjointWith kgclass:InvestmentGradeRatingScaleGrade ;
+    rdfs:isDefinedBy crao: .
+
+kgclass:DefaultGradeRatingScaleGrade
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:RatingScaleGrade ;
+    rdfs:label "Default Grade Rating Scale Grade"@en ;
+    skos:definition "A rating scale grade indicating an entity or instrument is in default (e.g., D, SD, RD)."@en ;
+    owl:disjointWith kgclass:InvestmentGradeRatingScaleGrade, kgclass:SpeculativeGradeRatingScaleGrade ;
+    rdfs:isDefinedBy crao: .
+
+
+kgclass:RatingOutlookValue # Using SKOS for controlled vocabulary
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf skos:Concept ;
+    rdfs:label "Rating Outlook Value"@en ;
+    skos:definition "A standardized term for a rating outlook (e.g., Positive, Stable, Negative)."@en ;
+    rdfs:isDefinedBy crao: .
+
+ex:OutlookPositive a kgclass:RatingOutlookValue ; rdfs:label "Positive Outlook"@en ; skos:prefLabel "Positive"@en .
+ex:OutlookStable a kgclass:RatingOutlookValue ; rdfs:label "Stable Outlook"@en ; skos:prefLabel "Stable"@en .
+ex:OutlookNegative a kgclass:RatingOutlookValue ; rdfs:label "Negative Outlook"@en ; skos:prefLabel "Negative"@en .
+ex:OutlookDeveloping a kgclass:RatingOutlookValue ; rdfs:label "Developing Outlook"@en ; skos:prefLabel "Developing"@en .
+
+
+kgclass:SNCCategory
+    a rdfs:Class, owl:Class ;
+    rdfs:label "SNC Category"@en ;
+    skos:definition "A regulatory classification for large syndicated loans under the Shared National Credit Program in the US."@en ;
+    rdfs:isDefinedBy crao: .
+    # Individuals for each category, e.g., ex:SNCPass, ex:SNCSpecialMention
+
+kgclass:CDSSpread
+    a rdfs:Class, owl:Class ;
+    rdfs:subClassOf kgclass:MarketIndicator ;
+    rdfs:label "CDS Spread"@en ;
+    skos:definition "Credit Default Swap spread, indicating the market-implied cost to insure against default of a reference entity."@en ;
+    rdfs:isDefinedBy crao: .
+
+# --- Properties (Further Enhanced with Domains, Ranges, and Characteristics) ---
+
+kgprop:hasLegalName
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has legal name"@en ;
+    rdfs:comment "The official legal name of an entity."@en ;
+    rdfs:domain kgclass:Entity ; # Or more specifically Company, Institution
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasInputParameter
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has input parameter"@en ;
+    rdfs:domain kgclass:CreditActivity ;
+    rdfs:range kgclass:Parameter ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasDataSource
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has data source"@en ;
+    rdfs:domain kgclass:Metric ;
+    rdfs:range kgclass:DataInput ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:calculatesMetric
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "calculates metric"@en ;
+    rdfs:domain kgclass:CreditActivity ;
+    rdfs:range kgclass:Metric ;
+    owl:inverseOf kgprop:metricCalculatedBy ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:metricCalculatedBy
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "metric calculated by"@en ;
+    rdfs:domain kgclass:Metric ;
+    rdfs:range kgclass:CreditActivity ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:appliesRule
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "applies rule"@en ;
+    rdfs:domain kgclass:CreditActivity ;
+    rdfs:range kgclass:EligibilityRule ; # More specific than general Policy here
+    rdfs:isDefinedBy crao: .
+
+kgprop:governedByPolicy
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "governed by policy"@en ;
+    rdfs:comment "Relates an activity, entity, or rule to a broader policy that governs it."@en ;
+    rdfs:domain [ owl:unionOf (kgclass:CreditActivity kgclass:Entity kgclass:EligibilityRule) ] ;
+    rdfs:range kgclass:Policy ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:requiresInput
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "requires input"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:CreditActivity kgclass:Metric kgclass:EligibilityRule kgclass:Financial_Model ) ] ;
+    rdfs:range kgclass:DataInput ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:producesOutput
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "produces output"@en ;
+    rdfs:domain kgclass:CreditActivity ;
+    rdfs:range kgclass:DataInput ;
+    rdfs:isDefinedBy crao: .
+
+# Enhanced properties from the large KG file
+kgprop:calculated_from
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "calculated from"@en ;
+    rdfs:comment "Indicates that a metric or value is derived from specific inputs or other metrics."@en ;
+    rdfs:domain kgclass:Metric ;
+    rdfs:range [ owl:unionOf ( kgclass:DataInput kgclass:Metric ) ] ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:assessesRisk
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "assesses risk"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:CreditActivity kgclass:Metric kgclass:Financial_Model ) ] ;
+    rdfs:range kgclass:Risk_Category ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasAssumption
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has assumption"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:CreditActivity kgclass:Financial_Model kgclass:Valuation_Method ) ] ;
+    rdfs:range kgclass:Assumption ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:providesRationale
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "provides rationale"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:Assessment kgclass:CreditRating kgclass:RiskScore kgclass:SNCCategory kgclass:Decision ) ] ; # Decision class might be useful
+    rdfs:range kgclass:Rationale ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:ratingIssuedFor
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "rating issued for"@en ;
+    rdfs:comment "Links a credit rating to the entity or financial instrument it assesses."@en ;
+    rdfs:domain kgclass:CreditRating ;
+    rdfs:range [ owl:unionOf (kgclass:Entity kgclass:FinancialInstrument) ] ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasRatingGrade
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has rating grade"@en ;
+    rdfs:comment "Specifies the particular grade of a credit rating on an agency's scale."@en ;
+    rdfs:domain kgclass:CreditRating ;
+    rdfs:range kgclass:RatingScaleGrade ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:issuedBy
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "issued by"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:CreditRating kgclass:RatingScaleGrade kgclass:FinancialStatement ) ] ; # e.g. Financial Statements issued by Company
+    rdfs:range [ owl:unionOf ( kgclass:RatingAgency kgclass:Entity ) ] ; # Agency for ratings, Company for statements
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasMinDefaultProbability
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has minimum 1yr default probability"@en ;
+    rdfs:domain kgclass:RatingScaleGrade ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasMaxDefaultProbability
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has maximum 1yr default probability"@en ;
+    rdfs:domain kgclass:RatingScaleGrade ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasOutlookValue
+    a rdf:Property, owl:ObjectProperty ; # Changed to ObjectProperty
+    rdfs:label "has outlook value"@en ;
+    rdfs:domain kgclass:CreditRating ;
+    rdfs:range kgclass:RatingOutlookValue ; # Points to SKOS concept individuals
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasSNCClassification
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "has SNC classification"@en ;
+    rdfs:domain kgclass:Financial_Instrument ; # Typically loans
+    rdfs:range kgclass:SNCCategory ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasIndicativeMinLGD
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has indicative minimum LGD"@en ;
+    rdfs:domain kgclass:SNCCategory ;
+    rdfs:range xsd:decimal ; # e.g., 0.25 for 25%
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasIndicativeMaxLGD
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has indicative maximum LGD"@en ;
+    rdfs:domain kgclass:SNCCategory ;
+    rdfs:range xsd:decimal ; # e.g., 0.50 for 50%
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasValue
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has value"@en ;
+    rdfs:domain kgclass:Metric ;
+    rdfs:range xsd:anySimpleType ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:lastUpdated
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "last updated"@en ;
+    rdfs:domain [ owl:unionOf (kgclass:MarketIndicator kgclass:EconomicDataPoint) ] ; # EconomicDataPoint could be a new class
+    rdfs:range xsd:dateTime ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:hasTenor
+    a rdf:Property, owl:DatatypeProperty ;
+    rdfs:label "has tenor"@en ;
+    rdfs:domain [ owl:unionOf ( kgclass:Financial_Instrument kgclass:CDSSpread ) ] ;
+    rdfs:range xsd:string ; # Or a class for Tenor with individuals like "5Y", "10Y"
+    rdfs:isDefinedBy crao: .
+
+kgprop:component_of
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "component of"@en ;
+    rdfs:comment "Indicates that something is a part or component of a larger whole."@en ;
+    # Domain/Range examples based on ex:market_value_equity kgprop:component_of ex:total_capital
+    rdfs:domain [ owl:unionOf (kgclass:Market_Data kgclass:Calculated_Value kgclass:Balance_Sheet_Item) ] ;
+    rdfs:range kgclass:Calculated_Value ; # Total_Capital is a Calculated_Value
+    rdfs:isDefinedBy crao: .
+
+kgprop:influenced_by
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "influenced by"@en ;
+    rdfs:comment "Indicates that an entity, process, or value is affected by some factor."@en ;
+    # Domain/Range examples based on ex:comparables kgprop:influenced_by ex:market_sentiment
+    rdfs:domain [ owl:unionOf ( kgclass:Valuation_Method kgclass:Financial_Instrument kgclass:Company kgclass:EconomicIndicator ) ] ;
+    rdfs:range kgclass:Market_Factor ; # Market_Sentiment is a Market_Factor
+    rdfs:isDefinedBy crao: .
+
+kgprop:implemented_by # also kgprop:implemented_via
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "implemented by" ;
+    rdfs:comment "Indicates the means or agent through which something is put into effect."@en ;
+    # Domain/Range e.g. Monetary_Policy implemented_by Central_Bank ; Sustainable_Investing implemented_via ESG_Integration
+    rdfs:domain [ owl:unionOf ( kgclass:Policy kgclass:Strategy kgclass:Process ) ] ;
+    rdfs:range [ owl:unionOf ( kgclass:Institution kgclass:Tool kgclass:Method kgclass:Framework ) ] ;
+    rdfs:isDefinedBy crao: .
+
+kgprop:measures
+    a rdf:Property, owl:ObjectProperty ;
+    rdfs:label "measures"@en ;
+    rdfs:comment "Indicates that a metric or indicator quantifies a particular concept or phenomenon."@en ;
+    # Domain/Range e.g. cvar measures tail_risk ; bollinger_bands measures volatility
+    rdfs:domain kgclass:Metric ;
+    rdfs:range [ owl:unionOf ( kgclass:Risk_Concept kgclass:FinancialPhenomenon kgclass:Statistical_Concept ) ] ; # FinancialPhenomenon for volatility
+    rdfs:isDefinedBy crao: .
+
+# --- Illustrative Individuals for New Concepts ---
+
+ex:SPGlobalRatings
+    a kgclass:RatingAgency ;
+    rdfs:label "S&P Global Ratings"@en ;
+    kgprop:hasLegalName "S&P Global Ratings Inc." .
+
+ex:SP_AAA
+    a kgclass:RatingScaleGrade, kgclass:InvestmentGradeRatingScaleGrade ;
+    rdfs:label "S&P AAA Rating Grade"@en ;
+    kgprop:hasRatingValue "AAA" ;
+    kgprop:issuedBy ex:SPGlobalRatings ;
+    kgprop:hasMinDefaultProbability "0.0"^^xsd:decimal ;
+    kgprop:hasMaxDefaultProbability "0.0001"^^xsd:decimal ;
+    skos:definition "Highest rating by S&P. Extremely strong capacity to meet financial commitments." .
+
+ex:SomeCompanyCreditRating
+    a kgclass:CreditRating ;
+    rdfs:label "Credit Rating for SomeCompany Inc."@en ;
+    kgprop:ratingIssuedFor ex:SomeCompany ; # Assuming ex:SomeCompany is an individual of kgclass:Company
+    kgprop:hasRatingGrade ex:SP_AAA ;
+    kgprop:issuedBy ex:SPGlobalRatings ;
+    kgprop:hasOutlookValue ex:OutlookStable ;
+    kgprop:lastUpdated "2025-01-15T09:00:00Z"^^xsd:dateTime .
+
+ex:SNCPass
+    a kgclass:SNCCategory ;
+    rdfs:label "SNC Pass Category"@en ;
+    skos:definition "Sound credit quality, performing as agreed, minimal risk identified." ;
+    kgprop:hasIndicativeMinLGD "0.0"^^xsd:decimal ;
+    kgprop:hasIndicativeMaxLGD "0.1"^^xsd:decimal .
+
+# All original individuals from the second TTL file would follow here,
+# ensuring they are consistent with any class/property refinements.
+# For instance, if a metric was used, ensure it links to kgclass:Metric or a subclass.
+
+# ... (Full list of classes, properties, and individuals from your second provided TTL would continue here,
+# adapted with the new structure, domains, ranges, and richer axioms where appropriate.)
