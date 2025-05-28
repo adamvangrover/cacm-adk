@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic: Architecting the Future of Credit Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Application Structure Plan:
+        The infographic will follow a narrative flow:
+        1. Hero Section: Title and Executive Summary hook.
+        2. Vision Statement: Highlighting the core vision.
+        3. Key Strategic Benefits: Visually representing Scalability, Efficiency, Enhanced Insight, Embedded Expertise.
+        4. Foundational Pillars: Explaining Ontology, KG, KB as the base.
+        5. Core Capabilities Overview: Briefly mentioning CACMs, Simulation, AI/ML.
+        6. High-Level Implementation Roadmap: Visualizing Table 3's content in a timeline/Gantt-like structure. This will be a key visual.
+        7. Illustrative Chart: A donut chart showing indicative resource focus for Year 1 themes.
+        8. Conclusion: Reaffirming the transformative potential.
+        This structure provides a logical progression for understanding the strategic plan, starting broad and then detailing key implementation aspects.
+    -->
+    <!-- Visualization & Content Choices:
+        - Hero/Title: Inform -> Large, impactful text. Library/Method: HTML/Tailwind.
+        - Vision Statement: Inform -> Prominent text block. Library/Method: HTML/Tailwind.
+        - Key Strategic Benefits (Scalability, Efficiency, Insight, Expertise): Inform/Compare -> 4 styled cards with Unicode icons and descriptive text. Goal: Quickly convey core advantages. Library/Method: HTML/Tailwind. NO SVG/Mermaid.
+        - Foundational Pillars (Ontology, KG, KB): Organize/Inform -> 3 styled cards, possibly with simple connecting CSS arrows to show dependency (Ontology -> KG -> KB). Goal: Explain the core semantic base. Library/Method: HTML/Tailwind. NO SVG/Mermaid.
+        - Core Capabilities (CACMs, Simulation, AI/ML): Inform -> Brief text snippets with icons in styled cards. Goal: Awareness of key tech components. Library/Method: HTML/Tailwind. NO SVG/Mermaid.
+        - High-Level Implementation Roadmap (from Table 3): Organize/Change -> HTML/CSS Gantt-style timeline. Rows for themes, columns for time periods, cells with key activities. Goal: Visually represent the phased rollout. Library/Method: HTML/Tailwind. NO SVG/Mermaid. (This is the most complex visualization and chosen over Chart.js for text clarity).
+        - Illustrative Resource Focus (Year 1): Inform/Compare -> Donut Chart (Chart.js/Canvas) showing fictional proportional resource allocation to key themes in Year 1 (e.g., Foundational Infrastructure: 40%, Core Analytical Capabilities: 25%, Efficiency & Automation: 20%, Expertise & UX: 15%). Goal: Provide a sample quantitative visual. Library/Method: Chart.js. NO SVG.
+        - Conclusion: Inform -> Concluding text. Library/Method: HTML/Tailwind.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8; /* Light blue-gray background */
+        }
+        .hero-gradient {
+            background: linear-gradient(to right, #1E3A8A, #3B82F6); /* Dark Blue to Lighter Blue */
+        }
+        .icon-placeholder {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+        .roadmap-table th, .roadmap-table td {
+            border: 1px solid #E5E7EB; /* gray-200 */
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+        .roadmap-table th {
+            background-color: #EFF6FF; /* blue-50 */
+            font-weight: 600;
+            color: #1E40AF; /* blue-800 */
+        }
+        .roadmap-activity {
+            background-color: #DBEAFE; /* blue-200 */
+            color: #1E40AF; /* blue-800 */
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+        }
+         .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px; /* Adjusted for donut chart */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Adjusted for donut chart */
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-title {
+            border-bottom: 3px solid #2563EB; /* blue-600 */
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <section class="hero-gradient text-white py-16 px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-6 leading-tight">Architecting the Future of Credit Intelligence</h1>
+            <p class="text-xl sm:text-2xl mb-8 opacity-90">A Strategic Roadmap for a Next-Generation AI-Powered Analysis Platform</p>
+            <p class="text-md sm:text-lg max-w-2xl mx-auto opacity-80">
+                This infographic visualizes the strategic plan to integrate AI-driven insights with human expertise, delivering scalable, efficient, and profoundly insightful credit assessments.
+            </p>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+        <section id="vision" class="text-center">
+            <h2 class="text-3xl font-bold text-blue-700 mb-4 section-title">Our Vision</h2>
+            <p class="text-lg text-slate-700 max-w-3xl mx-auto">
+                "To cultivate a next-generation credit analysis platform that seamlessly integrates AI-driven insights with human expertise...to deliver scalable, efficient, and profoundly insightful credit assessments across a broader range of situations."
+            </p>
+        </section>
+
+        <section id="benefits">
+            <h2 class="text-3xl font-bold text-blue-700 mb-10 text-center section-title">Key Strategic Benefits</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="text-blue-600 mb-4 icon-placeholder">📈</div>
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Scalability</h3>
+                    <p class="text-slate-600 text-sm">Handle increased volumes and complexity through automation, modular CACMs, and big/alternative data integration.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="text-blue-600 mb-4 icon-placeholder">⏱️</div>
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Efficiency</h3>
+                    <p class="text-slate-600 text-sm">Gain from automated data ingestion, intelligent workflow orchestration, and AI-assisted report generation.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="text-blue-600 mb-4 icon-placeholder">💡</div>
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Enhanced Insight</h3>
+                    <p class="text-slate-600 text-sm">Achieve deeper risk understanding via advanced AI/ML, XAI, dynamic scoring, and sophisticated simulations.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="text-blue-600 mb-4 icon-placeholder">🧠</div>
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Embedded Expertise</h3>
+                    <p class="text-slate-600 text-sm">Capture and evolve expert knowledge through a comprehensive KG, enriched KB, and continuous learning loops.</p>
+                </div>
+            </div>
+            <p class="text-center mt-8 text-slate-700 italic">These interconnected benefits create a virtuous cycle, making automated systems smarter and insights richer.</p>
+        </section>
+
+        <section id="foundations">
+            <h2 class="text-3xl font-bold text-blue-700 mb-10 text-center section-title">Foundational Pillars: The Semantic Backbone</h2>
+            <p class="text-center text-lg text-slate-700 max-w-3xl mx-auto mb-10">The platform's success hinges on a robust semantic infrastructure. These pillars are Priority Zero, enabling all advanced capabilities.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-sky-600 mb-3 icon-placeholder">📜</div>
+                    <h3 class="text-xl font-semibold text-sky-700 mb-2">Ontology (`credit_ontology.ttl`)</h3>
+                    <p class="text-slate-600 text-sm">A "living contract" formally defining shared understanding across the platform. Defines all terms, classes (e.g., `kgclass:FinancialInstrument`), and properties (e.g., `kgprop:hasRating`).</p>
+                </div>
+                <div class="text-center md:mt-16 hidden md:block">
+                    <span class="text-4xl text-slate-400">&rarr;</span>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                    <div class="text-sky-600 mb-3 icon-placeholder">🔗</div>
+                    <h3 class="text-xl font-semibold text-sky-700 mb-2">Knowledge Graph (KG)</h3>
+                    <p class="text-slate-600 text-sm">Instantiated from the ontology, dynamically populated with financial models, decision logic, simulated scenarios, and expert inputs. Enables advanced querying and relationship discovery.</p>
+                </div>
+                 <div class="text-center md:mt-16 hidden md:block">
+                    <span class="text-4xl text-slate-400">&rarr;</span>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                     <div class="text-sky-600 mb-3 icon-placeholder">📚</div>
+                    <h3 class="text-xl font-semibold text-sky-700 mb-2">Knowledge Base (KB)</h3>
+                    <p class="text-slate-600 text-sm">Curated repository of verified, domain-specific knowledge (formulas, techniques, risk factors). Semantically linked to the KG, providing "ground truth" for AI/LLMs.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities">
+            <h2 class="text-3xl font-bold text-blue-700 mb-10 text-center section-title">Core Capabilities Driving Transformation</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Modular CACMs</h3>
+                    <p class="text-sm text-slate-600">Credit Analysis Capability Modules (e.g., `cacm:SaaS_DefaultRisk_v1`) for reusable, expert-infused analytical building blocks, dynamically composed by the KG.</p>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Advanced Simulation Engine</h3>
+                    <p class="text-sm text-slate-600">Models impacts of macroeconomic shifts, industry shocks, and regulatory changes, enabling proactive risk management and "what-if" scenario testing.</p>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">AI-Assisted Reporting & Review</h3>
+                    <p class="text-sm text-slate-600">LLMs for drafting reports based on CACM outputs and KG context, with augmented review tools for analysts to ensure accuracy and accountability.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap">
+            <h2 class="text-3xl font-bold text-blue-700 mb-10 text-center section-title">High-Level Implementation Roadmap</h2>
+            <p class="text-center text-lg text-slate-700 max-w-3xl mx-auto mb-10">A phased approach to build the platform, delivering iterative value. Key activities are highlighted across themes and timelines.</p>
+            <div class="bg-white p-6 rounded-xl shadow-xl overflow-x-auto">
+                <table class="w-full min-w-[1000px] roadmap-table">
+                    <thead>
+                        <tr>
+                            <th>Theme / Timeline</th>
+                            <th>Year 1: Q1-Q2</th>
+                            <th>Year 1: Q3-Q4</th>
+                            <th>Year 2: Q1-Q2</th>
+                            <th>Year 2: Q3-Q4</th>
+                            <th>Year 3+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold bg-blue-100 text-blue-800">Foundational Infrastructure</td>
+                            <td><span class="roadmap-activity">Ontology v0.3.0 (Core)</span><span class="roadmap-activity">Initial KB Structure</span><span class="roadmap-activity">Select KG Tools</span></td>
+                            <td><span class="roadmap-activity">KG v0.1 Instantiation</span><span class="roadmap-activity">Ontology Refinement</span></td>
+                            <td><span class="roadmap-activity">Ontology v0.3.0 (Full)</span><span class="roadmap-activity">KB Enrichment (ESG)</span><span class="roadmap-activity">KG Validation Tools</span></td>
+                            <td><span class="roadmap-activity">KG v0.2 Population</span><span class="roadmap-activity">Continuous KB Linking</span></td>
+                            <td><span class="roadmap-activity">Ongoing Evolution</span><span class="roadmap-activity">Advanced KG Mgt.</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold bg-teal-100 text-teal-800">Core Analytical Capabilities</td>
+                            <td><span class="roadmap-activity">CACM Framework Design</span></td>
+                            <td><span class="roadmap-activity">Pilot CACMs (2-3)</span><span class="roadmap-activity">Basic Simulation (1 Model)</span></td>
+                            <td><span class="roadmap-activity">CACM Library Expansion</span><span class="roadmap-activity">Simulation Engine v0.2</span><span class="roadmap-activity">Predictive Model v1.0</span></td>
+                            <td><span class="roadmap-activity">Dynamic CACM (Proto)</span><span class="roadmap-activity">Sentiment Model v1.0</span></td>
+                            <td><span class="roadmap-activity">Advanced Simulation v1.0</span><span class="roadmap-activity">Expanded Model Library</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold bg-sky-100 text-sky-800">Efficiency & Automation</td>
+                            <td><span class="roadmap-activity">Data Ingestion (Pilot)</span></td>
+                            <td><span class="roadmap-activity">Workflow Templates (Pilot)</span><span class="roadmap-activity">Report Draft (Sectional)</span></td>
+                            <td><span class="roadmap-activity">Data Ingestion (Expanded)</span><span class="roadmap-activity">Workflow Engine v1.0</span></td>
+                            <td><span class="roadmap-activity">AI Reporting v1.0</span><span class="roadmap-activity">HITL Optimization</span></td>
+                            <td><span class="roadmap-activity">Intelligent Workflow</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold bg-indigo-100 text-indigo-800">Expertise Embedding & UI/UX</td>
+                            <td><span class="roadmap-activity">Decision Tree v3.1 Review UI</span></td>
+                            <td><span class="roadmap-activity">Feedback Loop v0.1</span><span class="roadmap-activity">Basic UI Dashboards</span></td>
+                            <td><span class="roadmap-activity">XAI v1.0</span><span class="roadmap-activity">Knowledge-Infused UI</span></td>
+                            <td><span class="roadmap-activity">Formalized Learning Loop</span><span class="roadmap-activity">Expert System Evolution</span></td>
+                            <td><span class="roadmap-activity">Reinforcement Learning (Explore)</span></td>
+                        </tr>
+                         <tr>
+                            <td class="font-semibold bg-purple-100 text-purple-800">System Expansion & Governance</td>
+                            <td><span class="roadmap-activity">Initial Governance Framework</span></td>
+                            <td><span class="roadmap-activity">API Strategy Defined</span></td>
+                            <td><span class="roadmap-activity">Template Library (Initial)</span><span class="roadmap-activity">Mapping Expansion</span></td>
+                            <td><span class="roadmap-activity">Auditability v1.0</span><span class="roadmap-activity">Broader Entity Analysis (Pilot)</span></td>
+                            <td><span class="roadmap-activity">Full API Ecosystem</span><span class="roadmap-activity">Mature Governance</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+             <p class="text-center mt-6 text-sm text-slate-600">Each phase prioritizes foundational work, followed by iterative development of advanced capabilities, ensuring continuous value delivery.</p>
+        </section>
+
+        <section id="resource-focus">
+            <h2 class="text-3xl font-bold text-blue-700 mb-10 text-center section-title">Illustrative Resource Focus: Year 1 Themes</h2>
+            <p class="text-center text-lg text-slate-700 max-w-3xl mx-auto mb-10">To illustrate initial priorities, this chart shows a hypothetical proportional resource focus for key themes in the first year of implementation. This is representative and subject to detailed planning.</p>
+            <div class="bg-white p-6 rounded-xl shadow-xl">
+                <div class="chart-container">
+                    <canvas id="resourceFocusChart"></canvas>
+                </div>
+                <p class="text-center mt-4 text-sm text-slate-600">Actual resource allocation will be determined by detailed project planning and evolving priorities. This visual emphasizes the foundational work required early on.</p>
+            </div>
+        </section>
+
+        <section id="conclusion" class="text-center bg-blue-700 text-white py-16 px-4 sm:px-6 lg:px-8 rounded-lg shadow-xl">
+            <h2 class="text-3xl font-bold mb-6">Charting the Course for Transformative Credit Intelligence</h2>
+            <p class="text-lg max-w-3xl mx-auto mb-8 opacity-90">
+                The successful realization of this strategic plan will equip the organization with unparalleled capabilities, providing a significant and sustainable competitive advantage.
+            </p>
+            <p class="text-md max-w-2xl mx-auto opacity-80">
+                Immediate next steps involve detailed operational planning, resource allocation, and formal initiation of Phase 1 activities, particularly the development of `credit_ontology.ttl v0.3.0` and core Knowledge Graph infrastructure.
+            </p>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 text-slate-600 text-sm border-t border-slate-200 mt-12">
+        <p>&copy; <span id="currentYear"></span> Credit Intelligence AI Platform Strategy. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function wrapText(text, maxWidth) {
+            if (typeof text !== 'string') return text; // Return as is if not a string (e.g., already an array)
+            if (text.length <= maxWidth) return text;
+
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach(word => {
+                if ((currentLine + word).length > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            });
+            lines.push(currentLine.trim());
+            return lines;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Illustrative Resource Focus Chart
+            const ctxResourceFocus = document.getElementById('resourceFocusChart');
+            if (ctxResourceFocus) {
+                const resourceData = {
+                    labels: [
+                        wrapText('Foundational Infrastructure (Ontology, KG, KB)', 16),
+                        wrapText('Core Analytical Capabilities (CACMs, Basic Sim)', 16),
+                        wrapText('Efficiency & Automation (Data Ingestion Pilot)', 16),
+                        wrapText('Expertise Embedding & UI/UX (Decision Tree UI, Feedback)', 16),
+                        wrapText('System Expansion & Governance (Initial Framework)', 16)
+                    ],
+                    datasets: [{
+                        label: 'Year 1 Resource Focus (Illustrative)',
+                        data: [40, 25, 15, 15, 5], // Fictional data
+                        backgroundColor: [
+                            '#1E40AF', // blue-800
+                            '#2563EB', // blue-600
+                            '#3B82F6', // blue-500
+                            '#60A5FA', // blue-400
+                            '#93C5FD'  // blue-300
+                        ],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }]
+                };
+
+                new Chart(ctxResourceFocus, {
+                    type: 'doughnut',
+                    data: resourceData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: { size: 10 },
+                                    boxWidth: 15,
+                                    padding: 15,
+                                     // Custom label generation to handle wrapped text correctly
+                                    generateLabels: function(chart) {
+                                        const data = chart.data;
+                                        if (data.labels.length && data.datasets.length) {
+                                            return data.labels.map(function(label, i) {
+                                                const meta = chart.getDatasetMeta(0);
+                                                const style = meta.controller.getStyle(i);
+                                                return {
+                                                    text: Array.isArray(label) ? label.join(' ') : label, // Join wrapped lines for legend
+                                                    fillStyle: style.backgroundColor,
+                                                    strokeStyle: style.borderColor,
+                                                    lineWidth: style.borderWidth,
+                                                    hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                                                    index: i
+                                                };
+                                            });
+                                        }
+                                        return [];
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    },
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Illustrative Year 1 Resource Allocation by Theme',
+                                font: { size: 16, weight: 'bold' },
+                                color: '#1E3A8A', // Dark Blue
+                                padding: { top: 10, bottom: 20 }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
