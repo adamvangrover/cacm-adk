@@ -1,0 +1,302 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cacm_ont: <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+@prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
+@prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
+
+# Base URI for this ontology will be defined in the next step
+
+<http://example.com/ontology/cacm_credit_ontology/0.3#>
+    a owl:Ontology ;
+    dcterms:title "Credit Analysis Capability Module Ontology"^^xsd:string ;
+    dcterms:description "Comprehensive expansion of the credit analysis ontology, incorporating detailed terms for valuation, risk management, macroeconomics, technical analysis, ESG factors, and LLM/ADK components based on user-provided knowledge graph structure."^^xsd:string ;
+    owl:versionInfo "0.3.0"^^xsd:string ;
+    dcterms:creator "Jules AI Agent"^^xsd:string ; # Or a more appropriate creator
+    dcterms:issued "2024-07-12"^^xsd:date ; # Assuming today's date or a relevant date
+    dcterms:modified "2024-07-12"^^xsd:date ; # Assuming today's date or a relevant date
+    rdfs:comment "This ontology is version 0.3, created to expand upon previous versions with a comprehensive set of classes and properties for credit analysis."^^xsd:string .
+
+# Definitions for classes and properties will follow this declaration.
+
+# --- Class Definitions ---
+
+cacm_ont:CreditActivity
+    rdf:type owl:Class ;
+    rdfs:label "Credit Activity"^^xsd:string ;
+    rdfs:comment "A general concept representing any activity or process related to credit analysis."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:FinancialInstrument
+    rdf:type owl:Class ;
+    rdfs:label "Financial Instrument"^^xsd:string ;
+    rdfs:comment "A financial instrument, such as a loan, bond, or line of credit, relevant to credit analysis."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:DataInput # Renamed from DataInputSource for broader applicability
+    rdf:type owl:Class ;
+    rdfs:label "Data Input"^^xsd:string ;
+    rdfs:comment "Represents any piece of data or information used as an input for a credit analysis capability."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:FinancialStatement
+    rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ;
+    rdfs:label "Financial Statement"^^xsd:string ;
+    rdfs:comment "A formal record of the financial activities and position of a business, person, or other entity (e.g., balance sheet, income statement)."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:Metric
+    rdf:type owl:Class ;
+    rdfs:label "Metric"^^xsd:string ;
+    rdfs:comment "A quantifiable measure used to track and assess the status of a specific business process, financial characteristic, or risk exposure."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:Ratio
+    rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ;
+    rdfs:label "Ratio"^^xsd:string ;
+    rdfs:comment "A type of metric that represents the relationship between two numbers or quantities, often used in financial analysis."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:RiskScore
+    rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ;
+    rdfs:label "Risk Score"^^xsd:string ;
+    rdfs:comment "A numerical representation of the creditworthiness or risk associated with an entity or financial instrument."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:EligibilityRule
+    rdf:type owl:Class ;
+    rdfs:label "Eligibility Rule"^^xsd:string ;
+    rdfs:comment "A specific criterion or condition that must be met for a credit application or process to proceed or be approved."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:Policy
+    rdf:type owl:Class ;
+    rdfs:label "Policy"^^xsd:string ;
+    rdfs:comment "A guiding principle or rule, often related to regulations or internal credit policies, that influences credit decisions."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Expanded Concepts (Classes) based on User Feedback ---
+
+kgclass:BalanceSheetItem 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:DataInput ; 
+    rdfs:label "Balance Sheet Item"^^xsd:string ; 
+    rdfs:comment "An item typically found on a balance sheet statement. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:IncomeStatementItem 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:DataInput ; 
+    rdfs:label "Income Statement Item"^^xsd:string ; 
+    rdfs:comment "An item typically found on an income statement. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:CashFlowItem 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:DataInput ; 
+    rdfs:label "Cash Flow Item"^^xsd:string ; 
+    rdfs:comment "An item typically found on a cash flow statement. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:ValuationMethod 
+    rdf:type owl:Class ; 
+    rdfs:label "Valuation Method"^^xsd:string ; 
+    rdfs:comment "A method used to determine the economic worth of an asset or company. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:IntrinsicValuationMethod 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf kgclass:ValuationMethod ; 
+    rdfs:label "Intrinsic Valuation Method"^^xsd:string ; 
+    rdfs:comment "Valuation based on intrinsic characteristics, like DCF. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RelativeValuationMethod 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf kgclass:ValuationMethod ; 
+    rdfs:label "Relative Valuation Method"^^xsd:string ; 
+    rdfs:comment "Valuation based on comparison with similar assets/companies (multiples). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:CalculatedValue 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:Metric ; 
+    rdfs:label "Calculated Value"^^xsd:string ; 
+    rdfs:comment "A value derived from a calculation, often in valuation contexts (e.g., Present Value, EV). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:ValuationOutput 
+    rdf:type owl:Class ; 
+    rdfs:label "Valuation Output"^^xsd:string ; 
+    rdfs:comment "A specific output from a valuation process (e.g., Enterprise Value, Implied Share Price). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RiskCategory 
+    rdf:type owl:Class ; 
+    rdfs:label "Risk Category"^^xsd:string ; 
+    rdfs:comment "A classification for different types of risks (e.g., Credit Risk, Market Risk, Liquidity Risk). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:CreditRiskMetric 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:Metric ; 
+    rdfs:label "Credit Risk Metric"^^xsd:string ; 
+    rdfs:comment "A metric specifically used to quantify or assess credit risk (e.g., PD, LGD, Expected Loss). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:LiquidityRiskType 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf kgclass:RiskCategory ; 
+    rdfs:label "Liquidity Risk Type"^^xsd:string ; 
+    rdfs:comment "Specific types of liquidity risk, like Funding Liquidity Risk or Market Liquidity Risk. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:LeverageRatio 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:Ratio ; 
+    rdfs:label "Leverage Ratio"^^xsd:string ; 
+    rdfs:comment "A financial ratio that measures the extent of a company's debt. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:LiquidityRatio 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:Ratio ; 
+    rdfs:label "Liquidity Ratio"^^xsd:string ; 
+    rdfs:comment "A financial ratio that measures a company's ability to meet short-term obligations. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:CoverageRatio 
+    rdf:type owl:Class ; 
+    rdfs:subClassOf cacm_ont:Ratio ; 
+    rdfs:label "Coverage Ratio"^^xsd:string ; 
+    rdfs:comment "A financial ratio that measures a company's ability to service its debt and other obligations. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RegulatoryRating 
+    rdf:type owl:Class ; 
+    rdfs:label "Regulatory Rating"^^xsd:string ; 
+    rdfs:comment "A credit-related rating assigned based on regulatory frameworks (e.g., SNC categories). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:PolicyObjective 
+    rdf:type owl:Class ; 
+    rdfs:label "Policy Objective"^^xsd:string ; 
+    rdfs:comment "A stated goal or aim of a policy that might influence credit (e.g. inflation target). User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Assumption 
+    rdf:type owl:Class ; 
+    rdfs:label "Assumption"^^xsd:string ; 
+    rdfs:comment "An underlying assumption made during an analysis or forecast. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Rationale 
+    rdf:type owl:Class ; 
+    rdfs:label "Rationale"^^xsd:string ; 
+    rdfs:comment "The reasoning or justification behind an analysis, conclusion, or rating. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:TrendIndicator 
+    rdf:type owl:Class ; 
+    rdfs:label "Trend Indicator"^^xsd:string ; 
+    rdfs:comment "An indicator used to determine the direction or strength of a trend. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:MarketFactor 
+    rdf:type owl:Class ; 
+    rdfs:label "Market Factor"^^xsd:string ; 
+    rdfs:comment "An external market factor that can influence financial analysis or entities. User-provided class definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Property Definitions ---
+
+# --- Core Properties (Relationships) ---
+
+cacm_ont:hasInputParameter
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "has input parameter"^^xsd:string ;
+    rdfs:comment "Relates a CACM or a step within it to an input parameter it requires. User-provided property definition."^^xsd:string ;
+    rdfs:domain cacm_ont:CreditActivity ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:hasDataSource
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "has data source"^^xsd:string ;
+    rdfs:comment "Relates an entity (e.g., a Metric) to the source of its underlying data (e.g., a specific FinancialStatement or external DataInput). User-provided property definition."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:calculatesMetric
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "calculates metric"^^xsd:string ;
+    rdfs:comment "Relates a process or capability to a metric it computes. User-provided property definition."^^xsd:string ;
+    rdfs:range cacm_ont:Metric ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:appliesRule
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "applies rule"^^xsd:string ;
+    rdfs:comment "Relates a process or capability to an eligibility rule or policy it enforces/checks. User-provided property definition."^^xsd:string ;
+    rdfs:range cacm_ont:EligibilityRule ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:requiresInput
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "requires input"^^xsd:string ;
+    rdfs:comment "Specifies that a capability, metric, or rule requires a particular type of data input. User-provided property definition."^^xsd:string ;
+    rdfs:range cacm_ont:DataInput ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+cacm_ont:producesOutput
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "produces output"^^xsd:string ;
+    rdfs:comment "Specifies that a capability or step produces a particular type of data as output. User-provided property definition."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Expanded Properties (Relationships) based on User Feedback ---
+
+kgprop:calculatedFrom 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "calculated from"^^xsd:string ; 
+    rdfs:comment "Indicates that a metric or value is derived from specific inputs or other metrics. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:assessesRisk 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "assesses risk"^^xsd:string ; 
+    rdfs:comment "Relates an analysis or metric to a specific type of risk it evaluates. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:appliesPolicy 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "applies policy"^^xsd:string ; 
+    rdfs:comment "Indicates that an analysis or rule is governed or influenced by a specific policy. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasAssumption 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "has assumption"^^xsd:string ; 
+    rdfs:comment "Links an analysis or model to an underlying assumption. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:providesRationale 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "provides rationale"^^xsd:string ; 
+    rdfs:comment "Connects an assessment or rating to its supporting rationale. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:mapsToRatingScale 
+    rdf:type owl:ObjectProperty ; # Could also be DatatypeProperty if range is literal
+    rdfs:label "maps to rating scale"^^xsd:string ; 
+    rdfs:comment "Relates a rating value to a specific rating scale (e.g. S&P, Moody's, SNC). User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:influencedByMarketFactor 
+    rdf:type owl:ObjectProperty ; 
+    rdfs:label "influenced by market factor"^^xsd:string ; 
+    rdfs:comment "Indicates that an entity or analysis is influenced by a market factor. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
