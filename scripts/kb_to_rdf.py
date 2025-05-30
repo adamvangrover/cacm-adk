@@ -1,39 +1,32 @@
 import json
+from rdflib import Graph, Namespace, Literal, URIRef
+from rdflib.namespace import RDF, RDFS, XSD, OWL, DCTERMS
 
-def escape_literal(literal_string):
-    """Escapes special characters for Turtle literals."""
-    return literal_string.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
+# Define Namespaces
+KGCLASS = Namespace("http://example.com/ontology/cacm_credit_ontology/0.3/classes/#")
+KGPROP = Namespace("http://example.com/ontology/cacm_credit_ontology/0.3/properties/#")
+KB_INSTANCE = Namespace("http://example.org/kb_instances/#") # As per prompt
+
+# Assumed new properties to be formally defined in the ontology later
+# KGPROP.hasMitigationStrategy
+# KGPROP.appliesToIndustryLiteral
 
 def main():
     kb_file_path = "knowledge_base/KB_Valuation_Risk_Macro_TechAnalysis_v1.json"
-    output_ttl_file_path = "knowledge_graph_instantiations/kb_formulas_instances.ttl"
+    output_ttl_file_path = "knowledge_graph_instantiations/kb_core_instances.ttl"
 
-    # Define RDF prefixes
-    prefixes = {
-        "rdf": "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
-        "rdfs": "<http://www.w3.org/2000/01/rdf-schema#>",
-        "owl": "<http://www.w3.org/2002/07/owl#>",
-        "xsd": "<http://www.w3.org/2001/XMLSchema#>",
-        "kgclass": "<http://example.com/ontology/cacm_credit_ontology/0.3/classes/#>",
-        "kgprop": "<http://example.com/ontology/cacm_credit_ontology/0.3/properties/#>",
-        "kb_instance": "<http://example.org/kb_instances/#>"
-    }
+    # Initialize RDF graph
+    g = Graph()
 
-    # Assumed new classes/properties for this script's output
-    # These would ideally be formally defined in the main ontology file
-    # For now, we are just using them in the generated Turtle.
-    # kgclass:FinancialFormula
-    # kgprop:hasCalculationString
-    # kgprop:hasInputLiteral (to store input names as literals for now)
-    # kgprop:hasOutputLiteral (to store output type as literal for now)
-
-
-    ttl_output = []
-
-    # Add prefixes to TTL output
-    for prefix, uri in prefixes.items():
-        ttl_output.append(f"@prefix {prefix}: {uri} .")
-    ttl_output.append("") # Newline for readability
+    # Bind prefixes
+    g.bind("rdf", RDF)
+    g.bind("rdfs", RDFS)
+    g.bind("owl", OWL)
+    g.bind("xsd", XSD)
+    g.bind("dcterms", DCTERMS)
+    g.bind("kgclass", KGCLASS)
+    g.bind("kgprop", KGPROP)
+    g.bind("kb_instance", KB_INSTANCE)
 
     # Load and parse the JSON KB
     try:
@@ -46,7 +39,7 @@ def main():
         print(f"Error: Could not decode JSON from {kb_file_path}")
         return
 
-    # Process only the 'financialFormulas' section
+    # Process 'financialFormulas'
     if "financialFormulas" in kb_data:
         for formula in kb_data["financialFormulas"]:
             formula_id = formula.get("formulaId")
@@ -54,49 +47,77 @@ def main():
                 print(f"Warning: Skipping formula due to missing 'formulaId': {formula.get('name')}")
                 continue
 
-            instance_uri = f"kb_instance:{formula_id}"
-            ttl_output.append(f"{instance_uri} rdf:type kgclass:FinancialFormula ;") # Assumed class
+            subject_uri = KB_INSTANCE[formula_id]
+            g.add((subject_uri, RDF.type, KGCLASS.FinancialFormula))
 
-            name = formula.get("name")
-            if name:
-                ttl_output.append(f'    rdfs:label "{escape_literal(name)}" ;')
-
-            description = formula.get("description")
-            if description:
-                ttl_output.append(f'    rdfs:comment "{escape_literal(description)}" ;')
-
-            calculation = formula.get("calculation")
-            if calculation:
-                # Assumed property kgprop:hasCalculationString
-                ttl_output.append(f'    kgprop:hasCalculationString "{escape_literal(calculation)}" ;')
-
-            inputs = formula.get("inputs")
-            if inputs and isinstance(inputs, list):
-                for inp in inputs:
-                    # Assumed property kgprop:hasInputLiteral
-                    ttl_output.append(f'    kgprop:hasInputLiteral "{escape_literal(inp)}" ;')
+            if formula.get("name"):
+                g.add((subject_uri, RDFS.label, Literal(formula["name"], lang="en")))
+            if formula.get("description"):
+                g.add((subject_uri, RDFS.comment, Literal(formula["description"], lang="en")))
+            if formula.get("calculation"):
+                g.add((subject_uri, KGPROP.hasCalculationString, Literal(formula["calculation"], datatype=XSD.string)))
             
-            output_type = formula.get("output")
-            if output_type:
-                # Assumed property kgprop:hasOutputLiteral
-                ttl_output.append(f'    kgprop:hasOutputLiteral "{escape_literal(output_type)}" ;')
+            inputs = formula.get("inputs", [])
+            for inp in inputs:
+                g.add((subject_uri, KGPROP.hasInputLiteral, Literal(inp, datatype=XSD.string)))
+            
+            if formula.get("output"):
+                g.add((subject_uri, KGPROP.hasOutputLiteral, Literal(formula["output"], datatype=XSD.string)))
+
+    # Process 'riskFactors'
+    if "riskFactors" in kb_data:
+        for rf in kb_data["riskFactors"]:
+            rf_id = rf.get("riskFactorId")
+            if not rf_id:
+                print(f"Warning: Skipping risk factor due to missing 'riskFactorId': {rf.get('name')}")
+                continue
+
+            subject_uri = KB_INSTANCE[rf_id]
+            g.add((subject_uri, RDF.type, KGCLASS.RiskFactor))
+
+            if rf.get("name"):
+                g.add((subject_uri, RDFS.label, Literal(rf["name"], lang="en")))
+            if rf.get("description"):
+                g.add((subject_uri, RDFS.comment, Literal(rf["description"], lang="en")))
+
+            strategies = rf.get("mitigationStrategies", [])
+            for strat in strategies:
+                g.add((subject_uri, KGPROP.hasMitigationStrategy, Literal(strat, datatype=XSD.string)))
+            
+            industries = rf.get("relevantIndustries", [])
+            for ind in industries:
+                g.add((subject_uri, KGPROP.appliesToIndustryLiteral, Literal(ind, datatype=XSD.string)))
+
+    # Process 'macroeconomicIndicators'
+    if "macroeconomicIndicators" in kb_data:
+        for indicator in kb_data["macroeconomicIndicators"]:
+            indicator_id = indicator.get("indicatorId")
+            if not indicator_id:
+                print(f"Warning: Skipping indicator due to missing 'indicatorId': {indicator.get('name')}")
+                continue
+            
+            subject_uri = KB_INSTANCE[indicator_id]
+            g.add((subject_uri, RDF.type, KGCLASS.EconomicIndicator))
+
+            if indicator.get("name"):
+                g.add((subject_uri, RDFS.label, Literal(indicator["name"], lang="en")))
+            if indicator.get("description"):
+                g.add((subject_uri, RDFS.comment, Literal(indicator["description"], lang="en")))
+            if indicator.get("source"):
+                # Using DCTERMS.source for the source string.
+                # DCTERMS.source typically expects a URI, but can hold a string.
+                # For more precise semantics, a custom property like kgprop:hasDataSourceName could be used
+                # if the source is always a name string and not a URI to a source entity.
+                # For this task, DCTERMS.source with a Literal is acceptable.
+                g.add((subject_uri, DCTERMS.source, Literal(indicator["source"], lang="en")))
 
 
-            # Remove trailing semicolon from the last property if it exists
-            if ttl_output and ttl_output[-1].endswith(';'):
-                ttl_output[-1] = ttl_output[-1][:-2] + " ." # Replace with period
-            else: # Should not happen if properties were added
-                ttl_output.append("    a owl:NamedIndividual .") # Fallback if no props, ensure valid triple
-
-            ttl_output.append("") # Newline for readability between instances
-
-    # Write the TTL output to file
+    # Serialize the graph to TTL file
     try:
-        with open(output_ttl_file_path, 'w') as f:
-            f.write("\n".join(ttl_output))
+        g.serialize(destination=output_ttl_file_path, format="turtle")
         print(f"Successfully generated RDF instances to {output_ttl_file_path}")
-    except IOError:
-        print(f"Error: Could not write TTL output to {output_ttl_file_path}")
+    except Exception as e:
+        print(f"Error: Could not write TTL output to {output_ttl_file_path}: {e}")
 
 if __name__ == "__main__":
     main()

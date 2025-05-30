@@ -1,0 +1,133 @@
+{
+  "cacmId": "urn:adk:template:financial_model:dcf_model_input:v1",
+  "version": "1.0.0",
+  "name": "Discounted Cash Flow (DCF) Model Input and Execution",
+  "description": "Defines inputs for and executes a Discounted Cash Flow (DCF) analysis to estimate enterprise and equity value.",
+  "inputs": {
+    "historicalFinancialSummary": {
+      "type": "object",
+      "description": "Summary of historical financials, typically including last actual year's revenue, EBITDA, D&A, NWC, Capex. (Structure could align with output of a financial summary CACM)."
+    },
+    "projectionYears": {
+      "type": "integer",
+      "description": "Number of explicit years for cash flow projection (e.g., 5 or 10)."
+    },
+    "weightedAverageCostOfCapital": {
+      "type": "number",
+      "description": "Weighted Average Cost of Capital (WACC) as a decimal (e.g., 0.08 for 8%)."
+    },
+    "terminalGrowthRate": {
+      "type": "number",
+      "description": "Perpetual growth rate for calculating terminal value, as a decimal (e.g., 0.02 for 2%)."
+    },
+    "forecastAssumptions": {
+      "type": "object",
+      "description": "Key assumptions for projecting line items.",
+      "properties": {
+        "revenueGrowthRates": { "type": "array", "items": {"type": "number"}, "description": "Array of revenue growth rates for each projection year." },
+        "ebitdaMargins": { "type": "array", "items": {"type": "number"}, "description": "Array of EBITDA margins for each projection year." },
+        "depreciationAsPercentageOfRevenue": { "type": "number", "optional": true },
+        "amortizationAsPercentageOfRevenue": { "type": "number", "optional": true },
+        "capexAsPercentageOfRevenue": { "type": "array", "items": {"type": "number"}, "description": "Array of Capex as % of Revenue for each projection year." },
+        "changeInNWCAsPercentageOfRevenueChange": { "type": "array", "items": {"type": "number"}, "description": "Array of Change in Net Working Capital as % of Revenue Change for each projection year." }
+      }
+    },
+    "netDebt": {
+      "type": "number",
+      "description": "Company's current net debt (Total Debt - Cash & Equivalents)."
+    }
+  },
+  "outputs": {
+    "projectedFreeCashFlows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "year": {"type": "integer"},
+          "revenue": {"type": "number"},
+          "ebitda": {"type": "number"},
+          "ebit": {"type": "number"},
+          "nopat": {"type": "number"},
+          "depreciationAndAmortization": {"type": "number"},
+          "capex": {"type": "number"},
+          "changeInNWC": {"type": "number"},
+          "freeCashFlowUnlevered": {"type": "number"}
+        }
+      },
+      "description": "Calculated unlevered free cash flows for each projection year."
+    },
+    "terminalValue": { "type": "number", "description": "Calculated terminal value at the end of the projection period." },
+    "enterpriseValue": { "type": "number", "description": "Calculated Enterprise Value (EV)." },
+    "equityValue": { "type": "number", "description": "Calculated Equity Value." },
+    "impliedPERatio": { "type": "number", "optional": true, "description": "Implied P/E ratio if net income is available/projected." },
+    "impliedEVEBITDARatio": { "type": "number", "optional": true, "description": "Implied EV/EBITDA ratio." }
+  },
+  "parameters": {
+    "effectiveTaxRate": {
+      "type": "number",
+      "description": "Effective tax rate for NOPAT calculation, as a decimal (e.g., 0.21 for 21%).",
+      "default": 0.21
+    },
+    "midYearDiscounting": {
+      "type": "boolean",
+      "description": "Whether to use mid-year convention for discounting cash flows.",
+      "default": false
+    }
+  },
+  "workflow": [
+    {
+      "stepName": "Project Financial Line Items",
+      "computeCapabilityRef": "urn:adk:capability:dcf_line_item_projector:v1",
+      "inputs": {
+        "historicalSummary": "inputs.historicalFinancialSummary",
+        "projectionYears": "inputs.projectionYears",
+        "forecastAssumptions": "inputs.forecastAssumptions",
+        "taxRate": "parameters.effectiveTaxRate"
+      },
+      "outputs": {
+        "projectedStatements": "intermediate.projectedStatements" 
+      }
+    },
+    {
+      "stepName": "Calculate Free Cash Flows",
+      "computeCapabilityRef": "urn:adk:capability:dcf_free_cash_flow_calculator:v1",
+      "inputs": {
+        "projectedStatements": "intermediate.projectedStatements"
+      },
+      "outputs": {
+        "cashFlows": "outputs.projectedFreeCashFlows"
+      }
+    },
+    {
+      "stepName": "Calculate Terminal Value",
+      "computeCapabilityRef": "urn:adk:capability:dcf_terminal_value_calculator:v1",
+      "inputs": {
+        "finalYearProjectedFCF": "outputs.projectedFreeCashFlows[-1].freeCashFlowUnlevered",
+        "wacc": "inputs.weightedAverageCostOfCapital",
+        "terminalGrowthRate": "inputs.terminalGrowthRate"
+      },
+      "outputs": {
+        "tv": "outputs.terminalValue"
+      }
+    },
+    {
+      "stepName": "Discount Cash Flows and Calculate Values",
+      "computeCapabilityRef": "urn:adk:capability:dcf_value_calculator:v1",
+      "inputs": {
+        "projectedFCFs": "outputs.projectedFreeCashFlows",
+        "terminalValue": "outputs.terminalValue",
+        "wacc": "inputs.weightedAverageCostOfCapital",
+        "netDebt": "inputs.netDebt",
+        "midYearDiscounting": "parameters.midYearDiscounting",
+        "latestEBITDA": "intermediate.projectedStatements[0].ebitda",
+        "latestNetIncome": "intermediate.projectedStatements[0].netIncome"
+      },
+      "outputs": {
+        "enterpriseValue": "outputs.enterpriseValue",
+        "equityValue": "outputs.equityValue",
+        "impliedPERatio": "outputs.impliedPERatio",
+        "impliedEVEBITDARatio": "outputs.impliedEVEBITDARatio"
+      }
+    }
+  ]
+}
