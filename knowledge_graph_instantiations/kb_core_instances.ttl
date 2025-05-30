@@ -1,0 +1,65 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix kb_instance: <http://example.org/kb_instances/#> .
+@prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
+@prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+kb_instance:FF_001 a kgclass:FinancialFormula ;
+    rdfs:label "Debt-to-Equity Ratio"@en ;
+    kgprop:hasCalculationString "(TotalLiabilities / ShareholdersEquity)"^^xsd:string ;
+    kgprop:hasInputLiteral "ShareholdersEquity"^^xsd:string,
+        "TotalLiabilities"^^xsd:string ;
+    kgprop:hasOutputLiteral "Ratio"^^xsd:string ;
+    rdfs:comment "Measures the financial leverage of a company."@en .
+
+kb_instance:FF_002 a kgclass:FinancialFormula ;
+    rdfs:label "Current Ratio"@en ;
+    kgprop:hasCalculationString "(CurrentAssets / CurrentLiabilities)"^^xsd:string ;
+    kgprop:hasInputLiteral "CurrentAssets"^^xsd:string,
+        "CurrentLiabilities"^^xsd:string ;
+    kgprop:hasOutputLiteral "Ratio"^^xsd:string ;
+    rdfs:comment "Measures a company's ability to pay short-term obligations (due within one year)."@en .
+
+kb_instance:FF_003 a kgclass:FinancialFormula ;
+    rdfs:label "Net Profit Margin"@en ;
+    kgprop:hasCalculationString "(NetIncome / Revenue) * 100"^^xsd:string ;
+    kgprop:hasInputLiteral "NetIncome"^^xsd:string,
+        "Revenue"^^xsd:string ;
+    kgprop:hasOutputLiteral "Percentage"^^xsd:string ;
+    rdfs:comment "Measures how much net income is generated as a percentage of revenues."@en .
+
+kb_instance:MI_001 a kgclass:EconomicIndicator ;
+    rdfs:label "GDP Growth Rate"@en ;
+    dcterms:source "National Statistics Office"@en ;
+    rdfs:comment "The rate at which a country's Gross Domestic Product is growing."@en .
+
+kb_instance:MI_002 a kgclass:EconomicIndicator ;
+    rdfs:label "Unemployment Rate"@en ;
+    dcterms:source "Bureau of Labor Statistics"@en ;
+    rdfs:comment "The percentage of the total labor force that is unemployed but actively seeking employment and willing to work."@en .
+
+kb_instance:RF_001 a kgclass:RiskFactor ;
+    rdfs:label "Interest Rate Risk"@en ;
+    kgprop:appliesToIndustryLiteral "kgclass:FinancialServices"^^xsd:string,
+        "kgclass:RealEstate"^^xsd:string ;
+    kgprop:hasMitigationStrategy "Fixed-rate financing"^^xsd:string,
+        "Hedging"^^xsd:string ;
+    rdfs:comment "The risk that changes in interest rates will adversely affect a company's financials or the value of a financial instrument."@en .
+
+kb_instance:RF_002 a kgclass:RiskFactor ;
+    rdfs:label "Market Risk"@en ;
+    kgprop:appliesToIndustryLiteral "kgclass:All"^^xsd:string ;
+    kgprop:hasMitigationStrategy "Asset Allocation"^^xsd:string,
+        "Diversification"^^xsd:string ;
+    rdfs:comment "The risk of losses in positions arising from movements in market prices."@en .
+
+kb_instance:RF_003 a kgclass:RiskFactor ;
+    rdfs:label "Geopolitical Risk"@en ;
+    kgprop:appliesToIndustryLiteral "kgclass:Energy"^^xsd:string,
+        "kgclass:InternationalTrade"^^xsd:string,
+        "kgclass:Mining"^^xsd:string ;
+    kgprop:hasMitigationStrategy "Diversification"^^xsd:string,
+        "Political risk insurance"^^xsd:string ;
+    rdfs:comment "Risk associated with political changes, conflicts, or instability in a country or region that could impact investments or business operations."@en .
+

@@ -1,0 +1,18 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:pd_model_input:v1",
+  "version": "1.0.0",
+  "name": "Probability of Default (PD) Model Input Preparation",
+  "description": "Structures inputs typically required for a Probability of Default model.",
+  "inputs": {
+    "calculatedFinancialRatios": { "type": "object", "description": "Object containing relevant financial ratios (e.g., from financial_summary_and_key_ratios_template outputs)." },
+    "qualitativeFactorScores": { "type": "object", "description": "Object containing numerically scored qualitative factors (e.g., management_quality_score: 4, industry_risk_score: 3).", "additionalProperties": {"type": "number"} },
+    "companyMetadata": { "type": "object", "properties": {"industryCode": {"type": "string"}, "ageInYears": {"type": "integer"}}, "optional": true}
+  },
+  "parameters": {},
+  "outputs": {
+    "pdModelInputVector": { "type": "object", "description": "Structured input vector ready for a PD model, potentially with normalized/transformed values." }
+  },
+  "workflow": [
+    { "stepName": "Assemble PD Model Inputs", "computeCapabilityRef": "urn:adk:capability:pd_input_assembler_transformer:v1", "inputs": { "ratios": "inputs.calculatedFinancialRatios", "qualitativeScores": "inputs.qualitativeFactorScores", "metadata": "inputs.companyMetadata"}, "outputs": {"vector": "outputs.pdModelInputVector"} }
+  ]
+}
