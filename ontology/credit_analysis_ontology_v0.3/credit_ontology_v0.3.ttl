@@ -268,6 +268,24 @@ kgclass:EconomicIndicator rdf:type owl:Class ;
     rdfs:comment "A statistic about an economic activity that allows analysis of economic performance and predictions of future performance."^^xsd:string ;
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
 
+kgclass:MarketData rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ;
+    rdfs:label "Market Data"^^xsd:string ;
+    rdfs:comment "Data points related to financial markets, such as stock prices, bond yields, exchange rates, and commodity prices."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RegulatoryFiling rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ; # Filings are a form of data input
+    rdfs:label "Regulatory Filing"^^xsd:string ;
+    rdfs:comment "A formal document or dataset submitted to a regulatory authority, such as SEC filings (10-K, 10-Q) or central bank reports."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Covenant rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ; # Could be also related to cacm_ont:EligibilityRule or cacm_ont:Policy but represents a contractual term.
+    rdfs:label "Covenant"^^xsd:string ;
+    rdfs:comment "A condition or restriction included in a loan agreement or bond indenture that the borrower must comply with."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
 # --- Property Definitions ---
 
 # --- Core Properties (Relationships) ---
@@ -446,4 +464,18 @@ kgprop:hasValue rdf:type owl:DatatypeProperty ;
     rdfs:domain kgclass:Rating ;
     rdfs:domain kgclass:RiskFactor ;
     rdfs:range xsd:string ; # Defaulting to xsd:string as per instruction, can be refined later.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasSourceSystem rdf:type owl:DatatypeProperty ;
+    rdfs:label "has source system"^^xsd:string ;
+    rdfs:comment "Relates a data item or artifact to the specific IT system or platform from which it originated. For now, the range is a string, but could be refined to a SoftwareSystem class."^^xsd:string ;
+    rdfs:domain cacm_ont:DataInput ; # Broadly applicable to any data input
+    rdfs:range xsd:string ; # Changed to xsd:string as kgclass:SoftwareSystem is not yet defined.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:isDerivedFrom rdf:type owl:ObjectProperty ;
+    rdfs:label "is derived from"^^xsd:string ;
+    rdfs:comment "Indicates that an entity (e.g., an analysis, a report, a metric) is derived or transformed from one or more other entities."^^xsd:string ;
+    rdfs:domain owl:Thing ; # Broadly applicable
+    rdfs:range owl:Thing ;  # Broadly applicable
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
