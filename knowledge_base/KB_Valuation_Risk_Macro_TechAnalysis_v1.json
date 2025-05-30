@@ -1,0 +1,67 @@
+{
+  "financialFormulas": [
+    {
+      "formulaId": "FF_001",
+      "name": "Debt-to-Equity Ratio",
+      "description": "Measures the financial leverage of a company.",
+      "calculation": "(TotalLiabilities / ShareholdersEquity)",
+      "inputs": ["TotalLiabilities", "ShareholdersEquity"],
+      "output": "Ratio",
+      "relatedOntologyConcepts": ["kgclass:Obligor", "kgprop:debtToEquityRatio"]
+    },
+    {
+      "formulaId": "FF_002",
+      "name": "Current Ratio",
+      "description": "Measures a company's ability to pay short-term obligations (due within one year).",
+      "calculation": "(CurrentAssets / CurrentLiabilities)",
+      "inputs": ["CurrentAssets", "CurrentLiabilities"],
+      "output": "Ratio",
+      "relatedOntologyConcepts": ["kgclass:Obligor", "kgclass:Asset", "cacm_ont:Ratio"]
+    }
+  ],
+  "riskFactors": [
+    {
+      "riskFactorId": "RF_001",
+      "name": "Interest Rate Risk",
+      "description": "The risk that changes in interest rates will adversely affect a company's financials or the value of a financial instrument.",
+      "mitigationStrategies": ["Hedging", "Fixed-rate financing"],
+      "relevantIndustries": ["kgclass:FinancialServices", "kgclass:RealEstate"],
+      "relatedOntologyConcepts": ["kgclass:RiskFactor", "kgprop:exposedTo"]
+    },
+    {
+      "riskFactorId": "RF_002",
+      "name": "Market Risk",
+      "description": "The risk of losses in positions arising from movements in market prices.",
+      "mitigationStrategies": ["Diversification", "Asset Allocation"],
+      "relevantIndustries": ["kgclass:All"],
+      "relatedOntologyConcepts": ["kgclass:RiskFactor", "kgclass:MarketFactor"]
+    }
+  ],
+  "analyticalTechniques": [
+    {
+      "techniqueId": "AT_001",
+      "name": "SWOT Analysis",
+      "description": "A strategic planning technique used to help an organization identify strengths, weaknesses, opportunities, and threats related to business competition or project planning.",
+      "steps": ["Identify Strengths", "Identify Weaknesses", "Identify Opportunities", "Identify Threats"],
+      "relatedOntologyConcepts": ["kgclass:Analysis"]
+    }
+  ],
+  "macroeconomicIndicators": [
+    {
+      "indicatorId": "MI_001",
+      "name": "GDP Growth Rate",
+      "description": "The rate at which a country's Gross Domestic Product is growing.",
+      "source": "National Statistics Office",
+      "relatedOntologyConcepts": ["kgclass:EconomicIndicator", "kgprop:hasValue"]
+    }
+  ],
+  "regulatoryGuidelines": [
+    {
+      "guidelineId": "RG_001",
+      "name": "Basel III Liquidity Coverage Ratio",
+      "description": "Requires banks to hold a buffer of high-quality liquid assets sufficient to deal with the cash outflows it could encounter over a 30-day stress period.",
+      "jurisdiction": "Global (BIS)",
+      "relatedOntologyConcepts": ["cacm_ont:Policy", "kgclass:LiquidityRatio"]
+    }
+  ]
+}
