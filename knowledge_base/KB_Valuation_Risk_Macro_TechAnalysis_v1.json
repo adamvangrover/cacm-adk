@@ -1,0 +1,91 @@
+{
+  "financialFormulas": [
+    {
+      "formulaId": "FF_001",
+      "name": "Debt-to-Equity Ratio",
+      "description": "Measures the financial leverage of a company.",
+      "calculation": "(TotalLiabilities / ShareholdersEquity)",
+      "inputs": ["TotalLiabilities", "ShareholdersEquity"],
+      "output": "Ratio",
+      "relatedOntologyConcepts": ["kgclass:Obligor", "kgprop:debtToEquityRatio"]
+    },
+    {
+      "formulaId": "FF_002",
+      "name": "Current Ratio",
+      "description": "Measures a company's ability to pay short-term obligations (due within one year).",
+      "calculation": "(CurrentAssets / CurrentLiabilities)",
+      "inputs": ["CurrentAssets", "CurrentLiabilities"],
+      "output": "Ratio",
+      "relatedOntologyConcepts": ["kgclass:Obligor", "kgclass:Asset", "cacm_ont:Ratio"]
+    },
+    {
+      "formulaId": "FF_003",
+      "name": "Net Profit Margin",
+      "description": "Measures how much net income is generated as a percentage of revenues.",
+      "calculation": "(NetIncome / Revenue) * 100",
+      "inputs": ["NetIncome", "Revenue"],
+      "output": "Percentage",
+      "relatedOntologyConcepts": ["cacm_ont:Ratio"]
+    }
+  ],
+  "riskFactors": [
+    {
+      "riskFactorId": "RF_001",
+      "name": "Interest Rate Risk",
+      "description": "The risk that changes in interest rates will adversely affect a company's financials or the value of a financial instrument.",
+      "mitigationStrategies": ["Hedging", "Fixed-rate financing"],
+      "relevantIndustries": ["kgclass:FinancialServices", "kgclass:RealEstate"],
+      "relatedOntologyConcepts": ["kgclass:RiskFactor", "kgprop:exposedTo"]
+    },
+    {
+      "riskFactorId": "RF_002",
+      "name": "Market Risk",
+      "description": "The risk of losses in positions arising from movements in market prices.",
+      "mitigationStrategies": ["Diversification", "Asset Allocation"],
+      "relevantIndustries": ["kgclass:All"],
+      "relatedOntologyConcepts": ["kgclass:RiskFactor", "kgclass:MarketFactor"]
+    },
+    {
+      "riskFactorId": "RF_003",
+      "name": "Geopolitical Risk",
+      "description": "Risk associated with political changes, conflicts, or instability in a country or region that could impact investments or business operations.",
+      "mitigationStrategies": ["Diversification", "Political risk insurance"],
+      "relevantIndustries": ["kgclass:Energy", "kgclass:Mining", "kgclass:InternationalTrade"],
+      "relatedOntologyConcepts": ["kgclass:RiskFactor"]
+    }
+  ],
+  "analyticalTechniques": [
+    {
+      "techniqueId": "AT_001",
+      "name": "SWOT Analysis",
+      "description": "A strategic planning technique used to help an organization identify strengths, weaknesses, opportunities, and threats related to business competition or project planning.",
+      "steps": ["Identify Strengths", "Identify Weaknesses", "Identify Opportunities", "Identify Threats"],
+      "relatedOntologyConcepts": ["kgclass:Analysis"]
+    }
+  ],
+  "macroeconomicIndicators": [
+    {
+      "indicatorId": "MI_001",
+      "name": "GDP Growth Rate",
+      "description": "The rate at which a country's Gross Domestic Product is growing.",
+      "source": "National Statistics Office",
+      "relatedOntologyConcepts": ["kgclass:EconomicIndicator", "kgprop:hasValue"]
+    },
+    {
+      "indicatorId": "MI_002",
+      "name": "Unemployment Rate",
+      "description": "The percentage of the total labor force that is unemployed but actively seeking employment and willing to work.",
+      "source": "Bureau of Labor Statistics",
+      "relatedOntologyConcepts": ["kgclass:EconomicIndicator", "kgprop:hasValue"]
+    }
+  ],
+  "regulatoryGuidelines": [
+    {
+      "guidelineId": "RG_001",
+      "name": "Basel III Liquidity Coverage Ratio",
+      "description": "Requires banks to hold a buffer of high-quality liquid assets sufficient to deal with the cash outflows it could encounter over a 30-day stress period.",
+      "jurisdiction": "Global (BIS)",
+      "relatedOntologyConcepts": ["cacm_ont:Policy", "kgclass:LiquidityRatio"]
+    }
+  ]
+}

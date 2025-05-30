@@ -3,6 +3,8 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix cacm_ont: <http://example.com/ontology/cacm_credit_ontology/0.3#> .
 @prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
 @prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
@@ -213,6 +215,95 @@ kgclass:MarketFactor
     rdfs:comment "An external market factor that can influence financial analysis or entities. User-provided class definition."^^xsd:string ; 
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
 
+# --- Newly Added Core Classes ---
+
+kgclass:FinancialInstrument rdf:type owl:Class ;
+    rdfs:label "Financial Instrument"^^xsd:string ;
+    rdfs:comment "Represents a financial instrument, such as a loan, bond, or derivative. Note: cacm_ont:FinancialInstrument also exists."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Obligor rdf:type owl:Class ;
+    rdfs:label "Obligor"^^xsd:string ;
+    rdfs:comment "An entity (e.g., individual, company, or government) that has an obligation to pay or perform a duty."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RiskFactor rdf:type owl:Class ;
+    rdfs:label "Risk Factor"^^xsd:string ;
+    rdfs:comment "A factor that can introduce or increase risk to an obligor, asset, or financial instrument."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Analysis rdf:type owl:Class ;
+    rdfs:label "Analysis"^^xsd:string ;
+    rdfs:comment "A general concept representing the process or result of a detailed examination or study."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:AnalysisTool rdf:type owl:Class ;
+    rdfs:subClassOf kgclass:Analysis ;
+    rdfs:label "Analysis Tool"^^xsd:string ;
+    rdfs:comment "A specific tool, model, or methodology used to perform an analysis."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Asset rdf:type owl:Class ;
+    rdfs:label "Asset"^^xsd:string ;
+    rdfs:comment "A resource with economic value that an individual, corporation, or country owns or controls with the expectation that it will provide future benefit."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:CreditReport rdf:type owl:Class ;
+    rdfs:label "Credit Report"^^xsd:string ;
+    rdfs:comment "A detailed report of an individual's or company's credit history."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Rating rdf:type owl:Class ;
+    rdfs:label "Rating"^^xsd:string ;
+    rdfs:comment "A classification or score assigned to an entity or instrument, typically indicating its creditworthiness or quality. Broader than kgclass:RegulatoryRating."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Industry rdf:type owl:Class ;
+    rdfs:label "Industry"^^xsd:string ;
+    rdfs:comment "A category representing a specific branch of economic or commercial activity."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:EconomicIndicator rdf:type owl:Class ;
+    rdfs:label "Economic Indicator"^^xsd:string ;
+    rdfs:comment "A statistic about an economic activity that allows analysis of economic performance and predictions of future performance."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:MarketData rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ;
+    rdfs:label "Market Data"^^xsd:string ;
+    rdfs:comment "Data points related to financial markets, such as stock prices, bond yields, exchange rates, and commodity prices."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:RegulatoryFiling rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ; # Filings are a form of data input
+    rdfs:label "Regulatory Filing"^^xsd:string ;
+    rdfs:comment "A formal document or dataset submitted to a regulatory authority, such as SEC filings (10-K, 10-Q) or central bank reports."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Covenant rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ; # Could be also related to cacm_ont:EligibilityRule or cacm_ont:Policy but represents a contractual term.
+    rdfs:label "Covenant"^^xsd:string ;
+    rdfs:comment "A condition or restriction included in a loan agreement or bond indenture that the borrower must comply with."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:FinancialFormula rdf:type owl:Class ;
+    rdfs:subClassOf kgclass:Analysis ;
+    rdfs:label "Financial Formula"@en ;
+    rdfs:comment "Represents a specific financial formula used in credit analysis, including its calculation logic and typical inputs/outputs."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:Event rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "Represents a generic event that can occur, such as a market event, a company-specific event, or a data change event."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgclass:MonitoringAlert rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ; # Could be kgclass:AnalysisOutput if defined, or related to an Event.
+    rdfs:label "Monitoring Alert"@en ;
+    rdfs:comment "Represents an alert generated by a monitoring process, indicating a notable event or threshold breach."@en ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
 # --- Property Definitions ---
 
 # --- Core Properties (Relationships) ---
@@ -299,4 +390,152 @@ kgprop:influencedByMarketFactor
     rdf:type owl:ObjectProperty ; 
     rdfs:label "influenced by market factor"^^xsd:string ; 
     rdfs:comment "Indicates that an entity or analysis is influenced by a market factor. User-provided property definition."^^xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Newly Added Core Properties ---
+
+kgprop:hasRating rdf:type owl:ObjectProperty ;
+    rdfs:label "has rating"^^xsd:string ;
+    rdfs:comment "Relates an entity (e.g., Obligor, FinancialInstrument) to its credit rating."^^xsd:string ;
+    rdfs:domain kgclass:FinancialInstrument ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range kgclass:Rating ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:exposedTo rdf:type owl:ObjectProperty ;
+    rdfs:label "exposed to"^^xsd:string ;
+    rdfs:comment "Connects an Obligor, Asset, or FinancialInstrument to a RiskFactor."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    rdfs:domain kgclass:FinancialInstrument ;
+    rdfs:range kgclass:RiskFactor ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:financedBy rdf:type owl:ObjectProperty ;
+    rdfs:label "financed by"^^xsd:string ;
+    rdfs:comment "Connects an Obligor or Asset to a FinancialInstrument that finances it."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    rdfs:range kgclass:FinancialInstrument ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:addressed_by rdf:type owl:ObjectProperty ;
+    rdfs:label "addressed by"^^xsd:string ;
+    rdfs:comment "Connects a RiskFactor or an Analysis to an AnalysisTool that addresses it."^^xsd:string ;
+    rdfs:domain kgclass:RiskFactor ;
+    rdfs:domain kgclass:Analysis ;
+    rdfs:range kgclass:AnalysisTool ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasPrincipalAmount rdf:type owl:DatatypeProperty ;
+    rdfs:label "has principal amount"^^xsd:string ;
+    rdfs:comment "Specifies the principal amount of a financial instrument."^^xsd:string ;
+    rdfs:domain kgclass:FinancialInstrument ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasCurrency rdf:type owl:DatatypeProperty ;
+    rdfs:label "has currency"^^xsd:string ;
+    rdfs:comment "Specifies the currency of a financial amount or instrument."^^xsd:string ;
+    rdfs:domain kgclass:FinancialInstrument ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasMaturityDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "has maturity date"^^xsd:string ;
+    rdfs:comment "Specifies the maturity date of a financial instrument."^^xsd:string ;
+    rdfs:domain kgclass:FinancialInstrument ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:generatedBy rdf:type owl:ObjectProperty ;
+    rdfs:label "generated by"^^xsd:string ;
+    rdfs:comment "Connects a CreditReport or Analysis to an AnalysisTool that generated it."^^xsd:string ;
+    rdfs:domain kgclass:CreditReport ;
+    rdfs:domain kgclass:Analysis ;
+    rdfs:range kgclass:AnalysisTool ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:pertainsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "pertains to"^^xsd:string ;
+    rdfs:comment "Connects an Analysis, CreditReport, Rating, or RiskFactor to an Obligor, FinancialInstrument, or Asset it concerns."^^xsd:string ;
+    rdfs:domain kgclass:Analysis ;
+    rdfs:domain kgclass:CreditReport ;
+    rdfs:domain kgclass:Rating ;
+    rdfs:domain kgclass:RiskFactor ;
+    rdfs:range kgclass:Obligor ;
+    rdfs:range kgclass:FinancialInstrument ;
+    rdfs:range kgclass:Asset ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasIndustry rdf:type owl:ObjectProperty ;
+    rdfs:label "has industry"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to an Industry."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range kgclass:Industry ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasValue rdf:type owl:DatatypeProperty ;
+    rdfs:label "has value"^^xsd:string ;
+    rdfs:comment "Represents a generic value for entities like EconomicIndicator, Rating, or RiskFactor. The specific datatype can vary (e.g., xsd:string, xsd:decimal)."^^xsd:string ;
+    rdfs:domain kgclass:EconomicIndicator ;
+    rdfs:domain kgclass:Rating ;
+    rdfs:domain kgclass:RiskFactor ;
+    rdfs:range xsd:string ; # Defaulting to xsd:string as per instruction, can be refined later.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasSourceSystem rdf:type owl:DatatypeProperty ;
+    rdfs:label "has source system"^^xsd:string ;
+    rdfs:comment "Relates a data item or artifact to the specific IT system or platform from which it originated. For now, the range is a string, but could be refined to a SoftwareSystem class."^^xsd:string ;
+    rdfs:domain cacm_ont:DataInput ; # Broadly applicable to any data input
+    rdfs:range xsd:string ; # Changed to xsd:string as kgclass:SoftwareSystem is not yet defined.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:isDerivedFrom rdf:type owl:ObjectProperty ;
+    rdfs:label "is derived from"^^xsd:string ;
+    rdfs:comment "Indicates that an entity (e.g., an analysis, a report, a metric) is derived or transformed from one or more other entities."^^xsd:string ;
+    rdfs:domain owl:Thing ; # Broadly applicable
+    rdfs:range owl:Thing ;  # Broadly applicable
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasCalculationString rdf:type owl:DatatypeProperty ;
+    rdfs:label "has calculation string"@en ;
+    rdfs:comment "Stores the textual representation of a formula's calculation logic."@en ;
+    rdfs:domain kgclass:FinancialFormula ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:occurredAtTime rdf:type owl:DatatypeProperty ;
+    rdfs:label "occurred at time"@en ;
+    rdfs:comment "Timestamp indicating when an event occurred or when a piece of data was recorded."@en ;
+    rdfs:domain kgclass:Event ; # Also applicable to other entities like kgclass:TimeSeriesDataPoint
+    rdfs:range xsd:dateTime ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasSeverity rdf:type owl:DatatypeProperty ;
+    rdfs:label "has severity"@en ;
+    rdfs:comment "Specifies the severity level of a monitoring alert."@en ;
+    rdfs:domain kgclass:MonitoringAlert ;
+    rdfs:range xsd:string ; # Could be an enumeration of severity levels in the future.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:isTriggeredBy rdf:type owl:ObjectProperty ;
+    rdfs:label "is triggered by"@en ;
+    rdfs:comment "Links a monitoring alert to the underlying event, condition, or data that caused it."@en ;
+    rdfs:domain kgclass:MonitoringAlert ;
+    rdfs:range kgclass:Event ; # Could also be kgclass:RiskFactor, or other entities. kgclass:Event is a good start.
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasInputLiteral rdf:type owl:DatatypeProperty ;
+    rdfs:label "has input literal"@en ;
+    rdfs:comment "Represents a literal input parameter or variable name used in a financial formula."@en ;
+    rdfs:domain kgclass:FinancialFormula ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:hasOutputLiteral rdf:type owl:DatatypeProperty ;
+    rdfs:label "has output literal"@en ;
+    rdfs:comment "Represents the literal name or type of output generated by a financial formula."@en ;
+    rdfs:domain kgclass:FinancialFormula ;
+    rdfs:range xsd:string ;
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .

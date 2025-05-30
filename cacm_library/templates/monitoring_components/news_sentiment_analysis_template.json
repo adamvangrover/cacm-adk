@@ -1,0 +1,26 @@
+{
+  "cacmId": "urn:adk:template:monitoring:news_sentiment_analysis:v1",
+  "version": "1.0.0",
+  "name": "News Sentiment Analysis",
+  "description": "Analyzes sentiment from news articles related to a company or topic and extracts key entities or themes.",
+  "inputs": {
+    "companyIdentifier": { "type": "string", "description": "Identifier for the company to track news for.", "optional": true },
+    "newsSourceUrls": { "type": "array", "items": { "type": "string", "format": "uri"}, "description": "List of URLs for specific news articles.", "optional": true },
+    "newsQuery": { "type": "string", "description": "Query string to search for relevant news if URLs are not provided.", "optional": true },
+    "timeWindowDays": { "type": "integer", "description": "Number of past days to consider for news search.", "default": 7, "optional": true }
+  },
+  "outputs": {
+    "overallSentimentScore": { "type": "number", "description": "Aggregated sentiment score (e.g., from -1 to 1).", "optional": true },
+    "sentimentTrend": { "type": "string", "enum": ["improving", "deteriorating", "stable"], "description": "Trend of sentiment over the period.", "optional": true },
+    "keyPositiveThemes": { "type": "array", "items": { "type": "string" } },
+    "keyNegativeThemes": { "type": "array", "items": { "type": "string" } },
+    "analyzedArticles": { "type": "array", "items": { "type": "object", "properties": { "url": {"type": "string"}, "title": {"type": "string"}, "sentiment": {"type": "number"}, "summary": {"type": "string", "optional": true} } } }
+  },
+  "parameters": {
+    "sentimentModelProvider": { "type": "string", "description": "Identifier for the sentiment analysis model/provider to use.", "default": "default_nlp_sentiment_v1" }
+  },
+  "workflow": [
+    { "stepName": "Fetch News Articles", "computeCapabilityRef": "urn:adk:capability:news_article_fetcher:v1", "inputs": { "companyId": "inputs.companyIdentifier", "sourceUrls": "inputs.newsSourceUrls", "query": "inputs.newsQuery", "timeWindow": "inputs.timeWindowDays"}, "outputs": {"articles": "intermediate.fetchedArticles"} },
+    { "stepName": "Analyze Sentiment and Themes", "computeCapabilityRef": "urn:adk:capability:sentiment_theme_analyzer:v1", "inputs": { "articles": "intermediate.fetchedArticles", "modelProvider": "parameters.sentimentModelProvider"}, "outputs": {"overallScore": "outputs.overallSentimentScore", "trend": "outputs.sentimentTrend", "positiveThemes": "outputs.keyPositiveThemes", "negativeThemes": "outputs.keyNegativeThemes", "processedArticles": "outputs.analyzedArticles"} }
+  ]
+}

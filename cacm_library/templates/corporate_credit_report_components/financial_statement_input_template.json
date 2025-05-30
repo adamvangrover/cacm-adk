@@ -1,0 +1,59 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:financial_statement_input:v1",
+  "version": "1.0.0",
+  "name": "Financial Statement Input Definition",
+  "description": "Defines the expected structure for submitting financial statement data (Income Statement, Balance Sheet, Cash Flow).",
+  "inputs": {},
+  "outputs": {
+    "financialStatements": {
+      "type": "object",
+      "description": "Container for financial statements.",
+      "properties": {
+        "incomeStatement": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string", "description": "e.g., YYYY, YYYY-QX"},
+              "revenue": {"type": "number"},
+              "cogs": {"type": "number", "optional": true},
+              "grossProfit": {"type": "number", "optional": true},
+              "operatingExpenses": {"type": "number"},
+              "ebitda": {"type": "number", "optional": true},
+              "netIncome": {"type": "number"}
+            }
+          }
+        },
+        "balanceSheet": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string"},
+              "currentAssets": {"type": "number"},
+              "totalAssets": {"type": "number"},
+              "currentLiabilities": {"type": "number"},
+              "totalLiabilities": {"type": "number"},
+              "totalEquity": {"type": "number"}
+            }
+          }
+        },
+        "cashFlowStatement": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string"},
+              "operatingCashFlow": {"type": "number"},
+              "investingCashFlow": {"type": "number"},
+              "financingCashFlow": {"type": "number"},
+              "netChangeInCash": {"type": "number"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {},
+  "workflow": []
+}
