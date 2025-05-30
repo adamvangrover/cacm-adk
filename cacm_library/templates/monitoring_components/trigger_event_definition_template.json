@@ -1,0 +1,56 @@
+{
+  "cacmId": "urn:adk:template:monitoring:trigger_event_definition:v1",
+  "version": "1.0.0",
+  "name": "Trigger Event Definition",
+  "description": "Defines conditions based on various data points that constitute a 'trigger' for re-assessment or alerts. This template itself doesn't execute, but defines trigger logic for an orchestrator.",
+  "inputs": {},
+  "outputs": {
+    "triggeredEvent": {
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "description": "Unique ID for this triggered event instance." },
+        "triggerName": { "type": "string", "description": "Name of the trigger that fired." },
+        "severity": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "description": { "type": "string", "description": "Description of why the trigger fired." },
+        "relatedEntities": { "type": "array", "items": {"type": "string"}, "description": "URIs or IDs of entities related to this event (e.g., obligor, instrument)." },
+        "causationData": { "type": "array", "items": {"type": "object"}, "description": "Key data points that caused the trigger."}
+      }
+    }
+  },
+  "parameters": {
+    "triggerDefinitionName": { "type": "string", "description": "Unique name for this trigger definition." },
+    "triggerConditions": {
+      "type": "array",
+      "description": "List of conditions that must ALL be met for the trigger to fire. Each condition references a data point and a rule.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "conditionName": {"type": "string"},
+          "dataSourceCacmId": {"type": "string", "description": "CACM ID that produces the data point to check (e.g., news_sentiment_analysis)."},
+          "dataPointPath": {"type": "string", "description": "Path to the specific data point in the source CACM's output (e.g., 'overallSentimentScore')."},
+          "comparisonOperator": {"type": "string", "enum": ["<", "<=", ">", ">=", "=", "!=", "contains", "not_contains", "trend_is"]},
+          "thresholdValue": {"type": "any", "description": "Value to compare against (can be number, string, boolean)."},
+          "trendDirection": {"type": "string", "enum": ["improving", "deteriorating", "stable"], "optional": true, "description": "Used if comparisonOperator is 'trend_is'."}
+        }
+      }
+    },
+    "outputEventSeverity": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"], "default": "Medium" },
+    "outputEventDescriptionTemplate": { "type": "string", "description": "Template string for the event description, can use placeholders for dataPoint values." }
+  },
+  "workflow": [
+    {
+      "stepName": "Define Trigger Logic (for external evaluation)",
+      "computeCapabilityRef": "urn:adk:capability:trigger_logic_registrar:v1",
+      "inputs": {
+        "definitionName": "parameters.triggerDefinitionName",
+        "conditions": "parameters.triggerConditions",
+        "eventSeverity": "parameters.outputEventSeverity",
+        "eventDescription": "parameters.outputEventDescriptionTemplate"
+      },
+      "outputs": {
+        "registeredTriggerId": "intermediate.triggerId"
+      }
+    }
+  ]
+}
