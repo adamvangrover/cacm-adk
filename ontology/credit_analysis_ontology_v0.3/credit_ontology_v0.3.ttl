@@ -523,6 +523,20 @@ kgprop:hasCalculationString rdf:type owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
 
+kgprop:hasMitigationStrategy rdf:type owl:DatatypeProperty ;
+    rdfs:label "has mitigation strategy"@en ;
+    rdfs:comment "Describes a strategy or measure to mitigate a risk factor. Stored as a string literal."@en ;
+    rdfs:domain kgclass:RiskFactor ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+kgprop:appliesToIndustryLiteral rdf:type owl:DatatypeProperty ;
+    rdfs:label "applies to industry literal"@en ;
+    rdfs:comment "Specifies an industry to which a risk factor or other concept applies, stored as a string literal. For linking to actual industry individuals, a separate object property should be used."@en ;
+    rdfs:domain kgclass:RiskFactor ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
 kgprop:hasInterestRate rdf:type owl:DatatypeProperty ;
     rdfs:label "has interest rate"@en ;
     rdfs:comment "The interest rate applicable to a loan or bond, typically expressed as a percentage."@en ;
