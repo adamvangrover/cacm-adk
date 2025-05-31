@@ -1,0 +1,21 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:swot_analysis_input:v1",
+  "version": "1.0.0",
+  "name": "SWOT Analysis Input Definition",
+  "description": "Defines the structure for providing SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis points.",
+  "inputs": {},
+  "parameters": {},
+  "outputs": {
+    "swotAnalysisPoints": {
+      "type": "object",
+      "description": "Container for SWOT points.",
+      "properties": {
+        "strengths": { "type": "array", "items": { "type": "string", "description": "A single strength point."} },
+        "weaknesses": { "type": "array", "items": { "type": "string", "description": "A single weakness point."} },
+        "opportunities": { "type": "array", "items": { "type": "string", "description": "A single opportunity point."} },
+        "threats": { "type": "array", "items": { "type": "string", "description": "A single threat point."} }
+      }
+    }
+  },
+  "workflow": []
+}

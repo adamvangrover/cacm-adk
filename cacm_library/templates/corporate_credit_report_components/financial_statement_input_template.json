@@ -1,0 +1,79 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:financial_statement_input:v1",
+  "version": "1.0.0",
+  "name": "Financial Statement Input Definition",
+  "description": "Defines the expected structure for submitting financial statement data (Income Statement, Balance Sheet, Cash Flow).",
+  "inputs": {},
+  "outputs": {
+    "financialStatements": {
+      "type": "object",
+      "description": "Container for financial statements.",
+      "properties": {
+        "incomeStatement": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string", "description": "e.g., YYYY, YYYY-QX"},
+              "revenue": {"type": "number"},
+              "cogs": {"type": "number", "optional": true, "description": "Cost of Goods Sold."},
+              "grossProfit": {"type": "number", "optional": true, "description": "Revenue - COGS."},
+              "sgaExpenses": {"type": "number", "optional": true, "description": "Selling, General & Administrative Expenses"},
+              "operatingExpenses": {"type": "number", "description": "Total Operating Expenses (excluding COGS, often includes SGA, R&D)."},
+              "depreciationAndAmortization": {"type": "number", "optional": true, "description": "Depreciation and Amortization Expense (from Income Statement)"},
+              "ebitda": {"type": "number", "optional": true, "description": "Earnings Before Interest, Taxes, Depreciation, and Amortization."},
+              "interestExpense": {"type": "number", "optional": true, "description": "Interest Expense on Debt"},
+              "incomeBeforeTax": {"type": "number", "optional": true, "description": "Earnings Before Tax (EBT) or Pre-Tax Income"},
+              "incomeTaxExpense": {"type": "number", "optional": true, "description": "Income Tax Expense"},
+              "netIncome": {"type": "number", "description": "Net Income after all expenses and taxes."}
+            }
+          }
+        },
+        "balanceSheet": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string"},
+              "cashAndEquivalents": {"type": "number", "optional": true, "description": "Cash and Cash Equivalents"},
+              "accountsReceivable": {"type": "number", "optional": true, "description": "Accounts Receivable (Net)"},
+              "inventory": {"type": "number", "optional": true, "description": "Inventory"},
+              "currentAssets": {"type": "number", "description": "Total Current Assets."},
+              "propertyPlantEquipmentNet": {"type": "number", "optional": true, "description": "Property, Plant & Equipment (Net of Accumulated Depreciation)"},
+              "goodwill": {"type": "number", "optional": true, "description": "Goodwill"},
+              "intangibleAssets": {"type": "number", "optional": true, "description": "Intangible Assets (Net of Accumulated Amortization), excluding Goodwill"},
+              "totalAssets": {"type": "number", "description": "Total Assets."},
+              "accountsPayable": {"type": "number", "optional": true, "description": "Accounts Payable"},
+              "shortTermDebt": {"type": "number", "optional": true, "description": "Short-Term Debt and Current Portion of Long-Term Debt"},
+              "currentLiabilities": {"type": "number", "description": "Total Current Liabilities."},
+              "longTermDebt": {"type": "number", "optional": true, "description": "Long-Term Debt (excluding current portion)"},
+              "totalLiabilities": {"type": "number", "description": "Total Liabilities."},
+              "totalEquity": {"type": "number", "description": "Total Shareholders' Equity."}
+            }
+          }
+        },
+        "cashFlowStatement": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "period": {"type": "string"},
+              "depreciationAmortizationCFFO": {"type": "number", "optional": true, "description": "Depreciation & Amortization (add-back in CFFO)"},
+              "operatingCashFlow": {"type": "number", "description": "Net Cash Flow from Operating Activities."},
+              "capitalExpenditures": {"type": "number", "optional": true, "description": "Capital Expenditures (CapEx)"},
+              "investingCashFlow": {"type": "number", "description": "Net Cash Flow from Investing Activities."},
+              "debtIssued": {"type": "number", "optional": true, "description": "Proceeds from Issuance of Debt"},
+              "debtRepaid": {"type": "number", "optional": true, "description": "Repayments of Debt"},
+              "equityIssued": {"type": "number", "optional": true, "description": "Proceeds from Issuance of Equity"},
+              "dividendsPaid": {"type": "number", "optional": true, "description": "Dividends Paid"},
+              "financingCashFlow": {"type": "number", "description": "Net Cash Flow from Financing Activities."},
+              "netChangeInCash": {"type": "number", "description": "Net Change in Cash and Cash Equivalents."}
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {},
+  "workflow": []
+}
