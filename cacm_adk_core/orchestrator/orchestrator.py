@@ -531,7 +531,7 @@ if __name__ == '__main__':
     # We need to add an entry for DataIngestionAgent in the catalog for this to fully work.
     # Let's assume "urn:adk:capability:basic_document_ingestor:v1" will be its ID.
     # (This would ideally be added to compute_capability_catalog.json in a prior step if not there)
-    # Removing the temporary addition of "urn:adk:capability:basic_document_ingestor:v1"
+    # Removing the temporary addition of "urn:adk:capability:basic_document_ingestor:v1" 
     # as the new test workflow does not use DataIngestionAgent.
     # if "urn:adk:capability:basic_document_ingestor:v1" not in orch.compute_catalog:
     #     orch.compute_catalog["urn:adk:capability:basic_document_ingestor:v1"] = {
@@ -550,15 +550,15 @@ if __name__ == '__main__':
     #     logger_main.info("Added temporary 'urn:adk:capability:basic_document_ingestor:v1' to catalog for test.")
 
     # Load the new test workflow
-    sample_cacm_instance_for_agent = {}
-    test_workflow_path = os.path.join(BASE_DIR, "examples/test_integrated_agents_workflow.json")
-    if not os.path.exists(test_workflow_path):
-        logger_main.error(f"Test workflow file not found: {test_workflow_path}")
-        # Exiting or skipping test if file not found
-    else:
-        with open(test_workflow_path, 'r') as f:
-            sample_cacm_instance_for_agent = json.load(f)
-        logger_main.info(f"Loaded test workflow from: {test_workflow_path}")
+    # sample_cacm_instance_for_agent = {} # This will be loaded specifically for the MSFT workflow
+    # test_workflow_path = os.path.join(BASE_DIR, "examples/test_integrated_agents_workflow.json")
+    # if not os.path.exists(test_workflow_path):
+    #     logger_main.error(f"Test workflow file not found: {test_workflow_path}")
+    #     # Exiting or skipping test if file not found
+    # else:
+    #     with open(test_workflow_path, 'r') as f:
+    #         sample_cacm_instance_for_agent = json.load(f)
+    #     logger_main.info(f"Loaded test workflow from: {test_workflow_path}")
 
     # Create a dummy validator if needed, or ensure Orchestrator handles it being None for this test
     # For this test, let's assume validation is not the focus and Orchestrator init handles validator=None
@@ -572,43 +572,62 @@ if __name__ == '__main__':
 
 
     async def run_agent_test():
-        # Test for Integrated FundamentalAnalystAgent & SNCAnalystAgent
-        logger_main.info("\n--- Orchestrator Test: Integrated FAA & SNCAA Workflow ---")
-        if not sample_cacm_instance_for_agent: # Check if workflow failed to load (already loaded above)
-            logger_main.error("Skipping Integrated FAA & SNCAA test as the CACM instance data is empty.")
-        else:
-            success, logs, outputs = await orch.run_cacm(sample_cacm_instance_for_agent)
-            logger_main.info(f"Integrated FAA & SNCAA test success: {success}")
-            logger_main.info(f"Integrated FAA & SNCAA test logs:\n" + "\n".join(logs))
-            logger_main.info(f"Integrated FAA & SNCAA test outputs:\n{json.dumps(outputs, indent=2)}")
+        logger_main.info("\n--- Orchestrator Test: MSFT Comprehensive Analysis Workflow ---")
+        msft_workflow_path = os.path.join(BASE_DIR, "examples/msft_comprehensive_analysis_workflow.json")
+        
+        if not os.path.exists(msft_workflow_path):
+            logger_main.error(f"MSFT comprehensive workflow file not found: {msft_workflow_path}")
+            return
 
-        # Test for DataIngestionAgent
-        logger_main.info("\n--- Orchestrator Test: DataIngestionAgent Workflow ---")
-        test_dia_workflow_path = os.path.join(BASE_DIR, "examples/test_data_ingestion_agent_workflow.json")
-        if not os.path.exists(test_dia_workflow_path):
-            logger_main.error(f"Test workflow file not found: {test_dia_workflow_path}")
-        else:
-            with open(test_dia_workflow_path, 'r') as f:
-                dia_cacm_instance = json.load(f)
-            success_dia, logs_dia, outputs_dia = await orch.run_cacm(dia_cacm_instance)
-            logger_main.info(f"DataIngestionAgent test success: {success_dia}")
-            logger_main.info(f"DataIngestionAgent test logs:\n" + "\n".join(logs_dia))
-            logger_main.info(f"DataIngestionAgent test outputs:\n{json.dumps(outputs_dia, indent=2)}")
+        with open(msft_workflow_path, 'r') as f:
+            msft_cacm_instance = json.load(f)
+        
+        logger_main.info(f"Loaded MSFT comprehensive workflow from: {msft_workflow_path}")
+        
+        success_msft, logs_msft, outputs_msft = await orch.run_cacm(msft_cacm_instance)
+        
+        logger_main.info(f"MSFT Comprehensive Analysis test success: {success_msft}")
+        logger_main.info(f"MSFT Comprehensive Analysis test logs:\n" + "\n".join(logs_msft))
+        logger_main.info(f"MSFT Comprehensive Analysis test outputs:\n{json.dumps(outputs_msft, indent=2)}")
 
-        # Test for CatalystWrapperAgent
-        logger_main.info("\n--- Orchestrator Test: CatalystWrapperAgent Workflow ---")
-        test_cwa_workflow_path = os.path.join(BASE_DIR, "examples/test_catalyst_wrapper_agent_workflow.json")
-        if not os.path.exists(test_cwa_workflow_path):
-            logger_main.error(f"Test workflow file not found: {test_cwa_workflow_path}")
-        else:
-            with open(test_cwa_workflow_path, 'r') as f:
-                cwa_cacm_instance = json.load(f)
-            success_cwa, logs_cwa, outputs_cwa = await orch.run_cacm(cwa_cacm_instance)
-            logger_main.info(f"CatalystWrapperAgent test success: {success_cwa}")
-            logger_main.info(f"CatalystWrapperAgent test logs:\n" + "\n".join(logs_cwa))
-            logger_main.info(f"CatalystWrapperAgent test outputs:\n{json.dumps(outputs_cwa, indent=2)}")
-            # Note: CatalystWrapperAgent test will likely show errors in its output.data if the
-            # placeholder URLs in catalyst_config.json are not live services.
-            # The key is that the wrapper itself runs and processes the attempt.
+        # Commenting out other test runs to focus output
+        # # Test for Integrated FundamentalAnalystAgent & SNCAnalystAgent
+        # logger_main.info("\n--- Orchestrator Test: Integrated FAA & SNCAA Workflow ---")
+        # test_integrated_workflow_path = os.path.join(BASE_DIR, "examples/test_integrated_agents_workflow.json")
+        # if not os.path.exists(test_integrated_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_integrated_workflow_path}")
+        # else:
+        #     with open(test_integrated_workflow_path, 'r') as f:
+        #         integrated_cacm_instance = json.load(f)
+        #     success_integrated, logs_integrated, outputs_integrated = await orch.run_cacm(integrated_cacm_instance)
+        #     logger_main.info(f"Integrated FAA & SNCAA test success: {success_integrated}")
+        #     logger_main.info(f"Integrated FAA & SNCAA test logs:\n" + "\n".join(logs_integrated))
+        #     logger_main.info(f"Integrated FAA & SNCAA test outputs:\n{json.dumps(outputs_integrated, indent=2)}")
+
+        # # Test for DataIngestionAgent
+        # logger_main.info("\n--- Orchestrator Test: DataIngestionAgent Workflow ---")
+        # test_dia_workflow_path = os.path.join(BASE_DIR, "examples/test_data_ingestion_agent_workflow.json")
+        # if not os.path.exists(test_dia_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_dia_workflow_path}")
+        # else:
+        #     with open(test_dia_workflow_path, 'r') as f:
+        #         dia_cacm_instance = json.load(f)
+        #     success_dia, logs_dia, outputs_dia = await orch.run_cacm(dia_cacm_instance)
+        #     logger_main.info(f"DataIngestionAgent test success: {success_dia}")
+        #     logger_main.info(f"DataIngestionAgent test logs:\n" + "\n".join(logs_dia))
+        #     logger_main.info(f"DataIngestionAgent test outputs:\n{json.dumps(outputs_dia, indent=2)}")
+
+        # # Test for CatalystWrapperAgent
+        # logger_main.info("\n--- Orchestrator Test: CatalystWrapperAgent Workflow ---")
+        # test_cwa_workflow_path = os.path.join(BASE_DIR, "examples/test_catalyst_wrapper_agent_workflow.json")
+        # if not os.path.exists(test_cwa_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_cwa_workflow_path}")
+        # else:
+        #     with open(test_cwa_workflow_path, 'r') as f:
+        #         cwa_cacm_instance = json.load(f)
+        #     success_cwa, logs_cwa, outputs_cwa = await orch.run_cacm(cwa_cacm_instance)
+        #     logger_main.info(f"CatalystWrapperAgent test success: {success_cwa}")
+        #     logger_main.info(f"CatalystWrapperAgent test logs:\n" + "\n".join(logs_cwa))
+        #     logger_main.info(f"CatalystWrapperAgent test outputs:\n{json.dumps(outputs_cwa, indent=2)}")
 
     asyncio.run(run_agent_test())
