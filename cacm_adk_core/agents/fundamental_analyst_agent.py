@@ -233,6 +233,7 @@ class FundamentalAnalystAgent(Agent):
                 comps_summary = f"Value: {comps_valuation:.2f}" if comps_valuation is not None else "Not available"
                 enterprise_value_summary_str = f"Value: {enterprise_value:.2f}" if enterprise_value is not None else "Not available"
 
+
                 DEFAULT_FAA_SUMMARY_PROMPT = (
                     "Provide a comprehensive analysis conclusion based on the provided data. "
                     "Your summary should cover the following aspects clearly:\n"
@@ -242,10 +243,12 @@ class FundamentalAnalystAgent(Agent):
                     "- If available, comment on the estimated default likelihood and recovery rate.\n" # Note: default_likelihood and recovery_rate are not currently passed to input_vars
                     "- Conclude with a balanced view, mentioning both positive aspects and potential concerns or areas requiring further investigation.\n"
                     "Ensure the analysis is objective and data-driven."
+                    "Provide a brief overall conclusion based on the data."
                 )
                 user_prompt_for_conclusion = self.config.get(
                     "summarize_analysis_user_prompt",
                     DEFAULT_FAA_SUMMARY_PROMPT
+
                 )
 
                 input_vars = { # SK arguments are typically flat key-value pairs
