@@ -165,9 +165,9 @@ class DataRetrievalAgent(Agent):
                         "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
                         "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
                     },
-                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000,
-                                    "annual_debt_service_placeholder": "1000",
-                                    "payment_history_placeholder": "Unknown",
+                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                    "annual_debt_service_placeholder": "1000", 
+                                    "payment_history_placeholder": "Unknown", 
                                     "interest_capitalization_placeholder": "Unknown"}
                 },
                 "qualitative_company_info": {
