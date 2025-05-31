@@ -28,9 +28,9 @@ Below are the SPARQL queries used in the script and representative snippets of t
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#>
 
-    SELECT ?formula ?label WHERE {
-        ?formula rdf:type kgclass:FinancialFormula ;
-                 rdfs:label ?label .
+    SELECT ?formula ?label WHERE { 
+        ?formula rdf:type kgclass:FinancialFormula ; 
+                 rdfs:label ?label . 
     }
     ```
 *   **Example Output Snippet:**
@@ -51,9 +51,9 @@ Below are the SPARQL queries used in the script and representative snippets of t
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#>
 
-    SELECT ?risk_factor ?description WHERE {
-        ?risk_factor rdf:type kgclass:RiskFactor ;
-                     rdfs:comment ?description .
+    SELECT ?risk_factor ?description WHERE { 
+        ?risk_factor rdf:type kgclass:RiskFactor ; 
+                     rdfs:comment ?description . 
     }
     ```
 *   **Example Output Snippet:**
@@ -75,10 +75,10 @@ Below are the SPARQL queries used in the script and representative snippets of t
     PREFIX kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#>
     PREFIX dcterms: <http://purl.org/dc/terms/>
 
-    SELECT ?indicator ?label ?source WHERE {
-        ?indicator rdf:type kgclass:EconomicIndicator ;
-                   rdfs:label ?label ;
-                   dcterms:source ?source .
+    SELECT ?indicator ?label ?source WHERE { 
+        ?indicator rdf:type kgclass:EconomicIndicator ; 
+                   rdfs:label ?label ; 
+                   dcterms:source ?source . 
     }
     ```
 *   **Example Output Snippet:**
@@ -96,9 +96,9 @@ Below are the SPARQL queries used in the script and representative snippets of t
     ```sparql
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-    SELECT ?formula ?prop ?value WHERE {
-        ?formula rdfs:label "Debt-to-Equity Ratio"@en ;
-                 ?prop ?value .
+    SELECT ?formula ?prop ?value WHERE { 
+        ?formula rdfs:label "Debt-to-Equity Ratio"@en ; 
+                 ?prop ?value . 
     }
     ```
 *   **Example Output Snippet:**
@@ -121,12 +121,12 @@ Below are the SPARQL queries used in the script and representative snippets of t
     ```sparql
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-    SELECT (STR(?class) AS ?className) (COUNT(?instance) AS ?instanceCount)
-    WHERE {
-        ?instance rdf:type ?class .
-        FILTER(STRSTARTS(STR(?class), "http://example.com/ontology/cacm_credit_ontology/0.3/classes/#"))
-    }
-    GROUP BY ?class
+    SELECT (STR(?class) AS ?className) (COUNT(?instance) AS ?instanceCount) 
+    WHERE { 
+        ?instance rdf:type ?class . 
+        FILTER(STRSTARTS(STR(?class), "http://example.com/ontology/cacm_credit_ontology/0.3/classes/#")) 
+    } 
+    GROUP BY ?class 
     ORDER BY DESC(?instanceCount)
     ```
 *   **Example Output Snippet:**

@@ -121,7 +121,7 @@ class TestFinancialRatios(unittest.TestCase):
         self.assertIn("Cannot calculate Current Ratio: Current Liabilities is zero.", result["errors"])
         self.assertIn("Cannot calculate Debt-to-Equity Ratio: Total Equity is zero.", result["errors"])
         self.assertEqual(result["calculated_ratios"], {})
-
+        
     def test_partial_valid_data_one_ratio_calculable(self):
         # Only D2E can be calculated
         data = {
