@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK Control Chatbot</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #chat-container { width: 400px; height: 600px; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; border-radius: 8px; }
+        #chat-output { flex-grow: 1; padding: 15px; overflow-y: auto; border-bottom: 1px solid #ddd; }
+        .message { margin-bottom: 10px; padding: 8px 12px; border-radius: 5px; line-height: 1.4; }
+        .user-message { background-color: #007bff; color: white; align-self: flex-end; text-align: right; margin-left: auto; }
+        .bot-message { background-color: #e9ecef; color: #333; align-self: flex-start; text-align: left; margin-right: auto; }
+        #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #ddd;}
+        #chat-input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;}
+        #send-button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        #send-button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-output">
+            <div class="message bot-message">Hello! How can I help you control the ADK systems?</div>
+        </div>
+        <div id="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Type your command...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+</body>
+</html>

@@ -144,6 +144,45 @@ python scripts/adk_cli.py [COMMAND] [OPTIONS] [ARGS]...
     python scripts/adk_cli.py run examples/sme_credit_score_example_01.json
     ```
 
+## ADK Control Chatbot
+
+A new experimental chatbot interface has been added to allow for controlling ADK sub-systems (e.g., Python or Java agents) via a C control program. This provides a user-friendly web interface to send commands and view responses.
+
+**Features:**
+
+*   Simple web-based chat interface (`chatbot/index.html`).
+*   Backend API (`api/backend_app.py`) using Flask to process commands.
+*   Interfaces with a C control program (`adk_controller`) which is responsible for the actual communication with Python/Java ADK sub-systems.
+
+**Running the Chatbot:**
+
+1.  **Ensure the C Control Program is available:**
+    *   The backend expects a compiled C program named `adk_controller` (or `adk_controller.exe` on Windows) to be present in the `api/` directory or accessible via the system's PATH.
+    *   This C program is responsible for translating commands from the chatbot into actions for the respective ADK sub-systems (Python/Java). Its development is separate from this ADK project.
+    *   A placeholder script `api/adk_controller` is provided for basic testing of the backend.
+
+2.  **Start the Flask backend server:**
+    *   Navigate to the project root directory.
+    *   Ensure you have installed dependencies (`pip install -r requirements.txt`) and activated your virtual environment.
+    *   Run the backend application:
+        ```bash
+        python api/backend_app.py
+        ```
+    *   The server will start, typically on `http://0.0.0.0:5001/`. The API endpoint will be `http://localhost:5001/api/chatbot`.
+
+3.  **Access the Chatbot UI:**
+    *   Open the `chatbot/index.html` file directly in your web browser (e.g., by navigating to `file:///path/to/your/project/chatbot/index.html` where `/path/to/your/project/` is the actual path to the cloned repository).
+    *   The JavaScript within `chatbot.js` is configured to send requests to the Flask server running at `http://localhost:5001`.
+
+**Using the Chatbot:**
+
+*   Type commands into the input field. Example commands depend on what your `adk_controller` C program supports, e.g.:
+    *   `python_test_command`
+    *   `java_test_command details --id=123`
+    *   `system_status --target python`
+    *   `error_test` (to test error handling with the placeholder)
+    *   `no_output_test` (to test commands with no output with the placeholder)
+
 ## API, Web UI, and Dockerization
 
 The CACM-ADK can be run as a web service, providing a REST API for its functionalities and a simple web-based landing page. It is also containerizable using Docker for easy deployment.
