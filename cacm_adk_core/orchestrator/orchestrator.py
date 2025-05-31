@@ -21,6 +21,7 @@ from cacm_adk_core.context.shared_context import SharedContext # Added
 from cacm_adk_core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from cacm_adk_core.agents.SNC_analyst_agent import SNCAnalystAgent
 from cacm_adk_core.agents.data_retrieval_agent import DataRetrievalAgent # Added for DRA registration
+from cacm_adk_core.agents.catalyst_wrapper_agent import CatalystWrapperAgent
 
 
 class Orchestrator:
@@ -55,7 +56,8 @@ class Orchestrator:
         self.register_agent("ReportGenerationAgent", ReportGenerationAgent)
         self.register_agent("FundamentalAnalystAgent", FundamentalAnalystAgent)
         self.register_agent("SNCAnalystAgent", SNCAnalystAgent)
-        self.register_agent("DataRetrievalAgent", DataRetrievalAgent) # Added DataRetrievalAgent registration
+        self.register_agent("DataRetrievalAgent", DataRetrievalAgent)
+        self.register_agent("CatalystWrapperAgent", CatalystWrapperAgent) # Added CatalystWrapperAgent registration
         print(f"INFO: Orchestrator: Registered {len(self.agents)} agent types.")
 
     def register_agent(self, agent_name_key: str, agent_class: Type[Agent]):
@@ -570,13 +572,43 @@ if __name__ == '__main__':
 
 
     async def run_agent_test():
-        if not sample_cacm_instance_for_agent: # Check if workflow failed to load
-            logger_main.error("Skipping run_agent_test as the CACM instance data is empty (workflow file likely not found).")
-            return
+        # Test for Integrated FundamentalAnalystAgent & SNCAnalystAgent
+        logger_main.info("\n--- Orchestrator Test: Integrated FAA & SNCAA Workflow ---")
+        if not sample_cacm_instance_for_agent: # Check if workflow failed to load (already loaded above)
+            logger_main.error("Skipping Integrated FAA & SNCAA test as the CACM instance data is empty.")
+        else:
+            success, logs, outputs = await orch.run_cacm(sample_cacm_instance_for_agent)
+            logger_main.info(f"Integrated FAA & SNCAA test success: {success}")
+            logger_main.info(f"Integrated FAA & SNCAA test logs:\n" + "\n".join(logs))
+            logger_main.info(f"Integrated FAA & SNCAA test outputs:\n{json.dumps(outputs, indent=2)}")
 
-        success, logs, outputs = await orch.run_cacm(sample_cacm_instance_for_agent)
-        logger_main.info(f"run_cacm success: {success}")
-        logger_main.info(f"run_cacm logs:\n" + "\n".join(logs))
-        logger_main.info(f"run_cacm outputs:\n{json.dumps(outputs, indent=2)}")
+        # Test for DataIngestionAgent
+        logger_main.info("\n--- Orchestrator Test: DataIngestionAgent Workflow ---")
+        test_dia_workflow_path = os.path.join(BASE_DIR, "examples/test_data_ingestion_agent_workflow.json")
+        if not os.path.exists(test_dia_workflow_path):
+            logger_main.error(f"Test workflow file not found: {test_dia_workflow_path}")
+        else:
+            with open(test_dia_workflow_path, 'r') as f:
+                dia_cacm_instance = json.load(f)
+            success_dia, logs_dia, outputs_dia = await orch.run_cacm(dia_cacm_instance)
+            logger_main.info(f"DataIngestionAgent test success: {success_dia}")
+            logger_main.info(f"DataIngestionAgent test logs:\n" + "\n".join(logs_dia))
+            logger_main.info(f"DataIngestionAgent test outputs:\n{json.dumps(outputs_dia, indent=2)}")
+
+        # Test for CatalystWrapperAgent
+        logger_main.info("\n--- Orchestrator Test: CatalystWrapperAgent Workflow ---")
+        test_cwa_workflow_path = os.path.join(BASE_DIR, "examples/test_catalyst_wrapper_agent_workflow.json")
+        if not os.path.exists(test_cwa_workflow_path):
+            logger_main.error(f"Test workflow file not found: {test_cwa_workflow_path}")
+        else:
+            with open(test_cwa_workflow_path, 'r') as f:
+                cwa_cacm_instance = json.load(f)
+            success_cwa, logs_cwa, outputs_cwa = await orch.run_cacm(cwa_cacm_instance)
+            logger_main.info(f"CatalystWrapperAgent test success: {success_cwa}")
+            logger_main.info(f"CatalystWrapperAgent test logs:\n" + "\n".join(logs_cwa))
+            logger_main.info(f"CatalystWrapperAgent test outputs:\n{json.dumps(outputs_cwa, indent=2)}")
+            # Note: CatalystWrapperAgent test will likely show errors in its output.data if the
+            # placeholder URLs in catalyst_config.json are not live services.
+            # The key is that the wrapper itself runs and processes the attempt.
 
     asyncio.run(run_agent_test())
