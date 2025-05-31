@@ -1,0 +1,33 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:industry_and_peer_snapshot:v1",
+  "version": "1.0.0",
+  "name": "Industry and Peer Snapshot",
+  "description": "Provides a snapshot of key industry trends and summary financial metrics for peer companies.",
+  "inputs": {
+    "targetCompanyIndustryCode": { "type": "string", "description": "Industry code (e.g., GICS, NAICS) for the target company." },
+    "peerCompanyIdentifiers": { "type": "array", "items": { "type": "string" }, "description": "List of identifiers for peer companies." },
+    "metricsForComparison": { "type": "array", "items": { "type": "string" }, "description": "List of specific financial metrics to compare (e.g., 'RevenueGrowth', 'EBITDAMargin')."}
+  },
+  "parameters": {
+    "maxPeersToDisplay": { "type": "integer", "default": 5 }
+  },
+  "outputs": {
+    "industryOutlookSummary": { "type": "string", "description": "AI-generated summary of key industry trends and outlook based on the industry code." },
+    "peerComparisonData": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "peerIdentifier": {"type": "string"},
+          "peerName": {"type": "string", "optional": true},
+          "metrics": {"type": "object", "additionalProperties": {"type": "any"}, "description": "Key-value pairs of metricName: value"}
+        }
+      },
+      "description": "Array containing metrics for each peer."
+    }
+  },
+  "workflow": [
+    { "stepName": "Fetch Industry Outlook", "computeCapabilityRef": "urn:adk:capability:industry_outlook_generator:v1", "inputs": { "industryCode": "inputs.targetCompanyIndustryCode"}, "outputs": {"summary": "outputs.industryOutlookSummary"} },
+    { "stepName": "Fetch Peer Financial Data", "computeCapabilityRef": "urn:adk:capability:peer_financial_data_aggregator:v1", "inputs": { "peerIds": "inputs.peerCompanyIdentifiers", "metrics": "inputs.metricsForComparison", "maxPeers": "parameters.maxPeersToDisplay"}, "outputs": {"data": "outputs.peerComparisonData"} }
+  ]
+}

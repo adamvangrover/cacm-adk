@@ -1,0 +1,24 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:capital_structure_summary:v1",
+  "version": "1.0.0",
+  "name": "Capital Structure Summary",
+  "description": "Summarizes the company's capital structure including debt and equity components for the latest period.",
+  "inputs": {
+    "latestBalanceSheet": { "type": "object", "description": "Latest period balance sheet data (single period object from financial_statement_input_template.outputs.financialStatements.balanceSheet[0])." },
+    "debtInstrumentDetails": { "type": "array", "items": {"type": "object", "properties": {"instrumentId": {"type": "string"}, "type": {"type": "string", "enum": ["loan", "bond", "line_of_credit", "other"]}, "outstandingAmount": {"type": "number"}, "currency": {"type": "string"}, "maturityDate": {"type": "string", "format": "date", "optional": true}, "interestRate": {"type": "string", "optional": true}, "isSecured": {"type": "boolean", "optional": true} } }, "description": "Details of major debt instruments.", "optional": true}
+  },
+  "parameters": {},
+  "outputs": {
+    "totalDebt": { "type": "number" },
+    "totalEquity": { "type": "number" },
+    "debtToEquityRatio": { "type": "number" },
+    "debtToCapitalizationRatio": { "type": "number" },
+    "debtBreakdownByType": { "type": "object", "description": "e.g., { bank_loans: X, bonds: Y }", "additionalProperties": {"type": "number"}},
+    "majorInstrumentsSummary": { "type": "array", "items": {"type": "object", "properties": {"instrumentId": {"type": "string"}, "type": {"type": "string"}, "outstandingAmount": {"type": "number"} }} }
+  },
+  "workflow": [
+    { "stepName": "Parse Balance Sheet for Capital", "computeCapabilityRef": "urn:adk:capability:balance_sheet_capital_parser:v1", "inputs": { "balanceSheet": "inputs.latestBalanceSheet"}, "outputs": {"debtFromBS": "intermediate.debtFromBS", "equityFromBS": "outputs.totalEquity"} },
+    { "stepName": "Aggregate Debt Instruments", "computeCapabilityRef": "urn:adk:capability:debt_instrument_aggregator:v1", "inputs": { "debtInstruments": "inputs.debtInstrumentDetails", "balanceSheetDebt": "intermediate.debtFromBS"}, "outputs": {"aggregatedDebt": "outputs.totalDebt", "breakdown": "outputs.debtBreakdownByType", "summaryList": "outputs.majorInstrumentsSummary"} },
+    { "stepName": "Calculate Capital Ratios", "computeCapabilityRef": "urn:adk:capability:capital_ratio_calculator:v1", "inputs": { "totalDebt": "outputs.totalDebt", "totalEquity": "outputs.totalEquity"}, "outputs": {"debtToEquity": "outputs.debtToEquityRatio", "debtToCapitalization": "outputs.debtToCapitalizationRatio"} }
+  ]
+}

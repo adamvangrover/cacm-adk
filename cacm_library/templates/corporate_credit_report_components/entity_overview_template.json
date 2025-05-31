@@ -1,0 +1,21 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:entity_overview:v1",
+  "version": "1.0.0",
+  "name": "Entity Overview",
+  "description": "Provides a basic qualitative overview of a company, including description, industry, and key identifiers.",
+  "inputs": {
+    "companyIdentifier": { "type": "string", "description": "Primary identifier (e.g., LEI, internal ID)." }
+  },
+  "outputs": {
+    "companyName": { "type": "string", "description": "Legal name of the company." },
+    "companyDescription": { "type": "string", "description": "Brief description of business activities." },
+    "primaryIndustry": { "type": "string", "description": "Main industry classification." },
+    "keyExecutives": { "type": "array", "items": { "type": "object", "properties": { "name": {"type": "string"}, "title": {"type": "string"} } }, "description": "List of key executives." },
+    "recentNewsSummary": { "type": "string", "description": "Placeholder for AI-generated summary of recent news." }
+  },
+  "parameters": {},
+  "workflow": [
+    { "stepName": "Fetch Company Profile", "computeCapabilityRef": "urn:adk:capability:company_profile_fetcher:v1", "inputs": { "identifier": "inputs.companyIdentifier"}, "outputs": {"name": "outputs.companyName", "description": "outputs.companyDescription", "industry": "outputs.primaryIndustry", "executives": "outputs.keyExecutives"} },
+    { "stepName": "Summarize Recent News", "computeCapabilityRef": "urn:adk:capability:news_aggregator_summarizer:v1", "inputs": { "identifier": "inputs.companyIdentifier", "companyName": "outputs.companyName"}, "outputs": {"summary": "outputs.recentNewsSummary"} }
+  ]
+}
