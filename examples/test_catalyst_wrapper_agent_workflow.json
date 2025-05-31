@@ -1,0 +1,31 @@
+{
+  "cacmId": "test_catalyst_wrapper_workflow_001",
+  "name": "Test Workflow for CatalystWrapperAgent",
+  "description": "A sample CACM to test the CatalystWrapperAgent.",
+  "inputs": {
+    "cat_client_id": {"value": "client789", "description": "Client ID for Catalyst."},
+    "cat_company_id": {"value": "companyXYZ", "description": "Company ID for Catalyst."},
+    "cat_industry": {"value": "Biotechnology", "description": "Industry for Catalyst."}
+  },
+  "outputs": {
+    "catalyst_run_output": {
+      "type": "object",
+      "description": "Output from the CatalystWrapperAgent."
+    }
+  },
+  "workflow": [
+    {
+      "stepId": "step1_run_catalyst_wrapper",
+      "description": "Invoke the CatalystWrapperAgent.",
+      "computeCapabilityRef": "urn:adk:capability:catalyst_wrapper_agent:v1",
+      "inputBindings": {
+        "client_id": "cacm.inputs.cat_client_id",
+        "company_id": "cacm.inputs.cat_company_id",
+        "industry": "cacm.inputs.cat_industry"
+      },
+      "outputBindings": {
+        "catalyst_output": "cacm.outputs.catalyst_run_output"
+      }
+    }
+  ]
+}
