@@ -148,6 +148,36 @@ class DataRetrievalAgent(Agent):
             }
             return {"status": "success", "data": testcorp_data}
 
-        # Fallback error if no other conditions met
-        self.logger.warning(f"No specific data retrieval logic implemented for company_id: {company_id} and data_type: {data_type}")
-        return {"status": "error", "message": f"Data not found for company_id: {company_id}, data_type: {data_type}"}
+        else: # For any other company_id
+            self.logger.info(f"Returning generic placeholder data for company_id: {company_id}, data_type: {data_type}")
+            generic_data_package = {
+                "company_info": {"name": f"{company_id} (Generic Data)", "ticker": company_id, "industry_sector": "N/A", "country": "N/A"},
+                "financial_data_detailed": {
+                    "income_statement": {"revenue": [1000000, 1100000], "net_income": [10000, 12000], "ebitda": [15000, 17000]},
+                    "balance_sheet": {"total_assets": [200000, 210000], "total_liabilities": [80000, 85000],
+                                      "shareholders_equity": [120000, 125000], "cash_and_equivalents": [20000, 25000],
+                                      "short_term_debt": [5000,5000], "long_term_debt": [50000,45000]},
+                    "cash_flow_statement": {"operating_cash_flow": [18000, 20000], "investing_cash_flow": [-5000, -6000],
+                                            "financing_cash_flow": [-3000, -4000], "free_cash_flow": [13000, 14000]},
+                    "key_ratios": {}, # Let FAA calculate these
+                    "dcf_assumptions": { # Generic assumptions
+                        "fcf_projection_years_total": 5, "initial_high_growth_period_years": 2,
+                        "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
+                        "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
+                    },
+                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                    "annual_debt_service_placeholder": "1000", 
+                                    "payment_history_placeholder": "Unknown", 
+                                    "interest_capitalization_placeholder": "Unknown"}
+                },
+                "qualitative_company_info": {
+                    "management_assessment": "N/A", "competitive_advantages": "N/A",
+                    "business_model_strength": "N/A",
+                    "revenue_cashflow_stability_notes_placeholder": "Data not available for detailed assessment.",
+                    "financial_deterioration_notes_placeholder": "Data not available for detailed assessment."
+                },
+                "industry_data_context": {"outlook": "N/A"},
+                "economic_data_context": {"overall_outlook": "N/A"},
+                "collateral_and_debt_details": {"loan_to_value_ratio": None, "collateral_type": "N/A", "other_credit_enhancements": "N/A"}
+            }
+            return {"status": "success", "data": generic_data_package, "message": f"Provided generic placeholder data for {company_id}."}

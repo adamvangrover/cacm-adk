@@ -34,8 +34,8 @@ class FundamentalAnalystAgent(Agent):
 
     def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
         super().__init__(
-            agent_name="FundamentalAnalystAgent",
-            kernel_service=kernel_service,
+            agent_name="FundamentalAnalystAgent", 
+            kernel_service=kernel_service, 
             skills_plugin_name="FundamentalAnalysisSkill"
         )
         self.config = agent_config if agent_config else {} # Store agent_config
@@ -47,7 +47,8 @@ class FundamentalAnalystAgent(Agent):
         """
         Performs fundamental analysis on a given company based on task description and inputs.
         """
-        company_id = current_step_inputs.get("company_id")
+        self.current_run_inputs = current_step_inputs # Store for access in helper methods
+        company_id = self.current_run_inputs.get("company_id")
         if not company_id:
             logging.error("FAA_RUN_ERROR: 'company_id' not found in current_step_inputs.")
             return {"status": "error", "message": "'company_id' is required but was not provided."}
@@ -102,10 +103,10 @@ class FundamentalAnalystAgent(Agent):
         """
         dra_agent_name = "DataRetrievalAgent" # This should match the name/key used for DRA registration
         logging.info(f"Attempting to get or create '{dra_agent_name}' to retrieve data for {company_id}.")
-
+        
         try:
             # Note: get_or_create_agent now expects agent_name and shared_context
-            dra_agent = await self.get_or_create_agent(dra_agent_name, shared_context)
+            dra_agent = await self.get_or_create_agent(dra_agent_name, shared_context) 
             if not dra_agent:
                 logging.error(f"Could not get or create {dra_agent_name}. Cannot retrieve company data for {company_id}.")
                 return None
@@ -233,23 +234,27 @@ class FundamentalAnalystAgent(Agent):
                 comps_summary = f"Value: {comps_valuation:.2f}" if comps_valuation is not None else "Not available"
                 enterprise_value_summary_str = f"Value: {enterprise_value:.2f}" if enterprise_value is not None else "Not available"
 
-
                 DEFAULT_FAA_SUMMARY_PROMPT = (
                     "Provide a comprehensive analysis conclusion based on the provided data. "
                     "Your summary should cover the following aspects clearly:\n"
                     "- Start with an overall assessment of the company's financial health (as provided) and briefly justify it.\n"
                     "- Discuss key insights derived from the financial ratios. Highlight any ratios that are particularly strong, weak, or show significant trends.\n"
                     "- Explain the implications of the DCF valuation and Enterprise Value, if available. What do these values suggest about the company's intrinsic worth or market perception?\n"
-                    "- If available, comment on the estimated default likelihood and recovery rate.\n" # Note: default_likelihood and recovery_rate are not currently passed to input_vars
+                    "- If available, comment on the estimated default likelihood and recovery rate.\n" 
                     "- Conclude with a balanced view, mentioning both positive aspects and potential concerns or areas requiring further investigation.\n"
                     "Ensure the analysis is objective and data-driven."
-                    "Provide a brief overall conclusion based on the data."
                 )
-                user_prompt_for_conclusion = self.config.get(
-                    "summarize_analysis_user_prompt",
-                    DEFAULT_FAA_SUMMARY_PROMPT
+                
+                base_prompt = self.config.get("summarize_analysis_user_prompt", DEFAULT_FAA_SUMMARY_PROMPT)
+                summary_guidance_prompt_addon = self.current_run_inputs.get("summary_guidance_prompt_addon")
 
-                )
+                if summary_guidance_prompt_addon and isinstance(summary_guidance_prompt_addon, str) and summary_guidance_prompt_addon.strip():
+                    # If addon is provided, use it as the main prompt. This matches notebook's intent.
+                    final_user_prompt = summary_guidance_prompt_addon
+                    logging.info("Using summary guidance from 'summary_guidance_prompt_addon' input for SK.")
+                else:
+                    final_user_prompt = base_prompt
+                    logging.info("Using default/config summary prompt for SK.")
 
                 input_vars = { # SK arguments are typically flat key-value pairs
                     "company_id": company_id,
@@ -258,13 +263,13 @@ class FundamentalAnalystAgent(Agent):
                     "dcf_valuation_summary": dcf_summary,
                     "comps_valuation_summary": comps_summary,
                     "enterprise_value_summary": enterprise_value_summary_str,
-                    "user_provided_key_insights_or_conclusion_prompt": user_prompt_for_conclusion
+                    "user_provided_key_insights_or_conclusion_prompt": final_user_prompt
                 }
                 
                 skill_name = "SummarizeAnalysis"
                 logging.info(f"Attempting to generate summary for {company_id} using Semantic Kernel skill '{self.skills_plugin_name}.{skill_name}'.")
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_INPUT: {input_vars}")
-
+                
                 # Use the invoke_skill method from the base Agent class or directly use kernel.invoke
                 # Assuming invoke_skill handles finding the function and invoking
                 # result = await self.invoke_skill(skill_name, input_vars)
@@ -368,10 +373,20 @@ class FundamentalAnalystAgent(Agent):
 
             dcf_assumptions = financial_details.get('dcf_assumptions', {})
             
-            # Core rates from existing assumptions
+            # Get override values from current_run_inputs
+            override_discount_rate = self.current_run_inputs.get("dcf_override_discount_rate")
+            override_terminal_growth_rate = self.current_run_inputs.get("dcf_override_terminal_growth_rate")
+
+            # Core rates from existing assumptions or overrides
             discount_rate = dcf_assumptions.get('discount_rate')
-            # Terminal growth rate for perpetuity calculation (after explicit projection period)
+            if override_discount_rate is not None and isinstance(override_discount_rate, float) and override_discount_rate > 0:
+                discount_rate = override_discount_rate
+                logging.info(f"FAA_XAI:DCF_OVERRIDE: Using override discount rate: {discount_rate}")
+            
             terminal_growth_rate_perpetuity = dcf_assumptions.get('terminal_growth_rate') 
+            if override_terminal_growth_rate is not None and isinstance(override_terminal_growth_rate, float) and override_terminal_growth_rate >= 0: # Allow 0 for terminal growth
+                terminal_growth_rate_perpetuity = override_terminal_growth_rate
+                logging.info(f"FAA_XAI:DCF_OVERRIDE: Using override terminal growth rate: {terminal_growth_rate_perpetuity}")
             
             # New parameters for two-stage growth model
             fcf_projection_years_total = int(dcf_assumptions.get('fcf_projection_years_total', 10)) # Default 10 years

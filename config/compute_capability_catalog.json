@@ -1,7 +1,6 @@
 import json
 
-# This is the content read from the file in the previous step,
-# which already includes DataRetrievalAgent's capability.
+# This is the content read from the file in the previous step
 current_catalog_json_string = """
 {
   "computeCapabilities": [
@@ -117,8 +116,8 @@ current_catalog_json_string = """
       ],
       "outputs": [
           {
-            "name": "ingestion_summary",
-            "type": "object",
+            "name": "ingestion_summary", 
+            "type": "object", 
             "description": "Summary of the data ingestion process, including status and a list of keys for data items the agent attempted to store in SharedContext.",
             "properties": {
                 "status": {"type": "string", "description": "Indicates the status of the ingestion (e.g., 'success')."},
@@ -217,6 +216,42 @@ current_catalog_json_string = """
           "description": "The data package retrieved by the agent. Structure depends on the data_type requested."
         }
       ]
+    },
+    {
+      "id": "urn:adk:capability:catalyst_wrapper_agent:v1",
+      "name": "Catalyst Wrapper Agent",
+      "description": "Wraps the original CatalystAgent to identify strategic opportunities, structure deals, and generate reports.",
+      "agent_type": "CatalystWrapperAgent",
+      "inputs": [
+        {
+          "name": "client_id",
+          "type": "string",
+          "description": "The client identifier for analysis."
+        },
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The company identifier for analysis."
+        },
+        {
+          "name": "industry",
+          "type": "string",
+          "description": "The industry context for analysis."
+        },
+        {
+          "name": "catalyst_config_path",
+          "type": "string",
+          "optional": true,
+          "description": "Optional path to the catalyst_config.json file if different from the default."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "catalyst_output", 
+          "type": "object",
+          "description": "The output from the CatalystAgent, typically including identified opportunities, deal structures, or reports."
+        }
+      ]
     }
   ]
 }
@@ -224,44 +259,47 @@ current_catalog_json_string = """
 
 data = json.loads(current_catalog_json_string)
 
-new_catalyst_wrapper_capability = {
-  "id": "urn:adk:capability:catalyst_wrapper_agent:v1",
-  "name": "Catalyst Wrapper Agent",
-  "description": "Wraps the original CatalystAgent to identify strategic opportunities, structure deals, and generate reports.",
-  "agent_type": "CatalystWrapperAgent",
-  "inputs": [
-    {
-      "name": "client_id",
-      "type": "string",
-      "description": "The client identifier for analysis."
-    },
-    {
-      "name": "company_id",
-      "type": "string",
-      "description": "The company identifier for analysis."
-    },
-    {
-      "name": "industry",
-      "type": "string",
-      "description": "The industry context for analysis."
-    },
-    {
-      "name": "catalyst_config_path",
-      "type": "string",
-      "optional": true,
-      "description": "Optional path to the catalyst_config.json file if different from the default."
-    }
-  ],
-  "outputs": [
-    {
-      "name": "catalyst_output",
-      "type": "object",
-      "description": "The output from the CatalystAgent, typically including identified opportunities, deal structures, or reports."
-    }
-  ]
-}
+# Find the FundamentalAnalystAgent capability
+faa_capability_id = "urn:adk:capability:fundamental_analyst_agent:v1"
+faa_capability = None
+for capability in data["computeCapabilities"]:
+    if capability["id"] == faa_capability_id:
+        faa_capability = capability
+        break
 
-data["computeCapabilities"].append(new_catalyst_wrapper_capability)
+if faa_capability:
+    new_inputs = [
+        {
+          "name": "summary_guidance_prompt_addon",
+          "type": "string",
+          "optional": true,
+          "description": "Additional user-provided guidance or a full custom prompt for the analysis summary generation."
+        },
+        {
+          "name": "dcf_override_discount_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF discount rate (e.g., 0.085 for 8.5%). If 0 or not provided, uses default from agent's data source."
+        },
+        {
+          "name": "dcf_override_terminal_growth_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF terminal growth rate (e.g., 0.025 for 2.5%). If 0 or not provided, uses default from agent's data source."
+        }
+    ]
+    # Ensure 'inputs' list exists
+    if "inputs" not in faa_capability:
+        faa_capability["inputs"] = []
+    
+    # Add new inputs, checking for duplicates if necessary (though not strictly required by prompt)
+    existing_input_names = {inp["name"] for inp in faa_capability["inputs"]}
+    for new_input in new_inputs:
+        if new_input["name"] not in existing_input_names:
+            faa_capability["inputs"].append(new_input)
+else:
+    # This case should ideally not happen if the catalog is consistent
+    print(f"ERROR: Capability with ID '{faa_capability_id}' not found in the catalog.")
 
 # Output the modified JSON with an indent of 2 for pretty printing
 print(json.dumps(data, indent=2))
