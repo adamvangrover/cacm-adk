@@ -1,6 +1,6 @@
 import uuid
 import logging
-import json # Moved to top
+import json 
 from typing import Optional, Dict, List, Any
 
 class SharedContext:
@@ -9,20 +9,13 @@ class SharedContext:
     throughout a CACM execution session.
     """
     def __init__(self, cacm_id: str, session_id: Optional[str] = None):
-        """
-        Initializes the SharedContext.
-
-        Args:
-            cacm_id (str): The ID of the CACM instance this context is associated with.
-            session_id (Optional[str]): A unique session ID. If None, one is generated.
-        """
         self.session_id: str = session_id or str(uuid.uuid4())
         self.cacm_id: str = cacm_id
         self.document_references: Dict[str, str] = {}
         self.knowledge_base_references: List[str] = []
         self.global_parameters: Dict[str, Any] = {}
-        self.data_store: Dict[str, Any] = {}  # For general inter-agent/skill data
-
+        self.data_store: Dict[str, Any] = {} 
+        
         self.logger = logging.getLogger(f"context.SharedContext.{self.session_id}")
         self.logger.info(f"SharedContext initialized for CACM ID '{self.cacm_id}' (Session ID: {self.session_id})")
 
@@ -54,7 +47,7 @@ class SharedContext:
 
     def set_global_parameter(self, key: str, value: Any):
         self.global_parameters[key] = value
-        self.logger.info(f"Set global parameter: Key='{key}', Value='{value}'")
+        self.logger.info(f"Set global parameter: Key='{key}' (Value type: {type(value).__name__})") # Added type
 
     def get_global_parameter(self, key: str) -> Optional[Any]:
         return self.global_parameters.get(key)
@@ -63,22 +56,19 @@ class SharedContext:
         return self.global_parameters.copy()
 
     def set_data(self, key: str, value: Any):
-        """Stores general data in the data_store."""
         self.data_store[key] = value
         self.logger.info(f"Set data in data_store: Key='{key}' (Value type: {type(value).__name__})")
 
     def get_data(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
-        """Retrieves data from the data_store."""
         return self.data_store.get(key, default)
 
     def log_context_summary(self):
-        """Logs a summary of the current context content."""
         summary_lines = [
             f"--- SharedContext Summary (Session: {self.session_id}, CACM: {self.cacm_id}) ---",
             f"Document References: {json.dumps(self.document_references, indent=2) if self.document_references else 'None'}",
             f"Knowledge Base Refs: {self.knowledge_base_references if self.knowledge_base_references else 'None'}",
             f"Global Parameters: {json.dumps(self.global_parameters, indent=2) if self.global_parameters else 'None'}",
-            f"Data Store Keys: {list(self.data_store.keys()) if self.data_store else 'None'}",
+            f"Data Store Keys: {list(self.data_store.keys()) if self.data_store else 'None (empty)'}", # Clarified empty case
             f"--- End of Summary ---"
         ]
         self.logger.info("\n".join(summary_lines))
@@ -86,25 +76,7 @@ class SharedContext:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     test_context = SharedContext(cacm_id="test_cacm_001")
-
     test_context.add_document_reference("10K_FILING", "s3://bucket/10k.pdf")
-    test_context.add_document_reference("NEWS_ARTICLE", "http://example.com/news.html")
-
-    test_context.add_knowledge_base_reference("kb:company_policies_v1")
-
     test_context.set_global_parameter("target_fiscal_year", 2024)
-    test_context.set_global_parameter("user_preferences", {"language": "en", "detail_level": "high"})
-
-    test_context.set_data("processed_text_segment_1", "This is a sample processed text.")
     test_context.set_data("analysis_score_component_A", 0.75)
-
-    retrieved_doc = test_context.get_document_reference("10K_FILING")
-    logging.info(f"Retrieved 10K: {retrieved_doc}")
-
-    retrieved_param = test_context.get_global_parameter("target_fiscal_year")
-    logging.info(f"Retrieved fiscal year: {retrieved_param}")
-
-    retrieved_data = test_context.get_data("analysis_score_component_A")
-    logging.info(f"Retrieved component A score: {retrieved_data}")
-
     test_context.log_context_summary()

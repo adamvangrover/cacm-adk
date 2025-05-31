@@ -28,11 +28,16 @@ class KernelService:
 
             # Register placeholder LLM skills
             from processing_pipeline.semantic_kernel_skills import SK_MDNA_SummarizerSkill #, SK_RiskAnalysisSkill
-            # Using SK_MDNA_SummarizerSkill for generic text summarization tasks by AnalysisAgent for now
+            # Using SK_MDNA_SummarizerSkill for generic text summarization tasks
+            # Its __init__ will try to get the kernel from KernelService itself if one isn't passed.
             self.kernel.add_plugin(SK_MDNA_SummarizerSkill(), plugin_name="SummarizationSkills")
-            # If SK_RiskAnalysisSkill had different methods needed, it would be registered too:
-            # self.kernel.add_plugin(SK_RiskAnalysisSkill(), plugin_name="RiskAnalysisSkills")
-            logger.info("Registered placeholder LLM skills (e.g., SummarizationSkills) with the kernel.")
+            logger.info("Registered SK_MDNA_SummarizerSkill as SummarizationSkills.")
+
+            # Register CustomReportingSkills
+            from processing_pipeline.semantic_kernel_skills import CustomReportingSkills
+            # Pass the kernel and logger to CustomReportingSkills instance
+            self.kernel.add_plugin(CustomReportingSkills(kernel=self.kernel, logger=logger), plugin_name="ReportingAnalysisSkills")
+            logger.info("Registered CustomReportingSkills with the kernel under plugin ReportingAnalysisSkills.")
 
         except ImportError as e:
             logger.error(f"Failed to import native or placeholder skills: {e}. Some functions may not be available.")
