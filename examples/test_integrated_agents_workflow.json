@@ -1,0 +1,73 @@
+{
+  "cacmId": "test_integrated_faa_sncaa_workflow_001",
+  "name": "Test Workflow for Integrated Fundamental and SNC Analyst Agents",
+  "description": "A sample CACM to test the refactored FundamentalAnalystAgent and SNCAnalystAgent.",
+  "inputs": {
+    "test_company_id": {
+      "value": "TESTCORP",
+      "description": "Company ID for testing."
+    },
+    "dra_company_data_override": {
+       "value": {
+          "company_info": {"name": "TESTCORP Inc.", "industry_sector": "Technology", "country": "USA"},
+          "financial_data_detailed": {
+              "income_statement": {"revenue": [1000, 1100, 1250], "net_income": [100, 120, 150], "ebitda": [150, 170, 200]},
+              "balance_sheet": {"total_assets": [2000, 2100, 2200], "total_liabilities": [800, 850, 900],
+                                "shareholders_equity": [1200, 1250, 1300], "cash_and_equivalents": [200, 250, 300],
+                                "short_term_debt": [50,50,50], "long_term_debt": [500,450, 400]},
+              "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70],
+                                      "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
+              "key_ratios": {"debt_to_equity_ratio": 0.6923, "net_profit_margin": 0.12, "current_ratio": 2.44, "interest_coverage_ratio": 5.0},
+              "dcf_assumptions": {
+                  "fcf_projection_years_total": 10,
+                  "initial_high_growth_period_years": 5,
+                  "initial_high_growth_rate": 0.10,
+                  "stable_growth_rate": 0.05,
+                  "discount_rate": 0.09,
+                  "terminal_growth_rate_perpetuity": 0.025
+              },
+              "market_data": {"share_price": 65.00, "shares_outstanding": 10000000, "annual_debt_service_placeholder": "60", "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"}
+          },
+          "qualitative_company_info": {"management_assessment": "Experienced", "competitive_advantages": "Strong IP", "revenue_cashflow_stability_notes_placeholder": "Stable", "financial_deterioration_notes_placeholder": "None"},
+          "industry_data_context": {"outlook": "Positive"},
+          "economic_data_context": {"overall_outlook": "Stable"},
+          "collateral_and_debt_details": {"loan_to_value_ratio": 0.6, "collateral_type": "Generic Collateral", "other_credit_enhancements": "None."}
+      },
+      "description": "Override data for DataRetrievalAgent to return. This simulates DRA's output."
+    }
+  },
+  "outputs": {
+    "fundamental_analysis_output": {
+      "type": "object",
+      "description": "Output from the Fundamental Analyst Agent."
+    },
+    "snc_analysis_output": {
+      "type": "object",
+      "description": "Output from the SNC Analyst Agent."
+    }
+  },
+  "workflow": [
+    {
+      "stepId": "step1_fundamental_analysis",
+      "description": "Perform fundamental analysis on the test company.",
+      "computeCapabilityRef": "urn:adk:capability:fundamental_analyst_agent:v1",
+      "inputBindings": {
+        "company_id": "cacm.inputs.test_company_id"
+      },
+      "outputBindings": {
+        "analysis_result": "cacm.outputs.fundamental_analysis_output"
+      }
+    },
+    {
+      "stepId": "step2_snc_analysis",
+      "description": "Perform SNC analysis on the test company.",
+      "computeCapabilityRef": "urn:adk:capability:snc_analyst_agent:v1",
+      "inputBindings": {
+        "company_id": "cacm.inputs.test_company_id"
+      },
+      "outputBindings": {
+        "snc_analysis_result": "cacm.outputs.snc_analysis_output"
+      }
+    }
+  ]
+}

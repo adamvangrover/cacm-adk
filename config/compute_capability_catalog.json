@@ -1,3 +1,7 @@
+import json
+
+# This is the content read from the file in the previous step
+current_catalog_json_string = """
 {
   "computeCapabilities": [
     {
@@ -96,22 +100,32 @@
     {
       "id": "urn:adk:capability:standard_data_ingestor:v1",
       "name": "Standard Data Ingestor Agent",
-      "description": "Agent responsible for ingesting initial data from CACM inputs into SharedContext.",
+      "description": "Agent responsible for ingesting initial data from various sources (direct inputs or conceptual file paths) into SharedContext for subsequent agents to use.",
       "agent_type": "DataIngestionAgent",
       "inputs": [
-          {"name": "companyName", "type": "string", "optional": true},
-          {"name": "companyTicker", "type": "string", "optional": true},
-          {"name": "financialStatementData", "type": "object", "optional": true, "description": "Direct input for financial data, can be simple or expanded."},
-          {"name": "mockStructuredFinancialsForLLMSummary", "type": "object", "optional": true, "description": "Direct input for mock financials for LLM summary."},
-          {"name": "riskFactorsText", "type": "string", "optional": true, "description": "Direct input for risk factors text."},
-          {"name": "riskFactorsFilePath", "type": "string", "optional": true, "description": "Path to file containing risk factors text."},
-          {"name": "mockFinancialsFilePath", "type": "string", "optional": true, "description": "Path to file for mock structured financials."},
-          {"name": "fullFinancialStatementFilePath", "type": "string", "optional": true, "description": "Path to file for full financial statement data (for expanded ratios)."},
-          {"name": "documentURI", "type": "string", "optional": true, "description": "A URI for a primary document (can be used by DataIngestionAgent)."},
-          {"name": "documentType", "type": "string", "optional": true, "description": "Type of the primary document if URI is provided (can be used by DataIngestionAgent)."}
+          {"name": "companyName", "type": "string", "optional": true, "description": "Company name. Stored in SharedContext if provided."},
+          {"name": "companyTicker", "type": "string", "optional": true, "description": "Company stock ticker. Stored in SharedContext if provided."},
+          {"name": "financialStatementData", "type": "object", "optional": true, "description": "Direct input for financial data. Used as a fallback if 'fullFinancialStatementFilePath' is not provided, or for basic ratio compatibility. The agent may attempt to derive an expanded structure from this if possible."},
+          {"name": "mockStructuredFinancialsForLLMSummary", "type": "object", "optional": true, "description": "Direct input for mock structured financials, typically for LLM summary generation. Used as fallback if 'mockFinancialsFilePath' is not provided."},
+          {"name": "riskFactorsText", "type": "string", "optional": true, "description": "Direct input for risk factors text. Used as fallback if 'riskFactorsFilePath' is not provided."},
+          {"name": "riskFactorsFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing risk factors text. If provided, its content is prioritized over 'riskFactorsText'."},
+          {"name": "mockFinancialsFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing mock structured financials. If provided, its content is prioritized over 'mockStructuredFinancialsForLLMSummary'."},
+          {"name": "fullFinancialStatementFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing full/expanded financial statement data. If provided, its content is prioritized over 'financialStatementData' for populating 'financial_data_for_ratios_expanded'."},
+          {"name": "documentURI", "type": "string", "optional": true, "description": "A URI for a primary document. Currently not processed by the agent; intended for future extension."},
+          {"name": "documentType", "type": "string", "optional": true, "description": "Type of the primary document if URI is provided. Currently not processed by the agent; intended for future extension."}
       ],
       "outputs": [
-          {"name": "ingestion_summary", "type": "object", "description": "Summary of data ingestion process, including status and list of stored keys."}
+          {
+            "name": "ingestion_summary",
+            "type": "object",
+            "description": "Summary of the data ingestion process, including status and a list of keys for data items the agent attempted to store in SharedContext.",
+            "properties": {
+                "status": {"type": "string", "description": "Indicates the status of the ingestion (e.g., 'success')."},
+                "agent": {"type": "string", "description": "Name of the agent performing the ingestion."},
+                "message": {"type": "string", "description": "A message detailing the outcome or process."},
+                "attempted_to_store_keys": {"type": "array", "items": {"type": "string"}, "description": "List of keys the agent attempted to store in SharedContext."}
+            }
+          }
       ]
     },
     {
@@ -126,6 +140,166 @@
           {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."},
           {"name": "report_file_path", "type": "string", "description": "Conceptual path to the generated report file."}
       ]
+    },
+    {
+      "id": "urn:adk:capability:fundamental_analyst_agent:v1",
+      "name": "Fundamental Analyst Agent",
+      "description": "Performs fundamental analysis of a company, including financial ratios, DCF valuation, and financial health assessment.",
+      "agent_type": "FundamentalAnalystAgent",
+      "inputs": [
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The unique identifier for the company to be analyzed."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "analysis_result",
+          "type": "object",
+          "description": "The comprehensive analysis results, including ratios, valuations, and summaries."
+        }
+      ]
+    },
+    {
+      "id": "urn:adk:capability:snc_analyst_agent:v1",
+      "name": "SNC Analyst Agent",
+      "description": "Performs Shared National Credit (SNC) analysis for a company, assigning an SNC rating and providing a rationale.",
+      "agent_type": "SNCAnalystAgent",
+      "inputs": [
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The unique identifier for the company to be analyzed for SNC rating."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "snc_analysis_result",
+          "type": "object",
+          "description": "The SNC analysis results, including the rating and rationale.",
+          "properties": {
+            "rating": {"type": ["string", "null"], "description": "The assigned SNC rating (e.g., Pass, Substandard) or null if not determined."},
+            "rationale": {"type": "string", "description": "The justification for the assigned SNC rating."}
+          }
+        }
+      ]
+    },
+    {
+      "id": "urn:adk:capability:data_retrieval_agent:v1",
+      "name": "Data Retrieval Agent",
+      "description": "Retrieves various types of data (e.g., company financials, market data) based on inputs. Supports data overrides for testing.",
+      "agent_type": "DataRetrievalAgent",
+      "inputs": [
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The unique identifier for the company or entity for which data is requested."
+        },
+        {
+          "name": "data_type",
+          "type": "string",
+          "optional": true,
+          "description": "Specifies the type of data to retrieve (e.g., 'get_company_financials', 'market_data'). Defaults to 'get_company_financials'."
+        },
+        {
+          "name": "data_override",
+          "type": "object",
+          "optional": true,
+          "description": "Allows passing a complete data package to be returned directly by the agent, bypassing other retrieval logic."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "retrieved_data",
+          "type": "object",
+          "description": "The data package retrieved by the agent. Structure depends on the data_type requested."
+        }
+      ]
+    },
+    {
+      "id": "urn:adk:capability:catalyst_wrapper_agent:v1",
+      "name": "Catalyst Wrapper Agent",
+      "description": "Wraps the original CatalystAgent to identify strategic opportunities, structure deals, and generate reports.",
+      "agent_type": "CatalystWrapperAgent",
+      "inputs": [
+        {
+          "name": "client_id",
+          "type": "string",
+          "description": "The client identifier for analysis."
+        },
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The company identifier for analysis."
+        },
+        {
+          "name": "industry",
+          "type": "string",
+          "description": "The industry context for analysis."
+        },
+        {
+          "name": "catalyst_config_path",
+          "type": "string",
+          "optional": true,
+          "description": "Optional path to the catalyst_config.json file if different from the default."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "catalyst_output",
+          "type": "object",
+          "description": "The output from the CatalystAgent, typically including identified opportunities, deal structures, or reports."
+        }
+      ]
     }
   ]
 }
+"""
+
+data = json.loads(current_catalog_json_string)
+
+# Find the FundamentalAnalystAgent capability
+faa_capability_id = "urn:adk:capability:fundamental_analyst_agent:v1"
+faa_capability = None
+for capability in data["computeCapabilities"]:
+    if capability["id"] == faa_capability_id:
+        faa_capability = capability
+        break
+
+if faa_capability:
+    new_inputs = [
+        {
+          "name": "summary_guidance_prompt_addon",
+          "type": "string",
+          "optional": true,
+          "description": "Additional user-provided guidance or a full custom prompt for the analysis summary generation."
+        },
+        {
+          "name": "dcf_override_discount_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF discount rate (e.g., 0.085 for 8.5%). If 0 or not provided, uses default from agent's data source."
+        },
+        {
+          "name": "dcf_override_terminal_growth_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF terminal growth rate (e.g., 0.025 for 2.5%). If 0 or not provided, uses default from agent's data source."
+        }
+    ]
+    # Ensure 'inputs' list exists
+    if "inputs" not in faa_capability:
+        faa_capability["inputs"] = []
+
+    # Add new inputs, checking for duplicates if necessary (though not strictly required by prompt)
+    existing_input_names = {inp["name"] for inp in faa_capability["inputs"]}
+    for new_input in new_inputs:
+        if new_input["name"] not in existing_input_names:
+            faa_capability["inputs"].append(new_input)
+else:
+    # This case should ideally not happen if the catalog is consistent
+    print(f"ERROR: Capability with ID '{faa_capability_id}' not found in the catalog.")
+
+# Output the modified JSON with an indent of 2 for pretty printing
+print(json.dumps(data, indent=2))

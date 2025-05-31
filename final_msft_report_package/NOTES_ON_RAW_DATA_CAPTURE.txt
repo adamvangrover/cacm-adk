@@ -1,0 +1,16 @@
+Notes on Raw Data Capture:
+
+This package contains the main human-readable Markdown report and the structured JSON outputs from the primary analytical agents.
+
+During execution, agents like FundamentalAnalystAgent, SNCAnalystAgent, and ReportGenerationAgent make calls to Semantic Kernel (SK) skills. These interactions involve specific prompts sent to Large Language Models (LLMs) and the raw textual responses received from them. Currently, these detailed prompts and raw LLM outputs are primarily logged by the individual agents during their execution.
+
+Systematically extracting all these granular artifacts (every prompt, every raw SK output) into separate, organized files within this package would require further enhancements to the agents' return structures or logging mechanisms.
+
+Future Consideration:
+As per user feedback, strategically capturing and organizing this raw machine data (prompts, intermediate LLM responses, etc.) is valuable for:
+- In-depth performance analysis of individual SK skills and agent components.
+- Fine-tuning prompts and LLM interactions.
+- Debugging and tracing the reasoning process of LLM-driven agents.
+- Building datasets for further machine learning and system evolution.
+
+The log files generated during the orchestrator run would contain much of this raw information, though not in a directly packaged format.
