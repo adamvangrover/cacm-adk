@@ -1,0 +1,27 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:covenant_monitoring_input:v1",
+  "version": "1.0.0",
+  "name": "Covenant Definition Input",
+  "description": "Defines the structure for specifying financial covenants to be monitored.",
+  "inputs": {},
+  "parameters": {},
+  "outputs": {
+    "covenants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "covenantId": {"type": "string", "description": "Unique ID for the covenant."},
+          "name": {"type": "string", "description": "Human-readable name, e.g., 'Debt Service Coverage Ratio'."},
+          "metricFormula": {"type": "string", "description": "Formula to calculate the covenant metric, e.g., 'EBITDA / (Principal + Interest Payments)'."},
+          "metricInputs": { "type": "array", "items": {"type": "string"}, "description": "List of financial data keys needed for the formula."},
+          "condition": {"type": "string", "enum": [">", ">=", "<", "<=", "=", "!="], "description": "Comparison operator."},
+          "thresholdValue": {"type": "number"},
+          "reportingFrequency": {"type": "string", "enum": ["Quarterly", "SemiAnnually", "Annually"]},
+          "gracePeriodDays": {"type": "integer", "optional": true, "default": 0}
+        }
+      }
+    }
+  },
+  "workflow": []
+}

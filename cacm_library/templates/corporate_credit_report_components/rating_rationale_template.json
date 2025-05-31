@@ -1,0 +1,23 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:rating_rationale:v1",
+  "version": "1.0.0",
+  "name": "Rating Rationale and Justification",
+  "description": "Generates structured text for rating justification, key drivers, and outlook based on various analytical inputs.",
+  "inputs": {
+    "financialHighlights": { "type": "string", "description": "Key takeaways from financial analysis." },
+    "swotPoints": { "type": "object", "description": "SWOT analysis structured as per swot_analysis_input_template." },
+    "pdModelOutput": { "type": "object", "description": "Output from a PD model (e.g., { pd_value: 0.05, primary_drivers: ['Leverage', 'Profitability'] }).", "optional": true },
+    "assignedCreditRating": { "type": "string", "description": "The final assigned credit rating (e.g., 'AA-', 'B+')." },
+    "ratingOutlook": { "type": "string", "enum": ["Stable", "Positive", "Negative", "Developing"], "description": "Outlook associated with the rating." }
+  },
+  "parameters": {},
+  "outputs": {
+    "ratingJustificationNarrative": { "type": "string", "description": "Full textual justification for the rating." },
+    "keyPositiveCreditFactors": { "type": "array", "items": { "type": "string" } },
+    "keyNegativeCreditFactors_Risks": { "type": "array", "items": { "type": "string" } },
+    "ratingOutlookStatement": { "type": "string", "description": "Textual explanation of the rating outlook." }
+  },
+  "workflow": [
+    { "stepName": "Generate Rating Narrative Components", "computeCapabilityRef": "urn:adk:capability:credit_rationale_composer:v1", "inputs": { "financials": "inputs.financialHighlights", "swot": "inputs.swotPoints", "pdInfo": "inputs.pdModelOutput", "rating": "inputs.assignedCreditRating", "outlook": "inputs.ratingOutlook"}, "outputs": {"mainNarrative": "outputs.ratingJustificationNarrative", "positives": "outputs.keyPositiveCreditFactors", "negatives": "outputs.keyNegativeCreditFactors_Risks", "outlookText": "outputs.ratingOutlookStatement"} }
+  ]
+}

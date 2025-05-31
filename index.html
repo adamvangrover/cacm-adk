@@ -96,6 +96,7 @@
                         <a href="#embedding-expertise" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Expertise</a>
                         <a href="#system-enhancements" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Enhancements</a>
                         <a href="#execution-blueprint" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Roadmap</a>
+                        <a href="#interactive-analysis" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Interactive Demo</a>
                         <a href="#concluding-remarks" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Conclusion</a>
                     </div>
                 </div>
@@ -123,6 +124,7 @@
                 <a href="#embedding-expertise" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Expertise</a>
                 <a href="#system-enhancements" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Enhancements</a>
                 <a href="#execution-blueprint" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Roadmap</a>
+                <a href="#interactive-analysis" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Interactive Demo</a>
                 <a href="#concluding-remarks" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-teal-600 hover:bg-teal-50">Conclusion</a>
             </div>
         </div>
@@ -154,18 +156,18 @@
                 <li><strong>Embedded Expertise:</strong> Capturing and evolving expert knowledge through a comprehensive Knowledge Graph (KG), enriched Knowledge Base (KB), "living" decision trees, and continuous learning loops.</li>
             </ul>
             <p class="mb-2">These benefits are interconnected, creating a virtuous cycle of improvement. For instance, increased efficiency enables more in-depth analysis, leading to richer insights that can be embedded back into the system, making automated components smarter. This compounding effect is a hallmark of a well-architected intelligent system.</p>
-            <p>Moreover, the combination of advanced simulation, early warning signal detection, and adaptive scoring shifts risk management from reactive to proactive, potentially reducing credit losses and enhancing institutional resilience.</p>
+            <p class="mb-2">Moreover, the combination of advanced simulation, early warning signal detection, and adaptive scoring shifts risk management from reactive to proactive, potentially reducing credit losses and enhancing institutional resilience.</p>
         </section>
 
         <section id="foundational-pillars" class="content-section pt-16 -mt-16 mb-12 bg-white p-6 rounded-lg shadow">
             <h2 class="text-2xl font-semibold text-stone-700 mb-6">II. Foundational Pillars: Validating and Prioritizing Core Semantic Infrastructure</h2>
             <p class="mb-4 text-stone-600">The success of the envisioned platform hinges on establishing a robust semantic infrastructure. This section validates the strategic approach to ontology, knowledge graph (KG), and knowledge base (KB) development and offers guidance on their prioritization. These elements form the semantic backbone, crucial for all advanced capabilities.</p>
             <h3 class="text-xl font-semibold text-teal-600 mb-3 mt-4">A. Ontology & Knowledge Graph (KG) Evolution</h3>
-            <p class="mb-2">The ontology and KG are correctly identified as the semantic backbone. The detailed strategy for "Execute Full Ontology Expansion (Target: `credit_ontology.ttl v0.3.0`)" is methodologically sound. Instantiating this ontology with diverse assets (financial models, decision trees like `Creditworthiness_Decision_Tree_v3.json`, mappings from `Comprehensive_Credit_Risk_Mapping_v2.json`, concepts from `KB_Valuation_Risk_Macro_TechAnalysis_v2.json`, simulation data, and "Teacher inputs") is critical. KG management tools (SPARQL, visualization, validation, versioning) are a pragmatic necessity.</p>
+            <p class="mb-2">The ontology and KG are correctly identified as the semantic backbone. The detailed strategy for "Execute Full Ontology Expansion (Target: `credit_ontology.ttl v0.3.0`)" is methodologically sound. <a href="./ontology/credit_analysis_ontology_v0.3/credit_ontology_v0.3.ttl" target="_blank" class="text-teal-600 hover:underline">(View Ontology File)</a> Instantiating this ontology with diverse assets (financial models, decision trees like `Creditworthiness_Decision_Tree_v3.json`, mappings from `Comprehensive_Credit_Risk_Mapping_v2.json`, concepts from `KB_Valuation_Risk_Macro_TechAnalysis_v2.json`, simulation data, and "Teacher inputs") is critical. KG management tools (SPARQL, visualization, validation, versioning) are a pragmatic necessity.</p>
             <p class="mb-2"><strong>Priority Zero:</strong> Development and instantiation of this core semantic infrastructure. Without it, advanced AI/ML, dynamic CACM composition, and other envisioned features cannot be reliably implemented. The ontology acts as a "living contract," defining shared understanding across the platform. KG instantiation is a continuous, dynamic process, not a one-time task.</p>
-            <p>Even in early stages, a well-structured KG with querying and visualization tools can deliver immediate value by empowering analysts with enhanced data discovery and novel perspectives.</p>
+            <p>Even in early stages, a well-structured KG with querying and visualization tools can deliver immediate value by empowering analysts with enhanced data discovery and novel perspectives. <a href="./docs/usage/sparql_query_examples.md" target="_blank" class="text-teal-600 hover:underline">(View SPARQL Query Examples)</a></p>
             <h3 class="text-xl font-semibold text-teal-600 mb-3 mt-6">B. Knowledge Base (KB) Expansion and Integration</h3>
-            <p class="mb-2">The KB (e.g., `KB_Valuation_Risk_Macro_TechAnalysis_v2.json`) serves as a curated repository of verified, domain-specific knowledge. "Continuous Enrichment," "LLM Integration," and "Semantic Linking" to the master KG are vital to ensure AI outputs are grounded in factual, curated knowledge.</p>
+            <p class="mb-2">The KB (e.g., `KB_Valuation_Risk_Macro_TechAnalysis_v2.json`) serves as a curated repository of verified, domain-specific knowledge. <a href="./knowledge_base/KB_Valuation_Risk_Macro_TechAnalysis_v1.json" target="_blank" class="text-teal-600 hover:underline">(View KB JSON File)</a> "Continuous Enrichment," "LLM Integration," and "Semantic Linking" to the master KG are vital to ensure AI outputs are grounded in factual, curated knowledge. <a href="./knowledge_graph_instantiations/kb_core_instances.ttl" target="_blank" class="text-teal-600 hover:underline">(View Sample KG Instances)</a></p>
             <p class="mb-2">KB development should proceed with high priority, concurrently with ontology/KG development. The KB provides the "content" that the KG "structures." In an era of LLM "hallucinations," a curated KB acts as "ground truth," improving reliability of LLM-generated content when deeply integrated.</p>
             <p>A powerful synergy exists with "Teacher inputs" (e.g., from `Teacher_Inputs_for_LLM_Training_v1.json`), which should be systematically incorporated into the KB, creating a virtuous cycle where expert input refines the KB, and the enhanced KB improves AI/LLM performance.</p>
             
@@ -264,7 +266,7 @@
             <h2 class="text-2xl font-semibold text-stone-700 mb-6">III. Scaling Capabilities for Breadth and Depth</h2>
             <p class="mb-4 text-stone-600">Once a robust semantic foundation is in place, the platform can effectively scale its analytical capabilities. This section examines the strategies for developing modular analytical components (CACMs), implementing advanced simulation engines, and expanding data integration to handle more complex and diverse analyses.</p>
             <h3 class="text-xl font-semibold text-teal-600 mb-3 mt-4">A. Modular and Composable Credit Analysis Capability Modules (CACMs)</h3>
-            <p class="mb-2">CACMs (e.g., `cacm:SaaS_DefaultRisk_v1`) represent a powerful paradigm for modularity, reusability, and scalability. The plan to refine the CACM framework, establish a library/registry, enable dynamic composition, and ensure flexibility is sound. Development of the core framework and initial CACMs is an early priority post-ontology/KG setup.</p>
+            <p class="mb-2">CACMs (e.g., `cacm:SaaS_DefaultRisk_v1`) represent a powerful paradigm for modularity, reusability, and scalability. <a href="./cacm_library/templates/basic_ratio_analysis_template.json" target="_blank" class="text-teal-600 hover:underline">(View Basic Ratio Analysis Template)</a> The plan to refine the CACM framework, establish a library/registry, enable dynamic composition, and ensure flexibility is sound. Development of the core framework and initial CACMs is an early priority post-ontology/KG setup.</p>
             <p class="mb-2">CACMs are encapsulated units of analytical expertise with clear interfaces, allowing reliable construction of complex workflows. The KG is critical for "Dynamic CACM Composition," enabling intelligent orchestration of workflows based on context, such as assembling relevant CACMs for specific queries like "Assess credit risk for a Series B SaaS company in a rising interest rate environment."</p>
             <h3 class="text-xl font-semibold text-teal-600 mb-3 mt-6">B. Advanced Simulation Engine</h3>
             <p class="mb-2">Developing an "Advanced Simulation Engine" by expanding the "World Simulation Module" and integrating financial models (e.g., MSFT, TSLA examples) marks a significant step towards proactive risk management. This allows modeling impacts of macroeconomic shifts, industry shocks, and regulatory changes. Programmatic integration of financial models is key for scenario testing. The "Feedback Loop" (simulation outputs enriching KG) is crucial for a learning system.</p>
@@ -512,6 +514,45 @@
             <p class="mb-2">The journey to build this platform is a substantial undertaking, requiring sustained commitment, strategic investment, and a collaborative spirit across technology, business, and risk functions. The path forward, as outlined, emphasizes a phased, agile approach, beginning with critical foundational work on the semantic infrastructure—ontology, knowledge graph, and knowledge base. Subsequent phases will iteratively build out advanced analytical capabilities, intelligent automation, and mechanisms for continuous learning and expertise embedding.</p>
             <p>The immediate next steps involve translating this strategic roadmap into a detailed operational plan. This includes allocating dedicated resources, structuring project teams with the necessary blend of technical and domain expertise, and formally initiating Phase 1 activities, with a particular focus on the development of `credit_ontology.ttl v0.3.0` and the establishment of the core Knowledge Graph infrastructure. Throughout this endeavor, a steadfast commitment to robust governance, continuous user feedback, and adaptive performance monitoring will be paramount to navigating complexities and ensuring the platform meets and exceeds its transformative potential.</p>
         </section>
+
+        <section id="interactive-analysis" class="content-section pt-16 -mt-16 mb-12 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-stone-700 mb-6">Interactive Demo: Basic Ratio Analysis</h2>
+            <p class="mb-4 text-stone-600">
+                Test a simple Credit Analysis Capability Module (CACM) directly from your browser.
+                Enter the required financial figures below to calculate basic financial ratios.
+                This demonstration uses the "Basic Ratio Analysis" CACM which is orchestrated by the backend.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="currentAssetsInput" class="block text-sm font-medium text-stone-700">Current Assets:</label>
+                    <input type="number" id="currentAssetsInput" name="currentAssetsInput" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" placeholder="e.g., 2000">
+                </div>
+                <div>
+                    <label for="currentLiabilitiesInput" class="block text-sm font-medium text-stone-700">Current Liabilities:</label>
+                    <input type="number" id="currentLiabilitiesInput" name="currentLiabilitiesInput" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" placeholder="e.g., 1000">
+                </div>
+                <div>
+                    <label for="totalDebtInput" class="block text-sm font-medium text-stone-700">Total Debt:</label>
+                    <input type="number" id="totalDebtInput" name="totalDebtInput" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" placeholder="e.g., 1500">
+                </div>
+                <div>
+                    <label for="totalEquityInput" class="block text-sm font-medium text-stone-700">Total Equity:</label>
+                    <input type="number" id="totalEquityInput" name="totalEquityInput" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" placeholder="e.g., 2500">
+                </div>
+            </div>
+            <button id="calculateRatiosButton" class="w-full md:w-auto px-6 py-3 bg-teal-600 text-white font-semibold rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150">
+                Calculate Ratios
+            </button>
+            <div id="ratioResultsArea" class="mt-6 p-4 bg-teal-50 rounded-md text-teal-800 hidden">
+                <h3 class="text-lg font-semibold mb-2">Calculated Ratios:</h3>
+                <pre class="whitespace-pre-wrap"></pre>
+            </div>
+            <div id="ratioErrorArea" class="mt-6 p-4 bg-red-50 rounded-md text-red-700 hidden">
+                <h3 class="text-lg font-semibold mb-2">Errors:</h3>
+                <pre class="whitespace-pre-wrap"></pre>
+            </div>
+        </section>
+
     </main>
 
     <footer class="bg-stone-800 text-stone-300 text-center p-6 mt-12">
@@ -664,7 +705,94 @@
                 });
             });
 
+            // Interactive Demo: Basic Ratio Analysis
+            const calculateRatiosButton = document.getElementById('calculateRatiosButton');
+            const currentAssetsInput = document.getElementById('currentAssetsInput');
+            const currentLiabilitiesInput = document.getElementById('currentLiabilitiesInput');
+            const totalDebtInput = document.getElementById('totalDebtInput');
+            const totalEquityInput = document.getElementById('totalEquityInput');
+            const ratioResultsArea = document.getElementById('ratioResultsArea');
+            const ratioErrorArea = document.getElementById('ratioErrorArea');
 
+            if (calculateRatiosButton) {
+                calculateRatiosButton.addEventListener('click', async () => {
+                    ratioResultsArea.classList.add('hidden');
+                    ratioErrorArea.classList.add('hidden');
+                    ratioResultsArea.querySelector('pre').textContent = '';
+                    ratioErrorArea.querySelector('pre').textContent = '';
+
+                    const ca = parseFloat(currentAssetsInput.value);
+                    const cl = parseFloat(currentLiabilitiesInput.value);
+                    const td = parseFloat(totalDebtInput.value);
+                    const te = parseFloat(totalEquityInput.value);
+
+                    if (isNaN(ca) || isNaN(cl) || isNaN(td) || isNaN(te)) {
+                        ratioErrorArea.querySelector('pre').textContent = 'All input fields must be valid numbers.';
+                        ratioErrorArea.classList.remove('hidden');
+                        return;
+                    }
+
+                    const inputPayload = {
+                        "financialStatementData": {
+                            "currentAssets": ca,
+                            "currentLiabilities": cl,
+                            "totalDebt": td,
+                            "totalEquity": te
+                        }
+                    };
+
+                    try {
+                        const response = await fetch('/api/run_basic_ratio_analysis', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputPayload),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            let errorsExist = false;
+                            let resultsPopulated = false;
+
+                            if (result.calculated_ratios && Object.keys(result.calculated_ratios).length > 0) {
+                                ratioResultsArea.querySelector('pre').textContent = JSON.stringify(result.calculated_ratios, null, 2);
+                                ratioResultsArea.classList.remove('hidden');
+                                resultsPopulated = true;
+                            }
+
+                            let errorMessages = [];
+                            if (result.errors && result.errors.length > 0) {
+                                errorMessages.push(...result.errors);
+                            }
+                            if (result.execution_errors && result.execution_errors.length > 0) {
+                                errorMessages.push(...result.execution_errors);
+                            }
+
+                            if (errorMessages.length > 0) {
+                                ratioErrorArea.querySelector('pre').textContent = errorMessages.join('\n');
+                                ratioErrorArea.classList.remove('hidden');
+                                errorsExist = true;
+                            }
+
+                            if (!resultsPopulated && !errorsExist) {
+                                ratioErrorArea.querySelector('pre').textContent = "No ratios calculated. The module executed but did not return any ratios. Input data might have led to valid non-calculation (e.g. division by zero handled by the module).";
+                                ratioErrorArea.classList.remove('hidden');
+                            }
+
+                        } else {
+                            const errorText = result.detail || result.error || `Server error: ${response.status}`;
+                            ratioErrorArea.querySelector('pre').textContent = errorText;
+                            ratioErrorArea.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        console.error('Error calling analysis API:', error);
+                        ratioErrorArea.querySelector('pre').textContent = 'Failed to connect to the analysis service. Is the backend running? Error: ' + error.message;
+                        ratioErrorArea.classList.remove('hidden');
+                    }
+                });
+            }
         });
     </script>
 
