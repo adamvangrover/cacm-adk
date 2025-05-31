@@ -94,7 +94,7 @@ The following checks will be implemented using SPARQL queries executed against t
       { ?c rdfs:subClassOf ?entity . }
       FILTER(isURI(?entity))
       # Optionally, filter out OWL and RDFS/RDF built-ins if not desired in this check
-      # FILTER(!STRSTARTS(STR(?entity), STR(owl:)) && !STRSTARTS(STR(?entity), STR(rdfs:)) && !STRSTARTS(STR(?entity), STR(rdf:)))
+      # FILTER(!STRSTARTS(STR(?entity), STR(owl:)) && !STRSTARTS(STR(?entity), STR(rdfs:)) && !STRSTARTS(STR(?entity), STR(rdf:))) 
     }
     ```
 *   **Follow-up (in Python):** The Python script would iterate through these `?entity` results and run further queries for each, like:
@@ -164,7 +164,7 @@ While the checks above focus on the ontology's TBox (schema), validating instanc
       ?property rdfs:range ?expectedDatatype .
       # Focus on common XSD datatypes for this example
       FILTER (?expectedDatatype IN (xsd:string, xsd:decimal, xsd:integer, xsd:boolean, xsd:date, xsd:dateTime))
-
+      
       ?subject ?property ?object .
       FILTER (isLiteral(?object) && datatype(?object) != ?expectedDatatype)
     }

@@ -27,7 +27,7 @@ def calculate_basic_ratios(financial_data: dict, rounding_precision: int = 2) ->
         if key in financial_data and not isinstance(financial_data[key], (int, float)):
             errors.append(f"Invalid type for {key}: expected numeric, got {type(financial_data[key]).__name__}.")
             non_numeric_keys = True
-
+    
     if missing_keys or non_numeric_keys:
         # Return early if fundamental input issues exist
         return {"calculated_ratios": {}, "errors": errors}
@@ -59,7 +59,7 @@ def calculate_basic_ratios(financial_data: dict, rounding_precision: int = 2) ->
             errors.append("Type error during Debt-to-Equity Ratio calculation. Ensure inputs are numeric.")
         except Exception as e: # Catch any other unexpected calculation error
             errors.append(f"Unexpected error calculating Debt-to-Equity Ratio: {str(e)}")
-
+            
     # Filter out ratios that could not be calculated (are None)
     final_calculated_ratios = {k: v for k, v in calculated_ratios_intermediate.items() if v is not None}
 

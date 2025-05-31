@@ -62,3 +62,4 @@ kb_instance:RF_003 a kgclass:RiskFactor ;
     kgprop:hasMitigationStrategy "Diversification"^^xsd:string,
         "Political risk insurance"^^xsd:string ;
     rdfs:comment "Risk associated with political changes, conflicts, or instability in a country or region that could impact investments or business operations."@en .
+
