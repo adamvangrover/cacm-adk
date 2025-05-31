@@ -1,3 +1,7 @@
+import json
+
+# This is the content read from the file in the previous step
+current_catalog_json_string = """
 {
   "computeCapabilities": [
     {
@@ -126,6 +130,59 @@
           {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."},
           {"name": "report_file_path", "type": "string", "description": "Conceptual path to the generated report file."}
       ]
+    },
+    {
+      "id": "urn:adk:capability:fundamental_analyst_agent:v1",
+      "name": "Fundamental Analyst Agent",
+      "description": "Performs fundamental analysis of a company, including financial ratios, DCF valuation, and financial health assessment.",
+      "agent_type": "FundamentalAnalystAgent",
+      "inputs": [
+        {
+          "name": "company_id",
+          "type": "string",
+          "description": "The unique identifier for the company to be analyzed."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "analysis_result",
+          "type": "object",
+          "description": "The comprehensive analysis results, including ratios, valuations, and summaries."
+        }
+      ]
     }
   ]
 }
+"""
+
+data = json.loads(current_catalog_json_string)
+
+new_snc_capability = {
+  "id": "urn:adk:capability:snc_analyst_agent:v1",
+  "name": "SNC Analyst Agent",
+  "description": "Performs Shared National Credit (SNC) analysis for a company, assigning an SNC rating and providing a rationale.",
+  "agent_type": "SNCAnalystAgent",
+  "inputs": [
+    {
+      "name": "company_id",
+      "type": "string",
+      "description": "The unique identifier for the company to be analyzed for SNC rating."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "snc_analysis_result",
+      "type": "object",
+      "description": "The SNC analysis results, including the rating and rationale.",
+      "properties": {
+        "rating": {"type": ["string", "null"], "description": "The assigned SNC rating (e.g., Pass, Substandard) or null if not determined."},
+        "rationale": {"type": "string", "description": "The justification for the assigned SNC rating."}
+      }
+    }
+  ]
+}
+
+data["computeCapabilities"].append(new_snc_capability)
+
+# Output the modified JSON with an indent of 2 for pretty printing
+print(json.dumps(data, indent=2))
