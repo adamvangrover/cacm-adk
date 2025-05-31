@@ -1,14 +1,14 @@
 # processing_pipeline/semantic_kernel_skills.py
 import json
-import os
+import os 
 import re
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional 
 import logging
 
 # from cacm_adk_core.semantic_kernel_adapter import KernelService # Not directly used by skills if kernel passed in
-import semantic_kernel as sk
+import semantic_kernel as sk 
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel import Kernel
+from semantic_kernel import Kernel 
 
 class SK_EntityInfoExtractorSkill:
     def extract_entity_info(self, sectioned_data: dict) -> dict:
@@ -20,7 +20,7 @@ class SK_EntityInfoExtractorSkill:
         if name_match: company_name = re.sub(r"[,.]?\s*(CORPORATION|INC\.|INCORPORATED|LLC|L\.L\.C\.|LIMITED|PLC|CORP\.)$", "", name_match.group(1).strip(), flags=re.IGNORECASE).strip()
         incorp_match = re.search(r"incorporated in the State of (\w+)", text_to_search, re.IGNORECASE)
         if not incorp_match: incorp_match = re.search(r"State of Incorporation[:\s]+(\w+)", text_to_search, re.IGNORECASE)
-        if not incorp_match:
+        if not incorp_match: 
             incorp_match_cand = re.search(r"a\s+(\w+)\s+corporation", text_to_search, re.IGNORECASE)
             if incorp_match_cand and incorp_match_cand.group(1).lower() not in ["delaware", "nevada", "washington", "california", "new york"]: incorp_match_cand = None
             incorp_match = incorp_match_cand
@@ -50,21 +50,21 @@ class SK_MDNA_SummarizerSkill:
     def __init__(self):
         try:
             # This import is here to avoid circular dependency if KernelService also imports skills from here at module level
-            from cacm_adk_core.semantic_kernel_adapter import KernelService
+            from cacm_adk_core.semantic_kernel_adapter import KernelService 
             self.kernel_service = KernelService()
             self.kernel = self.kernel_service.get_kernel()
-        except Exception as e:
+        except Exception as e: 
             logging.getLogger(self.__class__.__name__).warning(f"Could not get KernelService or kernel during __init__: {e}. Placeholder mode will be active.")
             self.kernel = None
             self.kernel_service = None
-
-        self.use_placeholder = True
-        self.summarize_function = None
+            
+        self.use_placeholder = True 
+        self.summarize_function = None 
 
         if self.kernel:
             try:
                 if self.kernel.get_service(type="chat-completion"):
-                    self.use_placeholder = False
+                    self.use_placeholder = False 
                     logging.info("SK_MDNA_SummarizerSkill: Chat Completion service found. Semantic function will be used if available.")
                     self.summarization_prompt = """
 Summarize the following text in approximately {{max_sentences}} sentences.
@@ -77,9 +77,9 @@ Focus on the key points and main ideas. Text to summarize: {{$input}} Summary:""
                     logging.warning("SK_MDNA_SummarizerSkill: Kernel available, but no Chat Completion service configured. Will use NATIVE placeholder logic.")
             except sk.exceptions.KernelServiceNotFoundError:
                 logging.warning("SK_MDNA_SummarizerSkill: Chat Completion service not found. Will use NATIVE placeholder logic.")
-            except Exception as e:
+            except Exception as e: 
                 logging.error(f"SK_MDNA_SummarizerSkill: Error setting up semantic function: {e}. Will use NATIVE placeholder logic.")
-                self.use_placeholder = True
+                self.use_placeholder = True 
         else:
             logging.warning("SK_MDNA_SummarizerSkill: Kernel instance not available. Will use NATIVE placeholder logic.")
 
@@ -98,10 +98,10 @@ Focus on the key points and main ideas. Text to summarize: {{$input}} Summary:""
         if self.use_placeholder or not self.summarize_function:
             logging.warning("SK_MDNA_SummarizerSkill.summarize_section: Using NATIVE placeholder (generic string).")
             return "[Placeholder LLM Summary: Content would be generated here based on provided input.]"
-
+        
         try:
             logging.info(f"SK_MDNA_SummarizerSkill.summarize_section: Invoking SEMANTIC function (max_sentences: {max_sentences}).")
-            kernel_args = KernelArguments(input=input, max_sentences=max_sentences)
+            kernel_args = KernelArguments(input=input, max_sentences=max_sentences) 
             result = await self.kernel.invoke(self.summarize_function, kernel_args)
             summary = str(result).strip()
             logging.info("SK_MDNA_SummarizerSkill.summarize_section: SEMANTIC summarization successful.")
@@ -125,7 +125,7 @@ class CustomReportingSkills:
     def __init__(self, kernel: Optional[Kernel] = None, logger_instance: Optional[logging.Logger] = None): # Renamed logger to logger_instance
         self.kernel = kernel
         self.logger = logger_instance or logging.getLogger(self.__class__.__name__)
-        self.use_placeholder = True
+        self.use_placeholder = True 
 
         if self.kernel:
             try:
@@ -146,7 +146,7 @@ class CustomReportingSkills:
         self.logger.info(f"CustomReportingSkills.generate_financial_summary called. Placeholder mode: {self.use_placeholder}")
         if self.use_placeholder:
             self.logger.info("Conceptual LLM call for generate_financial_summary: Would construct a prompt with financial_data and ask for a narrative summary.")
-
+        
         if not isinstance(financial_data, dict): financial_data = {"error": "Invalid input, expected dict."}
         rev_y1 = financial_data.get("revenue_y1", "N/A"); rev_y2 = financial_data.get("revenue_y2", "N/A")
         ni_y1 = financial_data.get("net_income_y1", "N/A"); ni_y2 = financial_data.get("net_income_y2", "N/A")
@@ -185,8 +185,8 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO) # Ensure logging is configured for __main__
     print("\n--- Testing Semantic Kernel Placeholder Skills ---")
     async def main():
-        summarizer = SK_MDNA_SummarizerSkill()
-        summarizer.use_placeholder = True
+        summarizer = SK_MDNA_SummarizerSkill() 
+        summarizer.use_placeholder = True 
         summary1 = await summarizer.summarize_section(input="This is a long text that needs summarization.", max_sentences="2")
         print(f"Forced Placeholder Summary: {summary1}")
         echo_text = summarizer.test_echo(text_to_echo="Hello Echo from MDNA Skill")

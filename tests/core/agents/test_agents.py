@@ -3,11 +3,11 @@ import unittest
 import asyncio
 import logging
 from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Dict, Any
+from typing import Dict, Any 
 
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions.function_result import FunctionResult
-from semantic_kernel import Kernel
+from semantic_kernel import Kernel 
 
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.agents.analysis_agent import AnalysisAgent
@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 class SimpleMockKernelService:
     def __init__(self):
         self._kernel = MagicMock(spec=Kernel)
-        self._kernel.plugins = MagicMock()
+        self._kernel.plugins = MagicMock() 
         self.logger = logging.getLogger("SimpleMockKernelService")
     def get_kernel(self) -> Kernel: return self._kernel
 
@@ -101,7 +101,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
     async def test_run_ratio_plugin_not_found(self):
         self.shared_context.set_data("financial_data_for_ratios_expanded", {"current_assets": 1})
         self.mock_kernel.plugins.get.side_effect = lambda key: self.mock_report_plugin if key == "ReportingAnalysisSkills" else None
-
+        
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["message"], "Error: Plugin 'FinancialAnalysis' not found.")
@@ -109,7 +109,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
     async def test_run_ratio_function_not_found(self):
         self.shared_context.set_data("financial_data_for_ratios_expanded", {"current_assets": 1})
         self.mock_fin_plugin.get.return_value = None # Ratio function not found
-
+        
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["message"], "Error: 'calculate_basic_ratios' function not found in plugin.")
@@ -120,7 +120,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
             if func == self.mock_ratio_func: raise Exception("Ratio Boom!")
             return MagicMock(spec=FunctionResult, value="summary")
         self.mock_kernel.invoke.side_effect = invoke_side_effect
-
+        
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["message"], "Error invoking 'calculate_basic_ratios' skill: Ratio Boom!")

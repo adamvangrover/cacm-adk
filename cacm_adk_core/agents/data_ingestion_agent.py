@@ -27,7 +27,7 @@ class DataIngestionAgent(Agent):
                 # This structure includes all keys expected by the enhanced FinancialAnalysisSkill
                 return {
                     "source": "file_conceptual",
-                    "current_assets": 760000.0, "current_liabilities": 310000.0,
+                    "current_assets": 760000.0, "current_liabilities": 310000.0, 
                     "total_debt": 510000.0, "total_equity": 910000.0,
                     "revenue": 2600000.0, "gross_profit": 1000000.0,
                     "net_income": 160000.0, "total_assets": 1500000.0
@@ -90,13 +90,13 @@ class DataIngestionAgent(Agent):
         # This will be stored under "financial_data_for_ratios_expanded"
         # The old "financial_data_for_ratios" might still be populated if "financialStatementData" is directly provided
         # and "fullFinancialStatementFilePath" is not.
-
+        
         expanded_financial_data = self._read_file_content_or_default(
             current_step_inputs.get("fullFinancialStatementFilePath"),
             current_step_inputs.get("financialStatementData"), # Fallback to direct data if path not given
             data_type="expanded_financials_json"
         )
-
+        
         # If fallback was used (direct financialStatementData) and it's not the conceptual file version,
         # check if it has the new expanded keys. If not, provide a default expanded structure.
         if isinstance(expanded_financial_data, dict) and \
@@ -104,23 +104,23 @@ class DataIngestionAgent(Agent):
            not all(k in expanded_financial_data for k in ["revenue", "gross_profit", "net_income", "total_assets"]):
             self.logger.warning("Fallback financialStatementData does not have the full expanded structure. Using a default expanded structure for ratios, preserving original basic ratio keys if present.")
             default_expanded_structure = {
-                "current_assets": expanded_financial_data.get("current_assets", 0.0),
-                "current_liabilities": expanded_financial_data.get("current_liabilities", 0.0),
-                "total_debt": expanded_financial_data.get("total_debt", 0.0),
+                "current_assets": expanded_financial_data.get("current_assets", 0.0), 
+                "current_liabilities": expanded_financial_data.get("current_liabilities", 0.0), 
+                "total_debt": expanded_financial_data.get("total_debt", 0.0), 
                 "total_equity": expanded_financial_data.get("total_equity", 1.0), # Avoid div by zero if possible
                 "revenue": 2000000.0, "gross_profit": 800000.0, # Default new fields
                 "net_income": 100000.0, "total_assets": 1200000.0,
                 "source": "default_expanded_fallback"
             }
             expanded_financial_data = default_expanded_structure
-
+        
         if expanded_financial_data:
             shared_context.set_data("financial_data_for_ratios_expanded", expanded_financial_data)
             self.logger.info(f"Stored financial_data_for_ratios_expanded. Source: {'file' if current_step_inputs.get('fullFinancialStatementFilePath') else ('direct_input_or_default_expanded')}.")
             stored_keys_list.append("financial_data_for_ratios_expanded")
         else:
             self.logger.warning("financial_data_for_ratios_expanded (from file/input) not found.")
-
+            
         # For backward compatibility or simpler tests, also store the basic ratio data if provided directly
         # under the old key, if `financial_data_for_ratios_expanded` wasn't populated from a specific file for it.
         # This helps if AnalysisAgent is not yet updated to use "financial_data_for_ratios_expanded".
@@ -146,7 +146,7 @@ class DataIngestionAgent(Agent):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    from semantic_kernel import Kernel
+    from semantic_kernel import Kernel 
 
     class MockKernelService(KernelService):
         def __init__(self): self._kernel = Kernel(); logging.info("MockKernelService initialized.")

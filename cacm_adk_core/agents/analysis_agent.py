@@ -1,5 +1,5 @@
 import logging
-import json
+import json 
 from typing import Dict, Any
 
 from cacm_adk_core.agents.base_agent import Agent
@@ -29,12 +29,12 @@ class AnalysisAgent(Agent):
         financial_summary_text = "[Financial Performance Summary Not Available - Generation Skipped or Failed]"
         key_risks_summary_text = "[Key Risks Summary Not Available - Generation Skipped or Failed]"
         overall_assessment_text = "[Overall Assessment Not Available - Generation Skipped or Failed]"
-        ratios_skill_payload = None
+        ratios_skill_payload = None 
 
         expanded_financial_data = shared_context.get_data("financial_data_for_ratios_expanded")
         structured_financials_for_summary = shared_context.get_data("structured_financials_for_summary")
         risk_factors_section_text = shared_context.get_data("risk_factors_section_text")
-
+        
         kernel = self.get_kernel()
         if not kernel:
             agent_ops_summary["kernel_access"] = "Failed: Kernel not available."
@@ -70,7 +70,7 @@ class AnalysisAgent(Agent):
                         except Exception as e:
                             agent_ops_summary["ratio_calculation"] = f"Error invoking 'calculate_basic_ratios' skill: {e}"
                             final_status = "error"; final_message = agent_ops_summary["ratio_calculation"]
-
+            
             # Summarization Skills (only if no critical error yet)
             if final_status not in ["error"]:
                 report_plugin = kernel.plugins.get("ReportingAnalysisSkills")
@@ -103,7 +103,7 @@ class AnalysisAgent(Agent):
                 else: # Reporting plugin not found
                     agent_ops_summary["financial_summary_generation"]=agent_ops_summary["risk_summary_generation"]=agent_ops_summary["overall_assessment_generation"]="Skipped: ReportingAnalysisSkills plugin not found."
                     if final_status == "success": final_status = "warning"; final_message = "Analysis completed with summarization plugin not found."
-
+        
         agent_ops_summary["final_message_before_reporting"] = final_message
 
         # Communication with ReportGenerationAgent

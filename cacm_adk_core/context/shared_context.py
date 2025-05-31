@@ -1,6 +1,6 @@
 import uuid
 import logging
-import json
+import json 
 from typing import Optional, Dict, List, Any
 
 class SharedContext:
@@ -14,8 +14,8 @@ class SharedContext:
         self.document_references: Dict[str, str] = {}
         self.knowledge_base_references: List[str] = []
         self.global_parameters: Dict[str, Any] = {}
-        self.data_store: Dict[str, Any] = {}
-
+        self.data_store: Dict[str, Any] = {} 
+        
         self.logger = logging.getLogger(f"context.SharedContext.{self.session_id}")
         self.logger.info(f"SharedContext initialized for CACM ID '{self.cacm_id}' (Session ID: {self.session_id})")
 

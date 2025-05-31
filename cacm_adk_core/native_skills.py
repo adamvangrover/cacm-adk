@@ -108,7 +108,7 @@ class FinancialAnalysisSkill:
             "net_income": "Net Profit Margin, ROA, ROE",
             "total_assets": "ROA, Debt Ratio"
         }
-
+        
         # Validate presence and type of all potentially required keys
         # This is a general validation pass. Specific calculations will re-check for their particular needs.
         for key, usage_example in required_keys_map.items():
@@ -157,7 +157,7 @@ class FinancialAnalysisSkill:
         if rev_gpm is not None and gp is not None:
             if rev_gpm == 0: errors.append("Cannot calculate Gross Profit Margin: Revenue is zero.")
             else: calculated_ratios_intermediate["gross_profit_margin"] = round((gp / rev_gpm) * 100, rounding_precision)
-
+        
         # Net Profit Margin
         rev_npm = get_numeric("revenue", "Net Profit Margin")
         ni_npm = get_numeric("net_income", "Net Profit Margin")
@@ -185,9 +185,9 @@ class FinancialAnalysisSkill:
         if td_dr is not None and ta_dr is not None:
             if ta_dr == 0: errors.append("Cannot calculate Debt Ratio: Total Assets is zero.")
             else: calculated_ratios_intermediate["debt_ratio"] = round(td_dr / ta_dr, rounding_precision)
-
+            
         final_calculated_ratios = {k: v for k, v in calculated_ratios_intermediate.items() if v is not None}
-
+        
         if errors:
              logger.warning(f"Errors during ratio calculation: {errors}")
 
@@ -195,7 +195,7 @@ class FinancialAnalysisSkill:
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG) # Set to DEBUG to see optional key messages
-
+    
     # Basic Test for BasicCalculationSkill (unchanged)
     basic_skill = BasicCalculationSkill()
     print("\n--- BasicCalculationSkill Tests ---")
@@ -212,7 +212,7 @@ if __name__ == '__main__':
     # Updated Test for FinancialAnalysisSkill
     financial_skill = FinancialAnalysisSkill()
     print("\n--- FinancialAnalysisSkill Tests (Expanded) ---")
-
+    
     good_data_expanded = {
         "current_assets": 1000.0, "current_liabilities": 500.0, # CR = 2.0
         "total_debt": 800.0, "total_equity": 1200.0,           # D/E = 0.67
@@ -222,7 +222,7 @@ if __name__ == '__main__':
                                                                # ROE = 83.33
     }
     print(f"Ratios (good expanded data): {financial_skill.calculate_basic_ratios(financial_data=good_data_expanded, rounding_precision=2)}")
-
+    
     # Test with some missing data for new ratios
     data_missing_some_new = {
         "current_assets": 1000.0, "current_liabilities": 500.0,
@@ -232,12 +232,12 @@ if __name__ == '__main__':
     print(f"Ratios (missing some new keys): {financial_skill.calculate_basic_ratios(financial_data=data_missing_some_new)}")
 
     data_zero_revenue_assets = {
-        "current_assets": 1000.0, "current_liabilities": 500.0,
-        "total_debt": 800.0, "total_equity": 1200.0,
-        "revenue": 0.0, "gross_profit": 0.0,
-        "net_income": 0.0,
-        "total_assets": 0.0
+        "current_assets": 1000.0, "current_liabilities": 500.0, 
+        "total_debt": 800.0, "total_equity": 1200.0,          
+        "revenue": 0.0, "gross_profit": 0.0,            
+        "net_income": 0.0,                                  
+        "total_assets": 0.0                                
     }
     print(f"Ratios (zero revenue/assets): {financial_skill.calculate_basic_ratios(financial_data=data_zero_revenue_assets)}")
-
+    
     logger.info("Native skills module self-test completed.")

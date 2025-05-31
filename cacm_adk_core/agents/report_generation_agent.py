@@ -1,5 +1,5 @@
 import logging
-import json
+import json 
 from typing import Dict, Any, Optional
 
 from cacm_adk_core.agents.base_agent import Agent
@@ -21,19 +21,19 @@ class ReportGenerationAgent(Agent):
         # a. Retrieve Expanded Data from SharedContext
         company_name = shared_context.get_data("company_name", "N/A")
         company_ticker = shared_context.get_data("company_ticker", "N/A")
-
+        
         # This now expects the dictionary of all calculated ratios
-        key_ratios_data = shared_context.get_data("calculated_key_ratios", {})
-
+        key_ratios_data = shared_context.get_data("calculated_key_ratios", {}) 
+        
         financial_summary = shared_context.get_data("financial_performance_summary_text", "[Financial Performance Summary Not Available]")
         risk_summary = shared_context.get_data("key_risks_summary_text", "[Key Risks Summary Not Available]")
         overall_assessment = shared_context.get_data("overall_assessment_text", "[Overall Assessment Not Available]")
-
+        
         self.logger.info(f"Retrieved data for report generation. Company: {company_name}. Ratios found: {bool(key_ratios_data)}")
 
         # b. Assemble Report String (with Expanded Ratios)
         report_sections = []
-
+        
         report_title_detail = current_step_inputs.get("report_title_detail", "Credit Analysis Report")
         report_sections.append(f"# {report_title_detail} for {company_name}")
         report_sections.append(f"## Task: {task_description}")
@@ -43,7 +43,7 @@ class ReportGenerationAgent(Agent):
         report_sections.append("### 1. Company Overview")
         report_sections.append(f"**Company Name:** {company_name}")
         report_sections.append(f"**Ticker:** {company_ticker}")
-
+        
         report_sections.append("\n### 2. Key Financial Ratios")
         if key_ratios_data:
             for ratio_name, ratio_value in key_ratios_data.items():
@@ -51,16 +51,16 @@ class ReportGenerationAgent(Agent):
                 report_sections.append(f"- **{display_ratio_name}:** {ratio_value}")
         else:
             report_sections.append("- No ratios calculated or available in SharedContext.")
-
+        
         report_sections.append("\n### 3. Financial Performance Summary")
         report_sections.append(financial_summary)
-
+        
         report_sections.append("\n### 4. Key Risks Summary")
         report_sections.append(risk_summary)
-
+        
         report_sections.append("\n### 5. Overall Assessment")
         report_sections.append(overall_assessment)
-
+        
         if current_step_inputs:
             report_sections.append("\n### 6. Additional Report Parameters")
             report_sections.append(f"```json\n{json.dumps(current_step_inputs, indent=2)}\n```")
@@ -70,9 +70,9 @@ class ReportGenerationAgent(Agent):
             for i, res_item in enumerate(self.stored_results):
                 report_sections.append(f"**Item {i+1} from Agent '{res_item.get('from', 'Unknown')}':**")
                 report_sections.append(f"```json\n{json.dumps(res_item.get('data',{}), indent=2)}\n```")
-
+        
         final_report_string = "\n\n".join(report_sections)
-
+            
         self.logger.info(f"Report assembled. Length: {len(final_report_string)}")
 
         # c. Conceptual File Output Logic
@@ -80,14 +80,14 @@ class ReportGenerationAgent(Agent):
         conceptual_file_path = f"./output_artifacts/final_machine_reports/{report_filename}"
         self.logger.info(f"Conceptually saving report to: {conceptual_file_path}")
         self.logger.debug(f"Report Content for {report_filename}:\n{final_report_string}")
-
+            
         # d. Update Agent Return Value
         return {
             "status": "success",
             "agent": self.agent_name,
             "message": "Report generated successfully and conceptually saved to file.",
             "generated_report_text": final_report_string,
-            "report_file_path": conceptual_file_path
+            "report_file_path": conceptual_file_path 
         }
 
     async def receive_analysis_results(self, sending_agent_name: str, results: Dict[str, Any]):
@@ -101,7 +101,7 @@ class ReportGenerationAgent(Agent):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     # from semantic_kernel import Kernel # Not strictly needed for this __main__ as kernel isn't used by agent directly
-
+    
     class MockKernelService(KernelService): # Minimal mock
         def __init__(self): self.logger = logging.getLogger("MockReportGenKernelService")
         def get_kernel(self): return None
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     test_shared_context.set_data("company_name", "TestCorp")
     test_shared_context.set_data("company_ticker", "TCORP")
     test_shared_context.set_data("calculated_key_ratios", {
-        "current_ratio": 2.15,
+        "current_ratio": 2.15, 
         "debt_to_equity_ratio": 0.65,
         "gross_profit_margin": 55.5,
         "net_profit_margin": 12.0
@@ -128,10 +128,10 @@ if __name__ == '__main__':
     async def test_run():
         # Simulate receiving data from AnalysisAgent
         await report_agent.receive_analysis_results(
-            "MockAnalysisAgent",
+            "MockAnalysisAgent", 
             {"summary": "Mock analysis summary", "key_metric": 123.45}
         )
-
+        
         result = await report_agent.run(
             task_description="Generate the standard financial report.",
             current_step_inputs={"report_title_detail": "Annual Test Report"},
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         print(result.get("generated_report_text"))
         print(f"\nConceptual file path: {result.get('report_file_path')}")
         print(f"Agent status: {result.get('status')}, message: {result.get('message')}")
-
+        
         print("\n--- SharedContext after Report Generation ---")
         test_shared_context.log_context_summary()
 

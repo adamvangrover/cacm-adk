@@ -1,17 +1,17 @@
 # cacm_adk_core/orchestrator/orchestrator.py
 import json
 import random
-import logging
+import logging 
 import uuid # Added
-from typing import List, Dict, Any, Tuple, Callable, Type, Optional
-import importlib
+from typing import List, Dict, Any, Tuple, Callable, Type, Optional 
+import importlib 
 
 from cacm_adk_core.validator.validator import Validator
 # Assuming basic_functions might be directly imported if needed, but registration handles it
 # from cacm_adk_core.compute_capabilities import basic_functions
 from cacm_adk_core.compute_capabilities import financial_ratios # For direct call
-from cacm_adk_core.semantic_kernel_adapter import KernelService
-from cacm_adk_core.agents.base_agent import Agent
+from cacm_adk_core.semantic_kernel_adapter import KernelService 
+from cacm_adk_core.agents.base_agent import Agent 
 from cacm_adk_core.context.shared_context import SharedContext # Added
 
 # Placeholder agent imports - will be done in a registration method
@@ -34,8 +34,8 @@ class Orchestrator:
             # _register_capabilities will use self.compute_catalog to find skill_plugin_name etc.
             # For now, it registers Python module based functions. We might need to adjust it
             # or rely on Kernel-based skill invocation if agent_type is not present.
-            self._register_capabilities()
-
+            self._register_capabilities() 
+        
         self._register_placeholder_agents() # Register agent classes
 
 
@@ -44,7 +44,7 @@ class Orchestrator:
         from cacm_adk_core.agents.data_ingestion_agent import DataIngestionAgent
         from cacm_adk_core.agents.analysis_agent import AnalysisAgent
         from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent
-
+        
         self.register_agent("DataIngestionAgent", DataIngestionAgent)
         self.register_agent("AnalysisAgent", AnalysisAgent)
         self.register_agent("ReportGenerationAgent", ReportGenerationAgent)
@@ -200,7 +200,7 @@ class Orchestrator:
 
     async def run_cacm(self, cacm_instance_data: dict) -> Tuple[bool, List[str], Dict[str, Any]]:
         log_messages: List[str] = []
-        final_cacm_outputs: Dict[str, Any] = {}
+        final_cacm_outputs: Dict[str, Any] = {} 
         step_outputs: Dict[str, Any] = {}
         self.agent_instances.clear() # Clear instances at the start of a new run
         log_messages.append("INFO: Orchestrator: Cleared active agent instances for new run_cacm execution.")
@@ -238,7 +238,7 @@ class Orchestrator:
             if not capability_ref:
                 log_messages.append(f"ERROR: Orchestrator: Step '{step_id}' is missing 'computeCapabilityRef'. Skipping.")
                 continue
-
+            
             capability_def = self.compute_catalog.get(capability_ref)
             if not capability_def:
                 log_messages.append(f"ERROR: Orchestrator: Capability '{capability_ref}' not found in catalog for step '{step_id}'. Skipping.")
@@ -254,7 +254,7 @@ class Orchestrator:
             # It resolves input bindings from cacm.inputs or previous steps.
             # For simplicity, we'll pass all resolved inputs as context_data to agents,
             # and filter them into function_args for direct skill calls.
-
+            
             resolved_inputs: Dict[str, Any] = {}
             step_input_bindings = step.get('inputBindings', {})
             for cap_input_def in capability_def.get('inputs', []):
@@ -302,7 +302,7 @@ class Orchestrator:
                     log_messages.append(f"ERROR: Orchestrator: Missing required input '{param_name}' for {capability_ref} in step '{step_id}'.")
                     # Halt or mark step as failed
                     # For now, we'll let it proceed and the agent/function might fail
-
+            
             if agent_type:
                 log_messages.append(f"INFO: Orchestrator: Attempting to execute Agent '{agent_type}' for capability '{capability_ref}'.")
                 agent_class = self.agents.get(agent_type)
@@ -325,8 +325,8 @@ class Orchestrator:
                     try:
                         # Agent's run method now receives resolved_inputs as current_step_inputs and shared_context
                         current_step_result_data = await agent_instance.run(
-                            effective_task_desc,
-                            resolved_inputs,
+                            effective_task_desc, 
+                            resolved_inputs, 
                             shared_context
                         )
                         log_messages.append(f"INFO: Orchestrator: Agent '{agent_type}' executed. Result: {current_step_result_data}")
@@ -357,7 +357,7 @@ class Orchestrator:
                     # For native functions, SK might expect parameters directly, not via KernelArguments always.
                     # The `invoke` method with function object and kwargs (from resolved_inputs) is typical.
                     result_obj = await kernel.invoke(skill_function, **resolved_inputs)
-
+                    
                     # The result from invoke might be a FunctionResult or directly the value.
                     # Assuming it's FunctionResult, and .value holds the actual output.
                     if hasattr(result_obj, 'value'):
@@ -388,7 +388,7 @@ class Orchestrator:
                         mocked_value = f"Mocked for unhandled {capability_ref} -> {binding_key}"
                         # Ensure the mocked value is stored in a way that step_outputs can use it
                         # The binding_key is what downstream steps will look for.
-                        mocked_outputs_for_step[binding_key] = mocked_value
+                        mocked_outputs_for_step[binding_key] = mocked_value 
                         final_cacm_outputs[output_key] = {"value": mocked_value, "description": f"Mocked output for {output_key}"}
                 current_step_result_data = mocked_outputs_for_step
 
@@ -398,7 +398,7 @@ class Orchestrator:
                 # If the function/agent returns a single value but catalog defines specific named outputs,
                 # we need to map it. For now, assume result is a dict if multiple outputs expected.
                 step_outputs[step_id] = current_step_result_data
-
+                
                 # Map to final_cacm_outputs based on step's outputBindings
                 for binding_key_in_step_output, cacm_output_ref_str in step.get('outputBindings', {}).items():
                     if isinstance(cacm_output_ref_str, str) and cacm_output_ref_str.startswith("cacm.outputs."):
@@ -412,7 +412,7 @@ class Orchestrator:
                         elif len(capability_def.get('outputs', [])) == 1 and capability_def['outputs'][0]['name'] == binding_key_in_step_output:
                             # Handle cases where function returns a single value, and binding key matches that single output name
                             value_to_set = current_step_result_data
-
+                        
                         if value_to_set is not None:
                             # CRITICAL DEBUG LOG
                             log_msg_detail = f"INFO: Orchestrator: Mapping step output key '{binding_key_in_step_output}' to CACM output key '{output_key_in_cacm}' with value type '{type(value_to_set).__name__}'."
@@ -426,7 +426,7 @@ class Orchestrator:
 
         # Log final context summary
         if shared_context: # Ensure shared_context exists
-            shared_context.log_context_summary()
+            shared_context.log_context_summary() 
             log_messages.append(f"INFO: Orchestrator: SharedContext summary logged for session {shared_context.get_session_id()}")
 
         log_messages.append("INFO: Orchestrator: Execution completed.")
@@ -440,18 +440,18 @@ class Orchestrator:
         if agent_name_key in self.agent_instances:
             self.logger.info(f"Orchestrator: Returning existing instance of agent '{agent_name_key}'.")
             return self.agent_instances[agent_name_key]
-
+        
         if agent_name_key in self.agents: # Check against registered agent classes
             self.logger.info(f"Orchestrator: Dynamically creating new instance of agent '{agent_name_key}'. Context for creation (if any): {context_data_for_creation}")
             agent_class = self.agents[agent_name_key]
             instance = agent_class(self.kernel_service)
             instance.set_agent_manager(self)
             self.agent_instances[agent_name_key] = instance
-
+            
             # Optional: Call a specific initialization method on the agent if it needs context
             # For example: if hasattr(instance, 'custom_init_with_context'):
             #    await instance.custom_init_with_context(context_data_for_creation if context_data_for_creation else {})
-
+            
             return instance
         else:
             self.logger.error(f"Orchestrator: Agent class for '{agent_name_key}' not found in registered agents.")
@@ -546,7 +546,7 @@ if __name__ == '__main__':
             "main_document_type": {"value": "10K_FILING", "description": "Type of the main document to process."},
             "main_document_identifier": {"value": "SEC_XYZ_10K_2023", "description": "Identifier for the main document."},
             "analysis_financial_data": {
-                "value": {
+                "value": { 
                     "current_assets": 3000.0, "current_liabilities": 1500.0,
                     "total_debt": 1000.0, "total_equity": 2000.0
                 },
@@ -567,7 +567,7 @@ if __name__ == '__main__':
                     "document_type": "cacm.inputs.main_document_type",
                     "document_id": "cacm.inputs.main_document_identifier"
                 },
-                "outputBindings": {
+                "outputBindings": { 
                     # Assuming DataIngestionAgent returns a dict with a summary or status
                     "ingestion_outcome": "cacm.outputs.data_ingestion_summary"
                 }
@@ -575,14 +575,14 @@ if __name__ == '__main__':
             {
                 "stepId": "step2_perform_analysis",
                 "description": "Perform financial ratio analysis using an agent, potentially using ingested data from context.",
-                "computeCapabilityRef": "urn:adk:capability:financial_ratios_calculator:v1",
+                "computeCapabilityRef": "urn:adk:capability:financial_ratios_calculator:v1", 
                 "inputBindings": { # Inputs for AnalysisAgent's run method's `current_step_inputs`
-                    "financial_data": "cacm.inputs.analysis_financial_data",
+                    "financial_data": "cacm.inputs.analysis_financial_data", 
                     "rounding_precision": "cacm.inputs.report_rounding_precision"
                     # AnalysisAgent will internally try to get ReportGenAgent and might use shared_context
                 },
                 "outputBindings": {
-                    "ratios_from_skill": "cacm.outputs.final_analysis_output"
+                    "ratios_from_skill": "cacm.outputs.final_analysis_output" 
                 }
             }
         ]

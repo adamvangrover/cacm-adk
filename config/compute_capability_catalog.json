@@ -84,9 +84,9 @@
       "name": "Financial Analysis Agent",
       "description": "Agent that calculates ratios and generates textual summaries using skills and SharedContext.",
       "agent_type": "AnalysisAgent",
-      "skill_plugin_name": "FinancialAnalysis",
-      "skill_function_name": "calculate_basic_ratios",
-      "inputs": [
+      "skill_plugin_name": "FinancialAnalysis", 
+      "skill_function_name": "calculate_basic_ratios", 
+      "inputs": [ 
           {"name": "roundingPrecision", "type": "integer", "optional": true, "description": "Precision for rounding calculated ratios."}
       ],
       "outputs": [
