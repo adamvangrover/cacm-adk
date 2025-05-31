@@ -185,7 +185,7 @@ Summary:
         try:
             logging.info(f"SK_MDNA_SummarizerSkill: Invoking semantic function for summarization (max_sentences: {max_sentences}).")
             kernel_args = KernelArguments(input=section_text, max_sentences=str(max_sentences))
-
+            
             # Ensure the kernel and service are available before invoking
             if not self.kernel.get_service(): # Check if any text completion service is configured
                  logging.error("SK_MDNA_SummarizerSkill: No AI service configured in the kernel. Cannot invoke function.")
@@ -197,7 +197,7 @@ Summary:
                  return f"Error: Semantic Kernel AI service not configured. Placeholder summary: {summary}"
 
             result = await self.kernel.invoke(self.summarize_function, kernel_args)
-
+            
             summary = str(result).strip()
             # Post-processing: ensure it's roughly the number of sentences requested, if needed.
             # For now, we directly return the LLM's output.
@@ -249,7 +249,7 @@ Summary:
                  logging.error(f"SK_MDNA_SummarizerSkill: RuntimeError with asyncio in sync wrapper: {e}. Falling back to generic placeholder.")
                  # Fallback to generic placeholder
                  return "[Placeholder LLM Summary: Asyncio error in sync wrapper. Content would be generated here.]"
-
+                 
         else: # Fallback if kernel doesn't have run_async (older SK or different setup)
             logging.warning("SK_MDNA_SummarizerSkill: Kernel does not have 'run_async' or other issue with sync wrapper. Using generic placeholder.")
             # Fallback to generic placeholder
@@ -317,16 +317,16 @@ if __name__ == '__main__':
     # MD&A Summarizer
     # Setup basic logging for the test
     logging.basicConfig(level=logging.INFO)
-
+    
     # IMPORTANT: For this test to attempt a real Semantic Kernel call,
     # ensure OPENAI_API_KEY and OPENAI_ORG_ID are set in your environment.
     # e.g., export OPENAI_API_KEY="your_key"
     # If not set, it will use placeholder logic due to KernelService initialization.
     print("\n--- Testing MD&A Summarizer ---")
     print("NOTE: If OPENAI_API_KEY is not set, this will use placeholder logic.")
-
+    
     mdna_summarizer = SK_MDNA_SummarizerSkill()
-
+    
     # Example: Test with OPENAI_API_KEY potentially not set (will use placeholder)
     # To truly test SK path, set the env var.
     # For CI/CD or automated tests without live keys, this test primarily checks integration,
@@ -340,7 +340,7 @@ if __name__ == '__main__':
         # but actual calls would fail or be blocked by SK if it tries to use a clearly invalid key.
         # The KernelService itself logs a warning if the key is missing.
         # Our skill's use_placeholder flag will be True.
-
+        
     print(f"Attempting to summarize MD&A (max 3 sentences): '{mdna_text_to_summarize[:100]}...'")
     mdna_summary = mdna_summarizer.summarize_section(mdna_text_to_summarize, max_sentences=3)
     print(f"\nMD&A Summary (sync wrapper, target 3 sentences):\n{mdna_summary}")

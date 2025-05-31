@@ -9,7 +9,7 @@ from unittest.mock import patch, AsyncMock, MagicMock # Added MagicMock
 from cacm_adk_core.orchestrator.orchestrator import Orchestrator
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 # SharedContext is implicitly tested via Orchestrator and Agents
-# from cacm_adk_core.context.shared_context import SharedContext
+# from cacm_adk_core.context.shared_context import SharedContext 
 from cacm_adk_core.validator.validator import Validator # Orchestrator needs a validator
 
 # Disable verbose logging from components during tests unless specifically needed
@@ -27,9 +27,9 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         # Assuming tests are run from project root, or PYTHONPATH handles cacm_adk_core
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         # Adjust path to go up from tests/core to the project root where config/ is
-        self.project_root = os.path.dirname(os.path.dirname(self.current_dir))
+        self.project_root = os.path.dirname(os.path.dirname(self.current_dir)) 
         self.catalog_path = os.path.join(self.project_root, "config/compute_capability_catalog.json")
-
+        
         # Ensure the catalog exists for the test
         if not os.path.exists(self.catalog_path):
             # Create a minimal catalog if it's missing, just for this test to run
@@ -67,15 +67,15 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
             }
             with open(self.catalog_path, 'w') as f:
                 json.dump(minimal_catalog, f, indent=2)
-
+        
         self.kernel_service = KernelService() # Real KernelService
-
+        
         # Orchestrator requires a validator. For integration test, can use a real one or a mock.
         # Using a mock validator that always validates successfully for simplicity here.
         self.mock_validator = MagicMock(spec=Validator)
         self.mock_validator.schema = True # Indicate schema is "loaded"
         self.mock_validator.validate_cacm_against_schema.return_value = (True, [])
-
+        
         self.orchestrator = Orchestrator(
             kernel_service=self.kernel_service,
             validator=self.mock_validator, # Use mock validator
@@ -97,7 +97,7 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
                 "companyNameInput": {"type": "string", "value": "MegaCorp Inc."},
                 "companyTickerInput": {"type": "string", "value": "MCORP"},
                 "statementDataInput": { # For DataIngestionAgent, which then puts it into SharedContext for AnalysisAgent
-                    "type": "object",
+                    "type": "object", 
                     "value": {"currentAssets": 750000, "currentLiabilities": 300000, "totalDebt": 500000, "totalEquity": 900000}
                 },
                 "mockFinancialsInput": { # For DataIngestionAgent
@@ -128,7 +128,7 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
                         "mockStructuredFinancialsForLLMSummary": "cacm.inputs.mockFinancialsInput",
                         "riskFactorsText": "cacm.inputs.riskTextDataInput"
                     },
-                    "outputBindings": {
+                    "outputBindings": { 
                         # DataIngestionAgent returns dict with "status", "message", "stored_keys_in_shared_context"
                         "ingestion_summary": "cacm.outputs.ingestion_process_output"
                     }
@@ -161,18 +161,18 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         }
 
         success, logs, outputs = await self.orchestrator.run_cacm(sample_cacm)
-
+        
         # Print logs for debugging if test fails
         # print("\n--- Orchestrator Logs for Integration Test ---")
         # for log_entry in logs:
         #     print(log_entry)
         # print("--- End of Logs ---")
-
+        
         # Critical Debug: Print the actual outputs received by the test method
         print(f"\nDEBUG: Outputs received in test_full_agent_workflow_with_skill:\n{json.dumps(outputs, indent=2)}\n")
 
         self.assertTrue(success, "Orchestrator run_cacm failed for the full workflow.")
-
+        
         # Verify ingestion output (optional, as it mainly writes to context)
         self.assertIn("ingestion_process_output", outputs) # Matches CACM "outputs" key
         self.assertIsNotNone(outputs["ingestion_process_output"].get("value"))
@@ -193,24 +193,24 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertIn("final_credit_report", outputs, "Final credit report key missing in outputs.")
         report_text = outputs["final_credit_report"].get("value")
         self.assertIsNotNone(report_text, "Generated report text is None.")
-
+        
         self.assertIn("Company Name: MegaCorp Inc.", report_text)
         self.assertIn("Ticker: MCORP", report_text)
         # Ratios based on new input: 750000/300000=2.5, 500000/900000=0.555 -> 0.56 (default rounding is 2 in skill)
         # The reportRoundingPrecisionInput is 2, so AnalysisAgent should use it.
-        self.assertIn("Current Ratio: 2.5", report_text)
-        self.assertIn("Debt-to-Equity Ratio: 0.56", report_text)
-
+        self.assertIn("Current Ratio: 2.5", report_text) 
+        self.assertIn("Debt-to-Equity Ratio: 0.56", report_text) 
+        
         # Check for placeholder summaries (as SK_MDNA_SummarizerSkill is a placeholder)
         self.assertIn("[Placeholder LLM Summary: Content would be generated here based on provided input.]", report_text)
-
+        
         # Check if ReportGenerationAgent's receive_analysis_results was called by AnalysisAgent
         mock_receive_analysis.assert_called_once()
         called_kwargs = mock_receive_analysis.call_args.kwargs
         self.assertEqual(called_kwargs.get('sending_agent_name'), "AnalysisAgent")
         received_results_to_report_agent = called_kwargs.get('results')
         self.assertIsNotNone(received_results_to_report_agent)
-        self.assertIn("ratios_payload", received_results_to_report_agent)
+        self.assertIn("ratios_payload", received_results_to_report_agent) 
         self.assertIsNotNone(received_results_to_report_agent["ratios_payload"])
         self.assertEqual(received_results_to_report_agent["ratios_payload"]["calculated_ratios"]["current_ratio"], 2.5)
 

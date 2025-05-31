@@ -39,20 +39,20 @@ class ReportGenerationAgent(Agent):
         # Retrieve Data from SharedContext
         company_name = shared_context.get_data("company_name", "N/A")
         company_ticker = shared_context.get_data("company_ticker", "N/A")
-
+        
         key_ratios_data = shared_context.get_data("calculated_key_ratios", {}) # Expected: {"current_ratio": ..., "debt_to_equity_ratio": ...}
         current_ratio = key_ratios_data.get("current_ratio", "N/A")
         debt_to_equity_ratio = key_ratios_data.get("debt_to_equity_ratio", "N/A")
-
+        
         financial_summary = shared_context.get_data("financial_performance_summary_text", "[Financial Performance Summary Not Available]")
         risk_summary = shared_context.get_data("key_risks_summary_text", "[Key Risks Summary Not Available]")
         overall_assessment = shared_context.get_data("overall_assessment_text", "[Overall Assessment Not Available]")
-
+        
         self.logger.info(f"Retrieved data for report generation. Company: {company_name}")
 
         # Assemble Report String
         report_sections = []
-
+        
         report_title_detail = current_step_inputs.get("report_title_detail", "Credit Analysis Report")
         report_sections.append(f"# {report_title_detail} for {company_name}")
         report_sections.append(f"## Task: {task_description}")
@@ -63,25 +63,25 @@ class ReportGenerationAgent(Agent):
         report_sections.append("### 1. Company Overview")
         report_sections.append(f"**Company Name:** {company_name}")
         report_sections.append(f"**Ticker:** {company_ticker}")
-
+        
         # Section 2: Key Financial Ratios
         report_sections.append("\n### 2. Key Financial Ratios")
         report_sections.append(f"- **Current Ratio:** {current_ratio}")
         report_sections.append(f"- **Debt-to-Equity Ratio:** {debt_to_equity_ratio}")
         # Add more ratios here if they become available in SharedContext
-
+        
         # Section 3: Financial Performance Summary
         report_sections.append("\n### 3. Financial Performance Summary")
         report_sections.append(financial_summary)
-
+        
         # Section 4: Key Risks Summary
         report_sections.append("\n### 4. Key Risks Summary")
         report_sections.append(risk_summary)
-
+        
         # Section 5: Overall Assessment
         report_sections.append("\n### 5. Overall Assessment")
         report_sections.append(overall_assessment)
-
+        
         # Include any data passed directly via current_step_inputs for this report generation step
         if current_step_inputs:
             report_sections.append("\n### 6. Additional Report Parameters")
@@ -93,11 +93,11 @@ class ReportGenerationAgent(Agent):
             for i, res_item in enumerate(self.stored_results):
                 report_sections.append(f"**Item {i+1} from Agent '{res_item.get('from', 'Unknown')}':**")
                 report_sections.append(f"```json\n{json.dumps(res_item.get('data',{}), indent=2)}\n```")
-
+        
         final_report_string = "\n\n".join(report_sections) # Using double newline for markdown paragraph breaks
-
+            
         self.logger.info(f"Report assembled. Length: {len(final_report_string)}")
-
+        
         return {
             "status": "success",
             "agent": self.agent_name,
@@ -124,13 +124,13 @@ if __name__ == '__main__':
     import json # Added for pretty printing in test run
     class MockKernelService(KernelService):
         def __init__(self):
-            self._kernel = Kernel()
+            self._kernel = Kernel() 
             self.logger_main = logging.getLogger("__main__") # Use main logger for mock service logs
             self.logger_main.info("MockKernelService for ReportGenerationAgent initialized.")
 
         def get_kernel(self):
             return self._kernel
-
+        
         def _initialize_kernel(self): pass
 
     mock_service = MockKernelService()
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         mock_shared_context_report = SharedContext(cacm_id="test_report_gen_cacm")
         # Simulate AnalysisAgent having stored some results via receive_analysis_results
         await report_agent.receive_analysis_results(
-            "AnalysisAgent_Test",
+            "AnalysisAgent_Test", 
             {"summary": "Test analysis summary", "value": 42}
         )
         # Simulate DataIngestionAgent having added a doc ref

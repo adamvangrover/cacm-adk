@@ -1,5 +1,5 @@
 import logging
-import json
+import json 
 from typing import Dict, Any
 
 from cacm_adk_core.agents.base_agent import Agent
@@ -11,7 +11,7 @@ from semantic_kernel.functions.kernel_arguments import KernelArguments
 
 class AnalysisAgent(Agent):
     """
-    Agent responsible for performing analysis tasks,
+    Agent responsible for performing analysis tasks, 
     including native skill calculations and orchestrating LLM summaries.
     """
     def __init__(self, kernel_service: KernelService):
@@ -35,7 +35,7 @@ class AnalysisAgent(Agent):
         key_risks_summary_text = "[Key Risks Summary Not Available - Generation Skipped or Failed]"
         overall_assessment_text = "[Overall Assessment Not Available - Generation Skipped or Failed]"
         ratios_skill_payload = None # Payload from the financial ratio native skill
-
+        
         final_status = "success" # Assume success, change on critical error
 
         # a. Retrieve Inputs from SharedContext
@@ -44,14 +44,14 @@ class AnalysisAgent(Agent):
         structured_financials_for_summary = shared_context.get_data("structured_financials_for_summary")
         risk_factors_section_text = shared_context.get_data("risk_factors_section_text")
 
-        for key, var in [("financial_data_for_ratios", financial_data_for_ratios),
+        for key, var in [("financial_data_for_ratios", financial_data_for_ratios), 
                          ("structured_financials_for_summary", structured_financials_for_summary),
                          ("risk_factors_section_text", risk_factors_section_text)]:
             if var is not None:
                 self.logger.info(f"Retrieved '{key}' from SharedContext.")
             else:
                 self.logger.warning(f"'{key}' not found in SharedContext. Dependent steps may be affected.")
-
+        
         kernel = self.get_kernel()
         if not kernel:
             self.logger.error("Kernel not available, cannot execute skills.")
@@ -101,7 +101,7 @@ class AnalysisAgent(Agent):
             summarizer_plugin = kernel.plugins.get("SummarizationSkills")
             if summarizer_plugin and summarizer_plugin.get("summarize_section"):
                 summarize_func = summarizer_plugin.get("summarize_section")
-
+                
                 # c. Financial Performance Summary
                 fin_text_for_summary = f"Summarize financial performance. Key data: {json.dumps(structured_financials_for_summary if structured_financials_for_summary else {'info': 'not available'})}"
                 kernel_args_fin = KernelArguments(input=fin_text_for_summary, max_sentences="3")
@@ -129,7 +129,7 @@ class AnalysisAgent(Agent):
                     self.logger.error(f"Error invoking risk summary skill: {e}", exc_info=True)
                     agent_ops_summary["risk_summary_generation"] = f"Error: {e}"
                     if final_status != "error": final_status = "partial_success"
-
+                
                 # e. Overall Assessment
                 assessment_input_text = (
                     f"Overall Assessment based on: "
@@ -166,15 +166,15 @@ class AnalysisAgent(Agent):
         # f. Communicate with ReportGenerationAgent
         self.logger.info(f"'{self.agent_name}' attempting to get ReportGenerationAgent after analysis.")
         report_agent_creation_context = {"triggering_agent": self.agent_name, "cacm_id": shared_context.get_cacm_id()}
-        report_agent = await self.get_or_create_agent("ReportGenerationAgent", context_data=report_agent_creation_context)
-
+        report_agent = await self.get_or_create_agent("ReportGenerationAgent", context_data=report_agent_creation_context) 
+        
         if report_agent:
             self.logger.info(f"'{self.agent_name}' successfully got instance of ReportGenerationAgent.")
             data_for_report = {
                 "analysis_status": final_status,
                 "analysis_summary_message": agent_ops_summary["final_message_before_reporting"],
-                "original_inputs": current_step_inputs,
-                "ratios_payload": ratios_skill_payload,
+                "original_inputs": current_step_inputs, 
+                "ratios_payload": ratios_skill_payload, 
                 "financial_summary": financial_summary_text,
                 "risk_summary": key_risks_summary_text,
                 "overall_assessment": overall_assessment_text,
@@ -191,14 +191,14 @@ class AnalysisAgent(Agent):
         else:
             self.logger.error(f"'{self.agent_name}' could not get ReportGenerationAgent. Results not sent.")
             agent_ops_summary["reporting_to_other_agent"] = "Failed: Could not get ReportGenerationAgent."
-            final_status = "error"
+            final_status = "error" 
 
         return {
             "status": final_status,
             "agent": self.agent_name,
             "message": agent_ops_summary.get("final_message_before_reporting", "Analysis agent processing finished."),
             "ratios_from_skill": ratios_skill_payload, # For direct output binding
-            "text_summaries_generated": {
+            "text_summaries_generated": { 
                 "financial_performance": financial_summary_text,
                 "key_risks": key_risks_summary_text,
                 "overall_assessment": overall_assessment_text
@@ -209,7 +209,7 @@ class AnalysisAgent(Agent):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     from semantic_kernel import Kernel
-
+    
     class MockKernelService(KernelService):
         def __init__(self):
             self._kernel = Kernel()
@@ -217,7 +217,7 @@ if __name__ == '__main__':
                 from cacm_adk_core.native_skills import FinancialAnalysisSkill
                 self._kernel.add_plugin(FinancialAnalysisSkill(), plugin_name="FinancialAnalysis")
                 logging.info("MockKernelService: FinancialAnalysisSkill registered.")
-
+                
                 from processing_pipeline.semantic_kernel_skills import SK_MDNA_SummarizerSkill
                 self._kernel.add_plugin(SK_MDNA_SummarizerSkill(), plugin_name="SummarizationSkills")
                 logging.info("MockKernelService: SummarizationSkills registered.")
@@ -226,13 +226,13 @@ if __name__ == '__main__':
                  logging.error(f"MockKernelService: Failed to register skills for test: {e}")
         def get_kernel(self): return self._kernel
         def _initialize_kernel(self): pass
-
-    class MockOrchestrator:
+    
+    class MockOrchestrator: 
         def __init__(self, kernel_service):
             self.kernel_service = kernel_service
             self.logger = logging.getLogger("MockOrchestrator")
-            self.agent_instances = {}
-            from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent
+            self.agent_instances = {} 
+            from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent 
             self.agents = {"ReportGenerationAgent": ReportGenerationAgent}
 
         async def get_or_create_agent_instance(self, agent_name_key: str, context_data_for_creation: dict):
@@ -241,17 +241,17 @@ if __name__ == '__main__':
                 return self.agent_instances[agent_name_key]
             if agent_name_key == "ReportGenerationAgent":
                 instance = self.agents[agent_name_key](self.kernel_service)
-                instance.set_agent_manager(self) # type: ignore
+                instance.set_agent_manager(self) # type: ignore 
                 self.agent_instances[agent_name_key] = instance
                 return instance
             return None
 
     mock_kernel_service = MockKernelService()
     analysis_agent = AnalysisAgent(kernel_service=mock_kernel_service)
-
+    
     mock_orchestrator = MockOrchestrator(mock_kernel_service)
     analysis_agent.set_agent_manager(mock_orchestrator) # type: ignore
-
+    
     mock_shared_context = SharedContext(cacm_id="test_analysis_agent_full_run_cacm")
     mock_shared_context.set_data("financial_data_for_ratios", {"current_assets": 2000.0, "current_liabilities": 1000.0, "total_debt": 500.0, "total_equity": 1500.0})
     mock_shared_context.set_data("structured_financials_for_summary", {"revenue": 5000, "cogs": 2000, "net_income": 1000})
@@ -265,7 +265,7 @@ if __name__ == '__main__':
             shared_context=mock_shared_context
         )
         logging.info(f"AnalysisAgent run result: {json.dumps(result, indent=2)}")
-
+        
         logging.info("\n--- Final SharedContext Summary ---")
         mock_shared_context.log_context_summary()
 

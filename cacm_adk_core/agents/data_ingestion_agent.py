@@ -81,7 +81,7 @@ class DataIngestionAgent(Agent):
             stored_keys_list.append("financial_data_for_ratios")
         else:
             self.logger.warning("financialStatementData (for ratios) not found in current_step_inputs.")
-
+            
         # Example of adding a document reference if a URI was provided
         # This part adapts the previous placeholder logic for document references
         doc_uri_input = current_step_inputs.get("documentURI") # Assuming a CACM input like "documentURI"
