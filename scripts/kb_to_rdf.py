@@ -56,11 +56,11 @@ def main():
                 g.add((subject_uri, RDFS.comment, Literal(formula["description"], lang="en")))
             if formula.get("calculation"):
                 g.add((subject_uri, KGPROP.hasCalculationString, Literal(formula["calculation"], datatype=XSD.string)))
-
+            
             inputs = formula.get("inputs", [])
             for inp in inputs:
                 g.add((subject_uri, KGPROP.hasInputLiteral, Literal(inp, datatype=XSD.string)))
-
+            
             if formula.get("output"):
                 g.add((subject_uri, KGPROP.hasOutputLiteral, Literal(formula["output"], datatype=XSD.string)))
 
@@ -83,7 +83,7 @@ def main():
             strategies = rf.get("mitigationStrategies", [])
             for strat in strategies:
                 g.add((subject_uri, KGPROP.hasMitigationStrategy, Literal(strat, datatype=XSD.string)))
-
+            
             industries = rf.get("relevantIndustries", [])
             for ind in industries:
                 g.add((subject_uri, KGPROP.appliesToIndustryLiteral, Literal(ind, datatype=XSD.string)))
@@ -95,7 +95,7 @@ def main():
             if not indicator_id:
                 print(f"Warning: Skipping indicator due to missing 'indicatorId': {indicator.get('name')}")
                 continue
-
+            
             subject_uri = KB_INSTANCE[indicator_id]
             g.add((subject_uri, RDF.type, KGCLASS.EconomicIndicator))
 
