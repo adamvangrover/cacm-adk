@@ -41,7 +41,7 @@ def extract_sections_from_text_filing(document_path: str) -> dict:
         document_path (str): Path to the input text document.
 
     Returns:
-        dict: A dictionary where keys are normalized section titles
+        dict: A dictionary where keys are normalized section titles 
               (e.g., "ITEM_1A_RISK_FACTORS") and values are the text content of these sections.
               Includes an "__UNMATCHED_PREAMBLE__" if there's text before the first known marker.
     """
@@ -85,7 +85,7 @@ def extract_sections_from_text_filing(document_path: str) -> dict:
         preamble = content[:first_marker_start].strip()
         if preamble:
             sections["__UNMATCHED_PREAMBLE__"] = preamble
-
+            
     # Extract content for each section
     for i, marker_info in enumerate(found_marker_positions):
         section_key = marker_info['key']
@@ -95,9 +95,9 @@ def extract_sections_from_text_filing(document_path: str) -> dict:
             text_end_position = found_marker_positions[i+1]['start']
         else:
             text_end_position = len(content)
-
+        
         section_content = content[text_start_position:text_end_position].strip()
-
+        
         # Avoid overwriting if multiple patterns for the same key matched and were sorted closely.
         # This simple loop structure with prior sorting should generally handle it by taking the first one.
         if section_key not in sections: # Add only if key not already populated (first occurrence wins)
@@ -111,7 +111,7 @@ def extract_sections_from_text_filing(document_path: str) -> dict:
     for key, text in sections.items():
         # Heuristic: if a section is very short and mostly uppercase, it might be a missed sub-header
         # This is very basic, more sophisticated cleanup could be added.
-        if len(text) < 100 and text.isupper() and key != "__UNMATCHED_PREAMBLE__":
+        if len(text) < 100 and text.isupper() and key != "__UNMATCHED_PREAMBLE__": 
             # Check if this text is a known marker itself to avoid removing actual short sections
             is_another_marker = False
             for _, patterns in SECTION_MARKERS:
@@ -124,7 +124,7 @@ def extract_sections_from_text_filing(document_path: str) -> dict:
                  print(f"Info: Potentially removing short/header-like section '{key}' with content: '{text[:50]}...'")
                  continue # Skip adding this as a section if it looks like a leftover title
         final_sections[key] = text
-
+        
     return final_sections
 
 
@@ -146,12 +146,12 @@ if __name__ == '__main__':
             with open(output_file_path, 'w', encoding='utf-8') as f:
                 json.dump(sectioned_data, f, indent=4, ensure_ascii=False)
             print(f"Successfully extracted sections and saved to: {output_file_path}")
-
+            
             # Check if all actual section values (excluding preamble) are empty or None
             actual_sections_empty = True
             if sectioned_data:
                 actual_sections_empty = all(not text for key, text in sectioned_data.items() if key != "__UNMATCHED_PREAMBLE__")
-
+            
             if not sectioned_data or actual_sections_empty:
                  print("Warning: The output is empty or contains mostly preamble/empty actual sections. Check input file content and section markers.")
                  if "__UNMATCHED_PREAMBLE__" in sectioned_data and len(sectioned_data) == 1:

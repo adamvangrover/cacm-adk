@@ -44,9 +44,9 @@ def execute_queries():
 
     print("\n--- Query 1: List all Financial Formulas ---")
     q1 = """
-    SELECT ?formula ?label WHERE {
-        ?formula rdf:type kgclass:FinancialFormula ;
-                 rdfs:label ?label .
+    SELECT ?formula ?label WHERE { 
+        ?formula rdf:type kgclass:FinancialFormula ; 
+                 rdfs:label ?label . 
     }
     """
     results1 = g.query(q1)
@@ -56,9 +56,9 @@ def execute_queries():
 
     print("\n--- Query 2: List all Risk Factors and their descriptions ---")
     q2 = """
-    SELECT ?risk_factor ?description WHERE {
-        ?risk_factor rdf:type kgclass:RiskFactor ;
-                     rdfs:comment ?description .
+    SELECT ?risk_factor ?description WHERE { 
+        ?risk_factor rdf:type kgclass:RiskFactor ; 
+                     rdfs:comment ?description . 
     }
     """
     results2 = g.query(q2)
@@ -68,10 +68,10 @@ def execute_queries():
 
     print("\n--- Query 3: List all Macroeconomic Indicators and their sources ---")
     q3 = """
-    SELECT ?indicator ?label ?source WHERE {
-        ?indicator rdf:type kgclass:EconomicIndicator ;
-                   rdfs:label ?label ;
-                   dcterms:source ?source .
+    SELECT ?indicator ?label ?source WHERE { 
+        ?indicator rdf:type kgclass:EconomicIndicator ; 
+                   rdfs:label ?label ; 
+                   dcterms:source ?source . 
     }
     """
     results3 = g.query(q3)
@@ -81,25 +81,25 @@ def execute_queries():
 
     print("\n--- Query 4: Get details for a specific Financial Formula ('Debt-to-Equity Ratio') ---")
     q4 = """
-    SELECT ?formula ?prop ?value WHERE {
-        ?formula rdfs:label "Debt-to-Equity Ratio"@en ;
-                 ?prop ?value .
+    SELECT ?formula ?prop ?value WHERE { 
+        ?formula rdfs:label "Debt-to-Equity Ratio"@en ; 
+                 ?prop ?value . 
     }
     """
     results4 = g.query(q4)
     if not results4: print("No results.")
     for row in results4:
         print(f"Formula: {row.formula}, Property: {row.prop}, Value: {row.value}")
-
+        
     print("\n--- Query 5: Count instances per KGCLASS ---")
     # Note: STRSTARTS is case-sensitive. Ensure KGCLASS URI matches exactly.
     q5 = """
-    SELECT (STR(?class) AS ?className) (COUNT(?instance) AS ?instanceCount)
-    WHERE {
-        ?instance rdf:type ?class .
-        FILTER(STRSTARTS(STR(?class), "http://example.com/ontology/cacm_credit_ontology/0.3/classes/#"))
-    }
-    GROUP BY ?class
+    SELECT (STR(?class) AS ?className) (COUNT(?instance) AS ?instanceCount) 
+    WHERE { 
+        ?instance rdf:type ?class . 
+        FILTER(STRSTARTS(STR(?class), "http://example.com/ontology/cacm_credit_ontology/0.3/classes/#")) 
+    } 
+    GROUP BY ?class 
     ORDER BY DESC(?instanceCount)
     """
     results5 = g.query(q5)
