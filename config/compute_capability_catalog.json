@@ -80,33 +80,47 @@
       ]
     },
     {
-      "id": "urn:adk:capability:financial_ratios_calculator:v1",
-      "name": "Financial Ratios Calculator (Agent Enabled)",
-      "description": "Calculates key financial ratios using an agent, which internally might use the FinancialAnalysis skill.",
+      "id": "urn:adk:capability:financial_analysis_agent:v1",
+      "name": "Financial Analysis Agent",
+      "description": "Agent that calculates ratios and generates textual summaries using skills and SharedContext.",
       "agent_type": "AnalysisAgent",
-      "task_details_from_capability": "Perform basic financial ratio analysis. Calculate current ratio and debt-to-equity ratio.",
-      "skill_plugin_name": "FinancialAnalysis",
-      "skill_function_name": "calculate_basic_ratios",
-      "inputs": [
-        {"name": "financial_data", "type": "object", "description": "A dictionary containing financial data. Expected keys: 'current_assets', 'current_liabilities', 'total_debt', 'total_equity', all with float values."},
-        {"name": "rounding_precision", "type": "integer", "description": "The number of decimal places to round the results to. Defaults to 2.", "optional": true}
+      "skill_plugin_name": "FinancialAnalysis", 
+      "skill_function_name": "calculate_basic_ratios", 
+      "inputs": [ 
+          {"name": "roundingPrecision", "type": "integer", "optional": true, "description": "Precision for rounding calculated ratios."}
       ],
       "outputs": [
-        {"name": "agent_result", "type": "object", "description": "The full dictionary result from the AnalysisAgent, potentially including 'calculated_ratios' and 'errors' if the agent invoked the skill."}
+          {"name": "analysis_summary_output", "type": "object", "description": "Summary of analysis performed, including status, messages, and results from skills."}
       ]
     },
     {
-      "id": "urn:adk:capability:basic_document_ingestor:v1",
-      "name": "Basic Document Ingestor (Agent)",
-      "description": "Ingests a document and updates shared context. Placeholder implementation.",
+      "id": "urn:adk:capability:standard_data_ingestor:v1",
+      "name": "Standard Data Ingestor Agent",
+      "description": "Agent responsible for ingesting initial data from CACM inputs into SharedContext.",
       "agent_type": "DataIngestionAgent",
       "inputs": [
-        {"name": "document_type", "type": "string", "description": "Type of the document (e.g., 10K_FILING, PRESS_RELEASE)."},
-        {"name": "document_id", "type": "string", "description": "Unique ID for the document."},
-        {"name": "document_uri", "type": "string", "description": "URI or path to the document content.", "optional": true}
+          {"name": "companyName", "type": "string", "optional": true},
+          {"name": "companyTicker", "type": "string", "optional": true},
+          {"name": "financialStatementData", "type": "object", "optional": true, "description": "Object containing currentAssets, currentLiabilities, totalDebt, totalEquity."},
+          {"name": "mockStructuredFinancialsForLLMSummary", "type": "object", "optional": true, "description": "Object with financial data points for summarization."},
+          {"name": "riskFactorsText", "type": "string", "optional": true, "description": "Full text of risk factors section."},
+          {"name": "documentURI", "type": "string", "optional": true, "description": "A URI for a primary document."},
+          {"name": "documentType", "type": "string", "optional": true, "description": "Type of the primary document if URI is provided."}
       ],
       "outputs": [
-        {"name": "ingestion_status_summary", "type": "object", "description": "Summary of the ingestion process, including status and document reference."}
+          {"name": "ingestion_summary", "type": "object", "description": "Summary of data ingestion process, including status and list of stored keys."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:standard_report_generator:v1",
+      "name": "Standard Report Generator Agent",
+      "description": "Agent responsible for assembling the final report from SharedContext.",
+      "agent_type": "ReportGenerationAgent",
+      "inputs": [
+        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."}
+      ],
+      "outputs": [
+          {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."}
       ]
     }
   ]

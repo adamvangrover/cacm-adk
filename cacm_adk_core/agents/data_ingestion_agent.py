@@ -33,28 +33,71 @@ class DataIngestionAgent(Agent):
             Dict[str, Any]: Results of the execution, including status.
         """
         self.logger.info(f"'{self.agent_name}' received task: {task_description} with inputs: {current_step_inputs}")
-        self.logger.info(f"Operating with SharedContext ID: {shared_context.get_session_id()}")
+        self.logger.info(f"Operating with SharedContext ID: {shared_context.get_session_id()} (CACM ID: {shared_context.get_cacm_id()})")
 
-        # Example: Simulate fetching data and updating shared context
-        source_type = current_step_inputs.get("document_type", "generic_document")
-        source_uri = current_step_inputs.get("document_uri", f"dummy_uri_for_{source_type}")
-        document_id = current_step_inputs.get("document_id", source_type) # Use document_type if id is missing
+        company_name = current_step_inputs.get("companyName")
+        company_ticker = current_step_inputs.get("companyTicker")
+        mock_financials_for_summary = current_step_inputs.get("mockStructuredFinancialsForLLMSummary")
+        risk_factors_text_input = current_step_inputs.get("riskFactorsText")
+        # Note: The input key for ratios is "financialStatementData" in the CACM template for AnalysisAgent,
+        # but "financial_data_for_ratios" is the key used in SharedContext.
+        # The DataIngestionAgent will receive it as "financialStatementData" if that's what the CACM input is named.
+        financial_data_for_ratios_input = current_step_inputs.get("financialStatementData")
 
-        # Simulate processing and storing a reference
-        processed_doc_path = f"processed/{document_id}.txt"
-        shared_context.add_document_reference(doc_type=source_type, doc_uri=processed_doc_path)
+        stored_keys_list = []
 
-        # Simulate storing some processed data snippet
-        shared_context.set_data(f"{document_id}_content_snippet", "This is a snippet of processed content from the document.")
-        shared_context.set_data("last_ingested_document_id", document_id)
+        if company_name is not None:
+            shared_context.set_data("company_name", company_name)
+            self.logger.info(f"Stored company_name: {company_name}")
+            stored_keys_list.append("company_name")
+        else:
+            self.logger.warning("companyName not found in current_step_inputs.")
 
-        self.logger.info(f"'{self.agent_name}' completed task for source type: {source_type}. Shared context updated.")
+        if company_ticker is not None:
+            shared_context.set_data("company_ticker", company_ticker)
+            self.logger.info(f"Stored company_ticker: {company_ticker}")
+            stored_keys_list.append("company_ticker")
+        else:
+            self.logger.warning("companyTicker not found in current_step_inputs.")
+
+        if mock_financials_for_summary is not None:
+            shared_context.set_data("structured_financials_for_summary", mock_financials_for_summary)
+            self.logger.info(f"Stored structured_financials_for_summary: {mock_financials_for_summary}")
+            stored_keys_list.append("structured_financials_for_summary")
+        else:
+            self.logger.warning("mockStructuredFinancialsForLLMSummary not found in current_step_inputs.")
+
+        if risk_factors_text_input is not None:
+            shared_context.set_data("risk_factors_section_text", risk_factors_text_input)
+            self.logger.info("Stored risk_factors_section_text (content length: {}).".format(len(risk_factors_text_input)))
+            stored_keys_list.append("risk_factors_section_text")
+        else:
+            self.logger.warning("riskFactorsText not found in current_step_inputs.")
+
+        if financial_data_for_ratios_input is not None:
+            # This will be stored under "financial_data_for_ratios" for AnalysisAgent to pick up
+            shared_context.set_data("financial_data_for_ratios", financial_data_for_ratios_input)
+            self.logger.info(f"Stored financial_data_for_ratios: {financial_data_for_ratios_input}")
+            stored_keys_list.append("financial_data_for_ratios")
+        else:
+            self.logger.warning("financialStatementData (for ratios) not found in current_step_inputs.")
+            
+        # Example of adding a document reference if a URI was provided
+        # This part adapts the previous placeholder logic for document references
+        doc_uri_input = current_step_inputs.get("documentURI") # Assuming a CACM input like "documentURI"
+        doc_type_input = current_step_inputs.get("documentType", "GeneralDocument") # Default if not specified
+        if doc_uri_input:
+            shared_context.add_document_reference(doc_type=doc_type_input, doc_uri=doc_uri_input)
+            self.logger.info(f"Added document reference to shared context: Type='{doc_type_input}', URI='{doc_uri_input}'")
+            stored_keys_list.append(f"doc_ref_{doc_type_input}")
+
+
+        self.logger.info(f"'{self.agent_name}' completed data ingestion. Shared context updated with specified keys.")
         return {
             "status": "success",
             "agent": self.agent_name,
-            "message": "Data ingestion placeholder completed, updated shared context.",
-            "ingested_document_path": processed_doc_path,
-            "document_id": document_id
+            "message": "Data ingested from inputs and stored in SharedContext.",
+            "stored_keys_in_shared_context": stored_keys_list
         }
 
 if __name__ == '__main__':

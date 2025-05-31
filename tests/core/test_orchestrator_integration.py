@@ -9,7 +9,7 @@ from unittest.mock import patch, AsyncMock, MagicMock # Added MagicMock
 from cacm_adk_core.orchestrator.orchestrator import Orchestrator
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 # SharedContext is implicitly tested via Orchestrator and Agents
-# from cacm_adk_core.context.shared_context import SharedContext
+# from cacm_adk_core.context.shared_context import SharedContext 
 from cacm_adk_core.validator.validator import Validator # Orchestrator needs a validator
 
 # Disable verbose logging from components during tests unless specifically needed
@@ -27,9 +27,9 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         # Assuming tests are run from project root, or PYTHONPATH handles cacm_adk_core
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         # Adjust path to go up from tests/core to the project root where config/ is
-        self.project_root = os.path.dirname(os.path.dirname(self.current_dir))
+        self.project_root = os.path.dirname(os.path.dirname(self.current_dir)) 
         self.catalog_path = os.path.join(self.project_root, "config/compute_capability_catalog.json")
-
+        
         # Ensure the catalog exists for the test
         if not os.path.exists(self.catalog_path):
             # Create a minimal catalog if it's missing, just for this test to run
@@ -67,15 +67,15 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
             }
             with open(self.catalog_path, 'w') as f:
                 json.dump(minimal_catalog, f, indent=2)
-
+        
         self.kernel_service = KernelService() # Real KernelService
-
+        
         # Orchestrator requires a validator. For integration test, can use a real one or a mock.
         # Using a mock validator that always validates successfully for simplicity here.
         self.mock_validator = MagicMock(spec=Validator)
         self.mock_validator.schema = True # Indicate schema is "loaded"
         self.mock_validator.validate_cacm_against_schema.return_value = (True, [])
-
+        
         self.orchestrator = Orchestrator(
             kernel_service=self.kernel_service,
             validator=self.mock_validator, # Use mock validator
@@ -88,90 +88,131 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
 
     @patch('cacm_adk_core.agents.report_generation_agent.ReportGenerationAgent.receive_analysis_results', new_callable=AsyncMock)
     async def test_full_agent_workflow_with_skill(self, mock_receive_analysis):
+        # This sample_cacm now defines the full 3-agent workflow
         sample_cacm = {
-            "cacmId": "integration_test_workflow_001",
-            "name": "Integration Test: Data Ingestion -> Analysis (with Skill) -> Report (mocked)",
-            "description": "Tests a multi-step workflow involving agents and a native skill.",
+            "cacmId": "test-full-report-flow-001",
+            "name": "Test Full Report Generation Workflow",
+            "description": "Tests a 3-agent workflow: DataIngestion -> Analysis -> ReportGeneration.",
             "inputs": {
-                "doc_type_input": {"value": "PRESS_RELEASE", "description": "Type of document to ingest."},
-                "doc_id_input": {"value": "PR_XYZ_Q1_2024", "description": "ID of document to ingest."},
-                "financial_data_input": { # This key is used by cacm.inputs.financial_data_input
-                    "value": {
-                        "current_assets": 2500.0, "current_liabilities": 1250.0, # Expected CR = 2.0
-                        "total_debt": 1000.0, "total_equity": 2000.0      # Expected D/E = 0.5
-                    },
-                    "description": "Financial data for analysis."
+                "companyNameInput": {"type": "string", "value": "MegaCorp Inc."},
+                "companyTickerInput": {"type": "string", "value": "MCORP"},
+                "statementDataInput": { # For DataIngestionAgent, which then puts it into SharedContext for AnalysisAgent
+                    "type": "object", 
+                    "value": {"currentAssets": 750000, "currentLiabilities": 300000, "totalDebt": 500000, "totalEquity": 900000}
                 },
-                "precision_input": {"value": 2, "description": "Rounding precision for ratios."} # Used by cacm.inputs.precision_input
+                "mockFinancialsInput": { # For DataIngestionAgent
+                    "type": "object",
+                    "value": {"revenue_y1": 2000000, "revenue_y2": 2500000, "net_income_y1": 100000, "net_income_y2": 150000, "currency": "USD"}
+                },
+                "riskTextDataInput": { # For DataIngestionAgent
+                    "type": "string",
+                    "value": "Market competition is fierce. Regulatory changes are anticipated. Supply chain stability is a concern."
+                },
+                "reportRoundingPrecisionInput": {"type": "integer", "value": 2}, # For AnalysisAgent step
+                "reportTitleDetailInput": {"type": "string", "value": "Q3 Financial Health Assessment"} # For ReportGenerationAgent step
             },
-            "outputs": { # These are the formal output keys of the CACM itself
-                "ingestion_report_output": {"type": "object", "description": "Output from data ingestion."},
-                "final_analysis_output": {"type": "object", "description": "Ratios calculated by the AnalysisAgent."}
+            "outputs": {
+                "final_credit_report": {"type": "string", "description": "The fully assembled credit report."},
+                "ingestion_process_output": {"type": "object", "optional": True, "description": "Output from the ingestion step."},
+                "analysis_process_output": {"type": "object", "optional": True, "description": "Output from the analysis step."}
             },
             "workflow": [
                 {
                     "stepId": "step_ingest_data",
-                    "description": "Ingest a press release.",
-                    "computeCapabilityRef": "urn:adk:capability:basic_document_ingestor:v1",
+                    "description": "Ingest initial company and financial data.",
+                    "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
                     "inputBindings": {
-                        "document_type": "cacm.inputs.doc_type_input",
-                        "document_id": "cacm.inputs.doc_id_input"
+                        "companyName": "cacm.inputs.companyNameInput",
+                        "companyTicker": "cacm.inputs.companyTickerInput",
+                        "financialStatementData": "cacm.inputs.statementDataInput", # This will be stored by DataIngestionAgent
+                        "mockStructuredFinancialsForLLMSummary": "cacm.inputs.mockFinancialsInput",
+                        "riskFactorsText": "cacm.inputs.riskTextDataInput"
                     },
-                    "outputBindings": {
-                        "ingested_document_path": "cacm.outputs.ingestion_report_output"
+                    "outputBindings": { 
+                        # DataIngestionAgent returns dict with "status", "message", "stored_keys_in_shared_context"
+                        "ingestion_summary": "cacm.outputs.ingestion_process_output"
                     }
                 },
                 {
                     "stepId": "step_analyze_data",
-                    "description": "Analyze financial data using the skill-enabled AnalysisAgent.",
-                    "computeCapabilityRef": "urn:adk:capability:financial_ratios_calculator:v1",
-                    "inputBindings": {
-                        "financial_data": "cacm.inputs.financial_data_input",
-                        "rounding_precision": "cacm.inputs.precision_input"
+                    "description": "Perform financial analysis including ratio calculation and textual summaries.",
+                    "computeCapabilityRef": "urn:adk:capability:financial_analysis_agent:v1",
+                    "inputBindings": { # AnalysisAgent now takes roundingPrecision directly
+                        "rounding_precision": "cacm.inputs.reportRoundingPrecisionInput"
+                        # Other data for analysis is pulled from SharedContext by the agent
                     },
                     "outputBindings": {
-                        "ratios_from_skill": "cacm.outputs.final_analysis_output" # Binding to the CACM's declared output key
+                        # AnalysisAgent returns dict with "status", "message", "ratios_from_skill", "text_summaries_generated", etc.
+                        "analysis_summary_output": "cacm.outputs.analysis_process_output"
+                    }
+                },
+                {
+                    "stepId": "step_generate_report",
+                    "description": "Generate the final credit report.",
+                    "computeCapabilityRef": "urn:adk:capability:standard_report_generator:v1",
+                    "inputBindings": { # ReportGenerationAgent takes report_title_detail directly
+                         "report_title_detail": "cacm.inputs.reportTitleDetailInput"
+                    }, # It primarily uses SharedContext for content
+                    "outputBindings": {
+                        "final_report_text": "cacm.outputs.final_credit_report"
                     }
                 }
             ]
         }
 
         success, logs, outputs = await self.orchestrator.run_cacm(sample_cacm)
-
+        
         # Print logs for debugging if test fails
         # print("\n--- Orchestrator Logs for Integration Test ---")
         # for log_entry in logs:
         #     print(log_entry)
         # print("--- End of Logs ---")
-
+        
         # Critical Debug: Print the actual outputs received by the test method
         print(f"\nDEBUG: Outputs received in test_full_agent_workflow_with_skill:\n{json.dumps(outputs, indent=2)}\n")
 
-        self.assertTrue(success, "Orchestrator run_cacm failed.")
+        self.assertTrue(success, "Orchestrator run_cacm failed for the full workflow.")
+        
+        # Verify ingestion output (optional, as it mainly writes to context)
+        self.assertIn("ingestion_process_output", outputs) # Matches CACM "outputs" key
+        self.assertIsNotNone(outputs["ingestion_process_output"].get("value"))
+        # DataIngestionAgent returns "stored_keys_in_shared_context" in its main dict,
+        # and the binding is for "ingestion_summary" which is the whole dict.
+        self.assertIn("company_name", outputs["ingestion_process_output"]["value"].get("stored_keys_in_shared_context", []))
 
-        self.assertIn("ingestion_report_output", outputs, "Ingestion report key missing in outputs.")
-        self.assertIsNotNone(outputs["ingestion_report_output"]["value"], "Ingestion report value is None.")
-        self.assertIn("processed/PR_XYZ_Q1_2024.txt", outputs["ingestion_report_output"]["value"])
+        # Verify analysis output (optional for specific details, main check is the final report)
+        self.assertIn("analysis_process_output", outputs) # Matches CACM "outputs" key
+        self.assertIsNotNone(outputs["analysis_process_output"].get("value"))
+        # AnalysisAgent returns "ratios_from_skill" in its main dict.
+        # The binding is for "analysis_summary_output" which is the whole dict from agent.
+        self.assertIn("ratios_from_skill", outputs["analysis_process_output"]["value"])
+        self.assertIsNotNone(outputs["analysis_process_output"]["value"]["ratios_from_skill"])
+        self.assertEqual(outputs["analysis_process_output"]["value"]["ratios_from_skill"]["calculated_ratios"]["current_ratio"], 2.5) # 750k/300k
 
-
-        self.assertIn("final_analysis_output", outputs, "Final analysis output key missing in outputs.")
-        final_ratios_value = outputs["final_analysis_output"]["value"] # This is the content of "ratios_from_skill"
-        self.assertIsNotNone(final_ratios_value, "Final analysis output value is None.")
-
-        self.assertIn("calculated_ratios", final_ratios_value)
-        self.assertEqual(final_ratios_value["calculated_ratios"]["current_ratio"], 2.0)
-        self.assertEqual(final_ratios_value["calculated_ratios"]["debt_to_equity_ratio"], 0.5)
-        self.assertEqual(len(final_ratios_value.get("errors", [])), 0, "Skill reported errors in calculation.")
-
+        # Main verification: the final report from ReportGenerationAgent
+        self.assertIn("final_credit_report", outputs, "Final credit report key missing in outputs.")
+        report_text = outputs["final_credit_report"].get("value")
+        self.assertIsNotNone(report_text, "Generated report text is None.")
+        
+        self.assertIn("Company Name: MegaCorp Inc.", report_text)
+        self.assertIn("Ticker: MCORP", report_text)
+        # Ratios based on new input: 750000/300000=2.5, 500000/900000=0.555 -> 0.56 (default rounding is 2 in skill)
+        # The reportRoundingPrecisionInput is 2, so AnalysisAgent should use it.
+        self.assertIn("Current Ratio: 2.5", report_text) 
+        self.assertIn("Debt-to-Equity Ratio: 0.56", report_text) 
+        
+        # Check for placeholder summaries (as SK_MDNA_SummarizerSkill is a placeholder)
+        self.assertIn("[Placeholder LLM Summary: Content would be generated here based on provided input.]", report_text)
+        
         # Check if ReportGenerationAgent's receive_analysis_results was called by AnalysisAgent
         mock_receive_analysis.assert_called_once()
-        # Access keyword arguments from the mock's call_args
         called_kwargs = mock_receive_analysis.call_args.kwargs
         self.assertEqual(called_kwargs.get('sending_agent_name'), "AnalysisAgent")
         received_results_to_report_agent = called_kwargs.get('results')
-        self.assertIsNotNone(received_results_to_report_agent, "Results kwarg not found in call to receive_analysis_results")
-        self.assertIn("skill_direct_payload", received_results_to_report_agent)
-        self.assertEqual(received_results_to_report_agent["skill_direct_payload"], final_ratios_value)
+        self.assertIsNotNone(received_results_to_report_agent)
+        self.assertIn("ratios_payload", received_results_to_report_agent) 
+        self.assertIsNotNone(received_results_to_report_agent["ratios_payload"])
+        self.assertEqual(received_results_to_report_agent["ratios_payload"]["calculated_ratios"]["current_ratio"], 2.5)
 
 
 if __name__ == '__main__':

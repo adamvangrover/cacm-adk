@@ -16,7 +16,7 @@ class KernelService:
         # The Kernel can use the standard Python logging, no need to pass it directly
         # to the constructor in recent versions of semantic-kernel.
         # Logging can be configured globally for the application.
-        self.kernel = sk.Kernel()
+        self.kernel = sk.Kernel() 
         logger = logging.getLogger(__name__)
 
         # Import and register native skills
@@ -25,8 +25,17 @@ class KernelService:
             self.kernel.add_plugin(BasicCalculationSkill(), plugin_name="BasicCalculations")
             self.kernel.add_plugin(FinancialAnalysisSkill(), plugin_name="FinancialAnalysis")
             logger.info("Successfully registered BasicCalculationSkill and FinancialAnalysisSkill.")
+
+            # Register placeholder LLM skills
+            from processing_pipeline.semantic_kernel_skills import SK_MDNA_SummarizerSkill #, SK_RiskAnalysisSkill
+            # Using SK_MDNA_SummarizerSkill for generic text summarization tasks by AnalysisAgent for now
+            self.kernel.add_plugin(SK_MDNA_SummarizerSkill(), plugin_name="SummarizationSkills")
+            # If SK_RiskAnalysisSkill had different methods needed, it would be registered too:
+            # self.kernel.add_plugin(SK_RiskAnalysisSkill(), plugin_name="RiskAnalysisSkills")
+            logger.info("Registered placeholder LLM skills (e.g., SummarizationSkills) with the kernel.")
+
         except ImportError as e:
-            logger.error(f"Failed to import native skills: {e}. Native functions will not be available.")
+            logger.error(f"Failed to import native or placeholder skills: {e}. Some functions may not be available.")
         except Exception as e: # Other potential errors during plugin registration
             logger.error(f"Error registering native skills: {e}. Native functions may not be available.")
 
@@ -48,7 +57,7 @@ class KernelService:
             # service_id is specified in add_service if needed, or it's auto-named.
             self.kernel.add_service(
                 OpenAIChatCompletion(
-                    ai_model_id="gpt-3.5-turbo",
+                    ai_model_id="gpt-3.5-turbo", 
                     api_key=api_key,
                     org_id=org_id
                 )#,
@@ -69,14 +78,14 @@ if __name__ == '__main__':
     # For example:
     # export OPENAI_API_KEY="your_api_key"
     # export OPENAI_ORG_ID="your_org_id"
-
+    
     # Setup basic logging for the __main__ example
     example_logger = logging.getLogger(__name__ + "_example")
     logging.basicConfig(level=logging.INFO) # Configure root logger
-
+    
     # Test if OPENAI_API_KEY is set, otherwise provide a dummy for local testing
     if not os.environ.get("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = "dummy_key_for_local_test_only"
+        os.environ["OPENAI_API_KEY"] = "dummy_key_for_local_test_only" 
         example_logger.warning("Using a DUMMY OpenAI API key for local testing. Real calls will fail.")
 
     kernel_service = KernelService() # This will trigger _initialize_kernel
@@ -117,6 +126,6 @@ if __name__ == '__main__':
                         example_logger.info(f"Plugin {plugin_name} does not have a standard 'functions' dictionary attribute.")
             else:
                 example_logger.info("No plugins found in the kernel or plugins collection is empty.")
-
+        
     else: # This matches the outer 'if kernel_instance:'
         example_logger.error("Failed to obtain Kernel instance.")
