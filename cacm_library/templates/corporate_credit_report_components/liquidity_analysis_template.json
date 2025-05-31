@@ -1,0 +1,23 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:liquidity_analysis:v1",
+  "version": "1.0.0",
+  "name": "Liquidity Analysis",
+  "description": "Assesses the company's short-term solvency and liquidity position using latest period data.",
+  "inputs": {
+    "latestBalanceSheet": { "type": "object", "description": "Latest period balance sheet data." },
+    "latestIncomeStatement": { "type": "object", "description": "Latest period income statement data (for ratios like DOH, DIO, DPO if extended).", "optional": true },
+    "availableCreditLinesAmount": { "type": "number", "description": "Total amount from undrawn committed credit lines.", "optional": true, "default": 0 }
+  },
+  "parameters": {},
+  "outputs": {
+    "currentRatio": { "type": "number" },
+    "quickRatio": { "type": "number" },
+    "cashRatio": { "type": "number", "optional": true },
+    "workingCapital": { "type": "number" },
+    "liquiditySourcesDescription": { "type": "string", "description": "Textual description of primary liquidity sources." }
+  },
+  "workflow": [
+    { "stepName": "Calculate Liquidity Ratios", "computeCapabilityRef": "urn:adk:capability:liquidity_metric_calculator:v1", "inputs": { "balanceSheet": "inputs.latestBalanceSheet"}, "outputs": {"currentRatioCalc": "outputs.currentRatio", "quickRatioCalc": "outputs.quickRatio", "cashRatioCalc": "outputs.cashRatio", "workingCapitalCalc": "outputs.workingCapital"} },
+    { "stepName": "Summarize Liquidity Sources", "computeCapabilityRef": "urn:adk:capability:liquidity_source_summarizer:v1", "inputs": { "balanceSheet": "inputs.latestBalanceSheet", "creditLines": "inputs.availableCreditLinesAmount"}, "outputs": {"summaryText": "outputs.liquiditySourcesDescription"} }
+  ]
+}

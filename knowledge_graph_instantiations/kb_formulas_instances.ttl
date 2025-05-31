@@ -1,0 +1,31 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
+@prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
+@prefix kb_instance: <http://example.org/kb_instances/#> .
+
+kb_instance:FF_001 rdf:type kgclass:FinancialFormula ;
+    rdfs:label "Debt-to-Equity Ratio" ;
+    rdfs:comment "Measures the financial leverage of a company." ;
+    kgprop:hasCalculationString "(TotalLiabilities / ShareholdersEquity)" ;
+    kgprop:hasInputLiteral "TotalLiabilities" ;
+    kgprop:hasInputLiteral "ShareholdersEquity" ;
+    kgprop:hasOutputLiteral "Ratio" .
+
+kb_instance:FF_002 rdf:type kgclass:FinancialFormula ;
+    rdfs:label "Current Ratio" ;
+    rdfs:comment "Measures a company's ability to pay short-term obligations (due within one year)." ;
+    kgprop:hasCalculationString "(CurrentAssets / CurrentLiabilities)" ;
+    kgprop:hasInputLiteral "CurrentAssets" ;
+    kgprop:hasInputLiteral "CurrentLiabilities" ;
+    kgprop:hasOutputLiteral "Ratio" .
+
+kb_instance:FF_003 rdf:type kgclass:FinancialFormula ;
+    rdfs:label "Net Profit Margin" ;
+    rdfs:comment "Measures how much net income is generated as a percentage of revenues." ;
+    kgprop:hasCalculationString "(NetIncome / Revenue) * 100" ;
+    kgprop:hasInputLiteral "NetIncome" ;
+    kgprop:hasInputLiteral "Revenue" ;
+    kgprop:hasOutputLiteral "Percentage" .

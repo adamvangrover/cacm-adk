@@ -1,0 +1,22 @@
+{
+  "cacmId": "urn:adk:template:corporate_credit_report:financial_summary_and_key_ratios:v1",
+  "version": "1.0.0",
+  "name": "Financial Summary and Key Ratios",
+  "description": "Calculates key financial ratios and provides a summary of historical financial figures.",
+  "inputs": {
+    "financialStatementData": { "type": "object", "description": "Financial statements structured as per financial_statement_input_template's output." }
+  },
+  "parameters": {
+    "periodsToAnalyze": { "type": "integer", "description": "Number of recent historical periods to analyze.", "default": 3 },
+    "ratioRoundingPrecision": { "type": "integer", "description": "Decimal places for calculated ratios.", "default": 2 }
+  },
+  "outputs": {
+    "historicalSummaryTable": { "type": "array", "items": { "type": "object", "properties": {"period": {"type": "string"}, "revenue": {"type": "number"}, "ebitda": {"type": "number"}, "netIncome": {"type": "number"} } }, "description": "Summary of key financials over specified periods."},
+    "calculatedRatios": { "type": "object", "description": "Calculated financial ratios for the latest period.", "properties": { "grossMargin": {"type": "number", "optional": true}, "ebitdaMargin": {"type": "number", "optional": true}, "netProfitMargin": {"type": "number"}, "currentRatio": {"type": "number"}, "debtToEquityRatio": {"type": "number"}, "interestCoverageRatio": {"type": "number", "optional": true} } }
+  },
+  "workflow": [
+    { "stepName": "Extract Relevant Financials", "computeCapabilityRef": "urn:adk:capability:financial_data_extractor:v1", "inputs": { "statements": "inputs.financialStatementData", "numberOfPeriods": "parameters.periodsToAnalyze"}, "outputs": {"timeSeriesData": "intermediate.relevantFinancials"} },
+    { "stepName": "Generate Historical Summary", "computeCapabilityRef": "urn:adk:capability:historical_financial_summarizer:v1", "inputs": { "timeSeriesData": "intermediate.relevantFinancials"}, "outputs": {"summaryTable": "outputs.historicalSummaryTable"} },
+    { "stepName": "Calculate Key Ratios", "computeCapabilityRef": "urn:adk:capability:core_ratio_calculator:v1", "inputs": { "timeSeriesData": "intermediate.relevantFinancials", "precision": "parameters.ratioRoundingPrecision"}, "outputs": {"ratios": "outputs.calculatedRatios"} }
+  ]
+}

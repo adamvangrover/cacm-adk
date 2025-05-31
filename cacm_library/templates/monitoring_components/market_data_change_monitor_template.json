@@ -1,0 +1,44 @@
+{
+  "cacmId": "urn:adk:template:monitoring:market_data_change_monitor:v1",
+  "version": "1.0.0",
+  "name": "Market Data Change Monitor",
+  "description": "Monitors specified market data series for significant changes or threshold breaches.",
+  "inputs": {
+    "marketDataSeries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "seriesId": {"type": "string", "description": "Unique identifier for the market data series (e.g., 'STOCK_AAPL', 'CDS_COMPANY_X_5Y')."},
+          "thresholdUpper": {"type": "number", "optional": true, "description": "Upper threshold for alert."},
+          "thresholdLower": {"type": "number", "optional": true, "description": "Lower threshold for alert."},
+          "percentageChangeAlert": {"type": "number", "optional": true, "description": "Percentage change over period to trigger alert (e.g., 0.1 for 10%)."}
+        }
+      }
+    },
+    "monitoringPeriodDays": { "type": "integer", "description": "Number of past days of data to analyze for changes.", "default": 1 }
+  },
+  "outputs": {
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "seriesId": {"type": "string"},
+          "alertType": {"type": "string", "enum": ["threshold_breach_upper", "threshold_breach_lower", "percentage_change_positive", "percentage_change_negative"]},
+          "currentValue": {"type": "number"},
+          "previousValue": {"type": "number", "optional": true},
+          "change": {"type": "number", "optional": true},
+          "message": {"type": "string"}
+        }
+      }
+    }
+  },
+  "parameters": {
+    "marketDataProvider": { "type": "string", "description": "Identifier for the market data source.", "default": "default_market_data_provider_v1"}
+  },
+  "workflow": [
+    { "stepName": "Fetch Market Data History", "computeCapabilityRef": "urn:adk:capability:market_data_history_fetcher:v1", "inputs": { "seriesConfigs": "inputs.marketDataSeries", "period": "inputs.monitoringPeriodDays", "provider": "parameters.marketDataProvider"}, "outputs": {"timeSeriesValues": "intermediate.seriesValues"} },
+    { "stepName": "Analyze Changes and Breaches", "computeCapabilityRef": "urn:adk:capability:market_data_change_analyzer:v1", "inputs": { "seriesValues": "intermediate.seriesValues", "alertConfigs": "inputs.marketDataSeries"}, "outputs": {"generatedAlerts": "outputs.alerts"} }
+  ]
+}
