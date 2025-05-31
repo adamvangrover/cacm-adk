@@ -53,23 +53,23 @@
     {
       "id": "cc:CalculateRatio_v1",
       "name": "Basic Ratio Calculator",
-      "description": "Calculates numerator / denominator. Handles zero denominator.",
-      "module": "cacm_adk_core.compute_capabilities.basic_functions",
-      "functionName": "calculate_ratio",
+      "description": "Calculates numerator / denominator. Raises error for zero denominator.",
+      "skill_plugin_name": "BasicCalculations",
+      "skill_function_name": "calculate_ratio",
       "inputs": [
         {"name": "numerator", "type": "float", "description": "The numerator value."},
         {"name": "denominator", "type": "float", "description": "The denominator value."}
       ],
       "outputs": [
-        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator), or null if error."}
+        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator)."}
       ]
     },
     {
       "id": "cc:SimpleScorer_v1",
       "name": "Simple Metric Scorer",
       "description": "Compares a metric against a threshold with an operator.",
-      "module": "cacm_adk_core.compute_capabilities.basic_functions",
-      "functionName": "simple_scorer",
+      "skill_plugin_name": "BasicCalculations",
+      "skill_function_name": "simple_scorer",
       "inputs": [
         {"name": "financial_metric", "type": "float", "description": "The metric value to score."},
         {"name": "threshold", "type": "float", "description": "The threshold value to compare against."},
@@ -77,6 +77,54 @@
       ],
       "outputs": [
         {"name": "assessment", "type": "string", "description": "String indicating the result of the comparison (e.g., 'Above Threshold')."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:financial_analysis_agent:v1",
+      "name": "Financial Analysis Agent",
+      "description": "Agent that calculates ratios and generates textual summaries using skills and SharedContext.",
+      "agent_type": "AnalysisAgent",
+      "skill_plugin_name": "FinancialAnalysis",
+      "skill_function_name": "calculate_basic_ratios",
+      "inputs": [
+          {"name": "roundingPrecision", "type": "integer", "optional": true, "description": "Precision for rounding calculated ratios."}
+      ],
+      "outputs": [
+          {"name": "analysis_summary_output", "type": "object", "description": "Summary of analysis performed, including status, messages, and results from skills."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:standard_data_ingestor:v1",
+      "name": "Standard Data Ingestor Agent",
+      "description": "Agent responsible for ingesting initial data from CACM inputs into SharedContext.",
+      "agent_type": "DataIngestionAgent",
+      "inputs": [
+          {"name": "companyName", "type": "string", "optional": true},
+          {"name": "companyTicker", "type": "string", "optional": true},
+          {"name": "financialStatementData", "type": "object", "optional": true, "description": "Direct input for financial data, can be simple or expanded."},
+          {"name": "mockStructuredFinancialsForLLMSummary", "type": "object", "optional": true, "description": "Direct input for mock financials for LLM summary."},
+          {"name": "riskFactorsText", "type": "string", "optional": true, "description": "Direct input for risk factors text."},
+          {"name": "riskFactorsFilePath", "type": "string", "optional": true, "description": "Path to file containing risk factors text."},
+          {"name": "mockFinancialsFilePath", "type": "string", "optional": true, "description": "Path to file for mock structured financials."},
+          {"name": "fullFinancialStatementFilePath", "type": "string", "optional": true, "description": "Path to file for full financial statement data (for expanded ratios)."},
+          {"name": "documentURI", "type": "string", "optional": true, "description": "A URI for a primary document (can be used by DataIngestionAgent)."},
+          {"name": "documentType", "type": "string", "optional": true, "description": "Type of the primary document if URI is provided (can be used by DataIngestionAgent)."}
+      ],
+      "outputs": [
+          {"name": "ingestion_summary", "type": "object", "description": "Summary of data ingestion process, including status and list of stored keys."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:standard_report_generator:v1",
+      "name": "Standard Report Generator Agent",
+      "description": "Agent responsible for assembling the final report from SharedContext.",
+      "agent_type": "ReportGenerationAgent",
+      "inputs": [
+        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."}
+      ],
+      "outputs": [
+          {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."},
+          {"name": "report_file_path", "type": "string", "description": "Conceptual path to the generated report file."}
       ]
     }
   ]
