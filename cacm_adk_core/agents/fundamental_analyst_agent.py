@@ -34,8 +34,8 @@ class FundamentalAnalystAgent(Agent):
 
     def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
         super().__init__(
-            agent_name="FundamentalAnalystAgent",
-            kernel_service=kernel_service,
+            agent_name="FundamentalAnalystAgent", 
+            kernel_service=kernel_service, 
             skills_plugin_name="FundamentalAnalysisSkill"
         )
         self.config = agent_config if agent_config else {} # Store agent_config
@@ -103,10 +103,10 @@ class FundamentalAnalystAgent(Agent):
         """
         dra_agent_name = "DataRetrievalAgent" # This should match the name/key used for DRA registration
         logging.info(f"Attempting to get or create '{dra_agent_name}' to retrieve data for {company_id}.")
-
+        
         try:
             # Note: get_or_create_agent now expects agent_name and shared_context
-            dra_agent = await self.get_or_create_agent(dra_agent_name, shared_context)
+            dra_agent = await self.get_or_create_agent(dra_agent_name, shared_context) 
             if not dra_agent:
                 logging.error(f"Could not get or create {dra_agent_name}. Cannot retrieve company data for {company_id}.")
                 return None
@@ -240,11 +240,11 @@ class FundamentalAnalystAgent(Agent):
                     "- Start with an overall assessment of the company's financial health (as provided) and briefly justify it.\n"
                     "- Discuss key insights derived from the financial ratios. Highlight any ratios that are particularly strong, weak, or show significant trends.\n"
                     "- Explain the implications of the DCF valuation and Enterprise Value, if available. What do these values suggest about the company's intrinsic worth or market perception?\n"
-                    "- If available, comment on the estimated default likelihood and recovery rate.\n"
+                    "- If available, comment on the estimated default likelihood and recovery rate.\n" 
                     "- Conclude with a balanced view, mentioning both positive aspects and potential concerns or areas requiring further investigation.\n"
                     "Ensure the analysis is objective and data-driven."
                 )
-
+                
                 base_prompt = self.config.get("summarize_analysis_user_prompt", DEFAULT_FAA_SUMMARY_PROMPT)
                 summary_guidance_prompt_addon = self.current_run_inputs.get("summary_guidance_prompt_addon")
 
@@ -269,7 +269,7 @@ class FundamentalAnalystAgent(Agent):
                 skill_name = "SummarizeAnalysis"
                 logging.info(f"Attempting to generate summary for {company_id} using Semantic Kernel skill '{self.skills_plugin_name}.{skill_name}'.")
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_INPUT: {input_vars}")
-
+                
                 # Use the invoke_skill method from the base Agent class or directly use kernel.invoke
                 # Assuming invoke_skill handles finding the function and invoking
                 # result = await self.invoke_skill(skill_name, input_vars)
@@ -382,7 +382,7 @@ class FundamentalAnalystAgent(Agent):
             if override_discount_rate is not None and isinstance(override_discount_rate, float) and override_discount_rate > 0:
                 discount_rate = override_discount_rate
                 logging.info(f"FAA_XAI:DCF_OVERRIDE: Using override discount rate: {discount_rate}")
-
+            
             terminal_growth_rate_perpetuity = dcf_assumptions.get('terminal_growth_rate') 
             if override_terminal_growth_rate is not None and isinstance(override_terminal_growth_rate, float) and override_terminal_growth_rate >= 0: # Allow 0 for terminal growth
                 terminal_growth_rate_perpetuity = override_terminal_growth_rate
