@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "data": {
+    "company_id": "MSFT",
+    "financial_ratios": {
+      "revenue_growth": 0.08, "net_profit_margin": 0.35, "return_on_equity": 0.25,
+      "debt_to_equity": 0.33, "current_ratio": 2.0, "ebitda_margin": 0.48
+    },
+    "dcf_valuation": 450.00,
+    "comps_valuation": null,
+    "enterprise_value": 3100000000000,
+    "financial_health": "Strong",
+    "analysis_summary": "Microsoft demonstrates strong financial health, underpinned by consistent revenue growth and robust profit margins. Key ratios such as ROE and current ratio indicate efficient capital management and good liquidity. The DCF valuation suggests potential undervaluation at the current market price, while the Enterprise Value reflects its significant market position. Cloud (Azure) and AI segments continue to be major growth drivers. Overall, the financial outlook is positive, though continued market competition and macroeconomic factors warrant monitoring."
+  }
+}
