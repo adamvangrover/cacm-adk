@@ -13,6 +13,7 @@ A CACM is a declarative, machine-readable blueprint (ideally JSON-LD or YAML) th
 - It references *logical* compute capabilities rather than specific code implementations.
 
 This project aims to build the core infrastructure and software for the CACM-ADK, enabling modular, intelligent, and governed development of credit analysis capabilities. The system is designed to be portable, modular, lightweight, and deeply expert, potentially packaged as a microservice or REST API.
+It now incorporates an agent-based architecture and leverages Semantic Kernel for enhanced modularity in defining and executing computational and AI-driven tasks.
 
 ## Project Goals
 
@@ -36,10 +37,23 @@ This project aims to build the core infrastructure and software for the CACM-ADK
 *   **Examples (`examples/`):**
     *   `sme_credit_score_example_01.json`
     *   `customer_data_aggregation_example_01.json`
+*   **Agent-Based Architecture & Semantic Kernel:**
+    *   **Core Agents:** The system now uses specialized agents like `DataIngestionAgent` (handles data intake), `AnalysisAgent` (performs analytical tasks, including invoking skills), and `ReportGenerationAgent` (compiles findings into reports).
+    *   **Semantic Kernel Integration:** Manages and executes `Semantic Skills`. These can be native Python functions (see `cacm_adk_core/native_skills.py`) wrapped for kernel use, or potentially LLM-driven functions (conceptualized in `processing_pipeline/semantic_kernel_skills.py`). The `KernelService` (`cacm_adk_core/semantic_kernel_adapter.py`) centralizes kernel access.
+    *   **SharedContext:** A `SharedContext` object (`cacm_adk_core/context/shared_context.py`) facilitates data sharing and session state management between agents and during a workflow execution.
+    *   **Orchestrator Evolution:** The `Orchestrator` (`cacm_adk_core/orchestrator/orchestrator.py`) now functions as an agent workflow manager, dispatching tasks to agents or skills based on CACM definitions and managing the overall execution flow, including agent communication.
+    *   **Compute Capability Catalog:** The catalog (`config/compute_capability_catalog.json`) has been updated to map capabilities to specific agents (via `agent_type`) or Semantic Kernel skills (via `skill_plugin_name` and `skill_function_name`), guiding the Orchestrator.
 
 ## Repository Structure
 
 -   `cacm_adk_core/`: Source code for the core engine components.
+    -   `agents/`: Contains the base agent class and specific agent implementations.
+    -   `context/`: Holds the `SharedContext` class for data sharing.
+    -   `orchestrator/`: The main workflow orchestrator and agent manager.
+    -   `semantic_kernel_adapter.py`: Manages Semantic Kernel instance.
+    -   `native_skills.py`: Wrappers for Python functions as native Semantic Kernel skills.
+    -   `compute_capabilities/`: (Legacy direct Python functions, being replaced by skills/agents)
+    -   `validator/`, `template_engine/`, `ontology_navigator/`, `report_generator/`
 -   `cacm_library/`: Definitions of CACMs and reusable templates.
 -   `cacm_standard/`: The CACM definition standard/schema.
 -   `ontology/`: The credit analysis semantic ontology.

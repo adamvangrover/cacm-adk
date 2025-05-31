@@ -53,23 +53,23 @@
     {
       "id": "cc:CalculateRatio_v1",
       "name": "Basic Ratio Calculator",
-      "description": "Calculates numerator / denominator. Handles zero denominator.",
-      "module": "cacm_adk_core.compute_capabilities.basic_functions",
-      "functionName": "calculate_ratio",
+      "description": "Calculates numerator / denominator. Raises error for zero denominator.",
+      "skill_plugin_name": "BasicCalculations",
+      "skill_function_name": "calculate_ratio",
       "inputs": [
         {"name": "numerator", "type": "float", "description": "The numerator value."},
         {"name": "denominator", "type": "float", "description": "The denominator value."}
       ],
       "outputs": [
-        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator), or null if error."}
+        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator)."}
       ]
     },
     {
       "id": "cc:SimpleScorer_v1",
       "name": "Simple Metric Scorer",
       "description": "Compares a metric against a threshold with an operator.",
-      "module": "cacm_adk_core.compute_capabilities.basic_functions",
-      "functionName": "simple_scorer",
+      "skill_plugin_name": "BasicCalculations",
+      "skill_function_name": "simple_scorer",
       "inputs": [
         {"name": "financial_metric", "type": "float", "description": "The metric value to score."},
         {"name": "threshold", "type": "float", "description": "The threshold value to compare against."},
@@ -77,6 +77,36 @@
       ],
       "outputs": [
         {"name": "assessment", "type": "string", "description": "String indicating the result of the comparison (e.g., 'Above Threshold')."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:financial_ratios_calculator:v1",
+      "name": "Financial Ratios Calculator (Agent Enabled)",
+      "description": "Calculates key financial ratios using an agent, which internally might use the FinancialAnalysis skill.",
+      "agent_type": "AnalysisAgent",
+      "task_details_from_capability": "Perform basic financial ratio analysis. Calculate current ratio and debt-to-equity ratio.",
+      "skill_plugin_name": "FinancialAnalysis",
+      "skill_function_name": "calculate_basic_ratios",
+      "inputs": [
+        {"name": "financial_data", "type": "object", "description": "A dictionary containing financial data. Expected keys: 'current_assets', 'current_liabilities', 'total_debt', 'total_equity', all with float values."},
+        {"name": "rounding_precision", "type": "integer", "description": "The number of decimal places to round the results to. Defaults to 2.", "optional": true}
+      ],
+      "outputs": [
+        {"name": "agent_result", "type": "object", "description": "The full dictionary result from the AnalysisAgent, potentially including 'calculated_ratios' and 'errors' if the agent invoked the skill."}
+      ]
+    },
+    {
+      "id": "urn:adk:capability:basic_document_ingestor:v1",
+      "name": "Basic Document Ingestor (Agent)",
+      "description": "Ingests a document and updates shared context. Placeholder implementation.",
+      "agent_type": "DataIngestionAgent",
+      "inputs": [
+        {"name": "document_type", "type": "string", "description": "Type of the document (e.g., 10K_FILING, PRESS_RELEASE)."},
+        {"name": "document_id", "type": "string", "description": "Unique ID for the document."},
+        {"name": "document_uri", "type": "string", "description": "URI or path to the document content.", "optional": true}
+      ],
+      "outputs": [
+        {"name": "ingestion_status_summary", "type": "object", "description": "Summary of the ingestion process, including status and document reference."}
       ]
     }
   ]
