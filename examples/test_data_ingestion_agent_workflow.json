@@ -1,0 +1,36 @@
+{
+  "cacmId": "test_data_ingestion_workflow_001",
+  "name": "Test Workflow for DataIngestionAgent",
+  "description": "A sample CACM to test the DataIngestionAgent's ability to process inputs and update SharedContext.",
+  "inputs": {
+    "ingest_company_name": {"value": "IngestTestCorp", "description": "Company name for ingestion."},
+    "ingest_ticker": {"value": "ITC", "description": "Company ticker for ingestion."},
+    "ingest_risk_file": {"value": "conceptual_risks_ingest.txt", "description": "Conceptual risk factors file path."},
+    "ingest_direct_financials": {
+      "value": {"current_assets": 1000.0, "current_liabilities": 500.0, "source": "direct_input_test"},
+      "description": "Direct financial statement data for ingestion."
+    }
+  },
+  "outputs": {
+    "ingestion_run_summary": {
+      "type": "object",
+      "description": "Summary output from the DataIngestionAgent run."
+    }
+  },
+  "workflow": [
+    {
+      "stepId": "step1_ingest_data",
+      "description": "Run DataIngestionAgent with mixed direct and conceptual file inputs.",
+      "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
+      "inputBindings": {
+        "companyName": "cacm.inputs.ingest_company_name",
+        "companyTicker": "cacm.inputs.ingest_ticker",
+        "riskFactorsFilePath": "cacm.inputs.ingest_risk_file",
+        "financialStatementData": "cacm.inputs.ingest_direct_financials"
+      },
+      "outputBindings": {
+        "ingestion_summary": "cacm.outputs.ingestion_run_summary"
+      }
+    }
+  ]
+}
