@@ -8,6 +8,7 @@
 @prefix cacm_ont: <http://example.com/ontology/cacm_credit_ontology/0.3#> .
 @prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
 @prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
+@prefix adkarch: <http://www.example.com/adk/architecture#> . # New namespace for ADK architecture
 
 # Base URI for this ontology will be defined in the next step
 
@@ -607,3 +608,65 @@ kgprop:hasOutputLiteral rdf:type owl:DatatypeProperty ;
     rdfs:domain kgclass:FinancialFormula ;
     rdfs:range xsd:string ;
     rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- ADK Architecture Ontology Terms ---
+
+adkarch:Agent rdf:type owl:Class ;
+    rdfs:label "Agent"^^xsd:string ;
+    rdfs:comment "An autonomous software agent performing tasks within the ADK."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:AnalysisAgent rdf:type owl:Class ;
+    rdfs:subClassOf adkarch:Agent ;
+    rdfs:label "Analysis Agent"^^xsd:string ;
+    rdfs:comment "An agent specialized in performing analytical tasks."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:DataIngestionAgent rdf:type owl:Class ;
+    rdfs:subClassOf adkarch:Agent ;
+    rdfs:label "Data Ingestion Agent"^^xsd:string ;
+    rdfs:comment "An agent specialized in ingesting data from various sources."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:ReportGenerationAgent rdf:type owl:Class ;
+    rdfs:subClassOf adkarch:Agent ;
+    rdfs:label "Report Generation Agent"^^xsd:string ;
+    rdfs:comment "An agent specialized in generating reports from processed data and analysis."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:SemanticSkill rdf:type owl:Class ;
+    rdfs:label "Semantic Skill"^^xsd:string ;
+    rdfs:comment "A skill usable by the Semantic Kernel, can be native or LLM-based."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+# --- ADK Architecture Object Properties ---
+
+adkarch:usesSkill rdf:type owl:ObjectProperty ;
+    rdfs:domain adkarch:Agent ;
+    rdfs:range adkarch:SemanticSkill ;
+    rdfs:label "uses skill"^^xsd:string ;
+    rdfs:comment "Relates an agent to a semantic skill it utilizes."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:communicatesWith rdf:type owl:ObjectProperty ;
+    rdfs:domain adkarch:Agent ;
+    rdfs:range adkarch:Agent ;
+    rdfs:label "communicates with"^^xsd:string ;
+    rdfs:comment "Describes that an agent can communicate with another agent."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+# --- ADK Architecture Data Properties ---
+
+adkarch:skillName rdf:type owl:DatatypeProperty ;
+    rdfs:domain adkarch:SemanticSkill ;
+    rdfs:range xsd:string ;
+    rdfs:label "skill name"^^xsd:string ;
+    rdfs:comment "The functional name of a semantic skill."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+adkarch:pluginName rdf:type owl:DatatypeProperty ;
+    rdfs:domain adkarch:SemanticSkill ;
+    rdfs:range xsd:string ;
+    rdfs:label "plugin name"^^xsd:string ;
+    rdfs:comment "The name of the plugin that groups this skill in the Semantic Kernel."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/adk/architecture#> .
