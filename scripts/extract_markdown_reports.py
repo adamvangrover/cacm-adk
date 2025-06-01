@@ -55,11 +55,11 @@ def main():
                     print(f"WARNING: Line {line_number} is empty. Skipping.")
                     error_count +=1
                     continue
-
+                
                 current_company_id_for_error = f"unknown_at_line_{line_number}"
                 try:
                     report_object = json.loads(stripped_line)
-
+                    
                     company_id = report_object.get("company_id", f"unknown_company_L{line_number}")
                     current_company_id_for_error = company_id # Update for more specific error logging
                     markdown_report = report_object.get("generated_markdown_report")
@@ -73,7 +73,7 @@ def main():
                         print(f"WARNING: Line {line_number} for company '{company_id}', 'generated_markdown_report' is not a string (type: {type(markdown_report)}). Skipping.")
                         error_count +=1
                         continue
-
+                        
                     sanitized_company_id = sanitize_filename(company_id)
                     output_md_filename = f"{sanitized_company_id}_analysis_report.md"
                     output_md_filepath = os.path.join(OUTPUT_REPORTS_DIR, output_md_filename)
@@ -81,7 +81,7 @@ def main():
                     try:
                         with open(output_md_filepath, 'w', encoding='utf-8') as f_md: # Added encoding
                             f_md.write(markdown_report)
-                        # print(f"Successfully extracted report for {company_id} to {output_md_filepath}") # Making it less verbose
+                        print(f"Successfully extracted and saved report for '{company_id}' to '{output_md_filepath}'")
                         report_count += 1
                     except IOError as e_write:
                         print(f"ERROR: Could not write Markdown file for company '{company_id}' to '{output_md_filepath}': {e_write}")
@@ -96,7 +96,7 @@ def main():
                 except Exception as e_general: # Catch any other unexpected errors per line
                     print(f"ERROR: Unexpected error processing line {line_number} for company '{current_company_id_for_error}': {e_general}")
                     error_count += 1
-
+                    
     except IOError as e_read:
         print(f"ERROR: Could not read input file {INPUT_JSONL_FILE}: {e_read}")
         return
