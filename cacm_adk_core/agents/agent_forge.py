@@ -22,21 +22,21 @@ class AgentForge(Agent):
     """
 
     def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
-        super().__init__(agent_name="AgentForge",
-                         kernel_service=kernel_service,
+        super().__init__(agent_name="AgentForge", 
+                         kernel_service=kernel_service, 
                          skills_plugin_name="AgentForgeSkills") # Assuming it will use SK
         self.config = agent_config if agent_config else {}
-
+        
         # Default template directory within the cacm_adk_core structure
-        # Assumes 'templates' is a subdirectory of the directory containing 'agent_forge.py'
-        default_template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+        # Points to the new Adam v18 specific template subdirectory
+        default_template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "adam_v18")
         self.template_dir = Path(self.config.get("template_dir", default_template_dir))
-
-        # Path for the registry of forged agents.
-        # Defaulting to 'config/forged_agents_registry.json' relative to the project root.
-        self.forged_agents_registry_path = Path(self.config.get("forged_agents_registry_path", "config/forged_agents_registry.json"))
-
-        self.logger.info(f"AgentForge initialized. Template dir: {self.template_dir}, Registry: {self.forged_agents_registry_path}")
+        
+        # Path for the registry of forged agents, updated for Adam v18.
+        # Defaulting to 'config/adam_v18_forged_agents_registry.json' relative to the project root.
+        self.forged_agents_registry_path = Path(self.config.get("forged_agents_registry_path", "config/adam_v18_forged_agents_registry.json"))
+        
+        self.logger.info(f"AgentForge initialized. Adam v18 Template dir: {self.template_dir}, Adam v18 Registry: {self.forged_agents_registry_path}")
 
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
@@ -59,7 +59,7 @@ class AgentForge(Agent):
                 if content is None:
                     return {"status": "error", "message": f"Template '{template_name}' not found."}
                 return {"status": "success", "data": {"template_name": template_name, "content": content}}
-
+            
             elif action == "create_agent":
                 # Placeholder - To be fully implemented in Step 4 of the plan
                 self.logger.info("Action 'create_agent' called. Full implementation pending.")
@@ -72,7 +72,7 @@ class AgentForge(Agent):
                 # Placeholder - To be fully implemented in Step 6 of the plan
                 self.logger.info("Action 'analyze_agent_requirement' called. Full implementation pending.")
                 return {"status": "pending_implementation", "message": "'analyze_agent_requirement' action logic not yet fully implemented."}
-
+            
             else:
                 self.logger.warning(f"Unknown action: {action}")
                 return {"status": "error", "message": f"Unknown action specified: {action}"}
@@ -87,7 +87,7 @@ class AgentForge(Agent):
             self.logger.warning(f"Template directory {self.template_dir} does not exist or is not a directory.")
             return []
         # Assuming templates end with .py.tpl for Python agent templates
-        return [f.stem.replace('.py', '') for f in self.template_dir.glob("*.py.tpl")]
+        return [f.stem.replace('.py', '') for f in self.template_dir.glob("*.py.tpl")] 
 
     def _get_template_content_logic(self, template_name: str) -> Optional[str]:
         # Assuming template_name does not include .py.tpl
