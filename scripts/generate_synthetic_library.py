@@ -18,8 +18,8 @@ from cacm_adk_core.semantic_kernel_adapter import KernelService
 
 # --- Configuration ---
 TARGET_COMPANIES = [
-    "MSFT", "TESTCORP",
-    "AAPL", "GOOGL", "AMZN", "JNJ", "PFE",
+    "MSFT", "TESTCORP", 
+    "AAPL", "GOOGL", "AMZN", "JNJ", "PFE", 
     "TSLA", "MCD", "BA", "CAT", "JPM", "V", "XOM"
 ]
 OUTPUT_FILE_PATH = os.path.join(PROJECT_ROOT, "default_synthetic_library_v1", "synthetic_reports.jsonl")
@@ -55,7 +55,7 @@ def get_company_specific_texts(company_id):
             "business_overview": JPM_BUSINESS_OVERVIEW,
             "risk_factors": JPM_RISK_FACTORS
         }
-    elif company_id == "TESTCORP":
+    elif company_id == "TESTCORP": 
         return {
             "business_overview": GENERIC_BUSINESS_OVERVIEW_TEMPLATE.format(company_id=company_id) + " (TESTCORP specific details would be here if available.)",
             "risk_factors": GENERIC_RISK_FACTORS_TEMPLATE.format(company_id=company_id) + " (TESTCORP specific risks would be here.)"
@@ -69,9 +69,9 @@ def get_company_specific_texts(company_id):
 def construct_cacm_for_company(company_id: str, company_texts: dict):
     # Based on examples/msft_comprehensive_analysis_workflow.json and notebook's dynamic construction
     # For synthetic library, FAA summary guidance and DCF overrides will use defaults (i.e., not passed or passed as None)
-
+    
     workflow_id = f"synthetic_lib_analysis_{company_id.lower()}_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}"
-
+    
     cacm_instance = {
       "cacmId": workflow_id,
       "name": f"Synthetic Library Analysis for {company_id}",
@@ -114,13 +114,13 @@ def construct_cacm_for_company(company_id: str, company_texts: dict):
           "description": "Ingest specific text data and Catalyst parameters into SharedContext.",
           "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
           "inputBindings": {
-            "companyName": {"value": f"{company_id} Corp."} ,
+            "companyName": {"value": f"{company_id} Corp."} , 
             "companyTicker": {"value": company_id},
-            "riskFactorsText": "cacm.inputs.msft_risk_factors_text",
+            "riskFactorsText": "cacm.inputs.msft_risk_factors_text", 
             "mockStructuredFinancialsForLLMSummary": "cacm.inputs.msft_business_overview_text",
             # For DataIngestionAgent to potentially pick up Catalyst params for shared_context
             # (This part of DIA is not implemented yet, so Catalyst step below gets from cacm.inputs directly)
-            # "catalystParamsForContext": "cacm.inputs.catalyst_input_params"
+            # "catalystParamsForContext": "cacm.inputs.catalyst_input_params" 
           },
            "outputBindings": { "ingestion_summary": "intermediate.step1_ingestion_summary" }
         },
@@ -147,8 +147,8 @@ def construct_cacm_for_company(company_id: str, company_texts: dict):
           "stepId": "step4_catalyst_insights",
           "description": "Generate strategic insights using CatalystWrapperAgent.",
           "computeCapabilityRef": "urn:adk:capability:catalyst_wrapper_agent:v1",
-          "inputBindings": {
-            "client_id": "cacm.inputs.catalyst_input_params.value.client_id",
+          "inputBindings": { 
+            "client_id": "cacm.inputs.catalyst_input_params.value.client_id", 
             "company_id": "cacm.inputs.catalyst_input_params.value.company_id",
             "industry": "cacm.inputs.catalyst_input_params.value.industry"
           },
@@ -184,7 +184,7 @@ def assemble_full_report_object(company_id: str, company_name_processed: str, wo
             "user_dcf_discount_rate": cacm_inputs["user_dcf_discount_rate"]["value"],
             "user_dcf_terminal_growth_rate": cacm_inputs["user_dcf_terminal_growth_rate"]["value"]
         },
-        "ingested_data_summary": workflow_outputs.get("intermediate.step1_ingestion_summary",
+        "ingested_data_summary": workflow_outputs.get("intermediate.step1_ingestion_summary", 
              # Try to get from SharedContext if DIA output binding failed or wasn't there
              # This part is conceptual as direct SC access post-run isn't trivial from here
              {"status": "info", "message": "Ingestion summary not directly bound in workflow outputs."}
@@ -203,7 +203,7 @@ def assemble_full_report_object(company_id: str, company_name_processed: str, wo
 
 async def main():
     print("Starting Synthetic Library Generation...")
-
+    
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
         print(f"Created output directory: {OUTPUT_DIR}")
@@ -216,7 +216,7 @@ async def main():
     if orch.validator is None:
         from cacm_adk_core.validator.validator import Validator # Assuming Validator can be init'd simply
         class MockPermissiveValidator: # Copied from notebook
-            schema = True
+            schema = True 
             def validate_cacm_against_schema(self, data): return True, []
         orch.validator = MockPermissiveValidator()
         print("Orchestrator validator was None, using MockPermissiveValidator.")
@@ -226,7 +226,7 @@ async def main():
         print(f"--- Processing company: {company_id} ---")
         company_specific_texts = get_company_specific_texts(company_id)
         workflow_id, cacm_instance_data = construct_cacm_for_company(company_id, company_specific_texts)
-
+        
         print(f"Running workflow {workflow_id} for {company_id}...")
         success, logs, outputs = await orch.run_cacm(cacm_instance_data)
 
@@ -265,9 +265,9 @@ async def main():
     print("\n--- Collected Report Objects (to be written to JSONL) ---")
     for obj in all_report_objects:
         # For display here, pretty print. For JSONL, each obj is one line.
-        print(json.dumps(obj, indent=2))
+        print(json.dumps(obj, indent=2)) 
         print("---")
-
+    
     print(f"\nWriting {len(all_report_objects)} report objects to JSONL file: {OUTPUT_FILE_PATH}...")
     try:
         with open(OUTPUT_FILE_PATH, 'w') as f:
@@ -276,7 +276,7 @@ async def main():
         print(f"Synthetic library successfully generated at {OUTPUT_FILE_PATH}")
     except IOError as e:
         print(f"ERROR: Could not write to output file {OUTPUT_FILE_PATH}: {e}")
-
+    
     print("Synthetic Library Generation script finished.")
 
 
