@@ -66,24 +66,24 @@ aapl_data_package = {
       "total_liabilities": [290435, 270500, 280000],
       "shareholders_equity": [62320, 64550, 70000],
       "cash_and_equivalents": [61555, 55700, 60000],
-      "short_term_debt": [15000, 14000, 13000],
+      "short_term_debt": [15000, 14000, 13000], 
       "long_term_debt": [98967, 95000, 90000]
     },
     "cash_flow_statement": {
       "operating_cash_flow": [122151, 110540, 115000],
-      "investing_cash_flow": [-22000, -20000, -18000],
-      "financing_cash_flow": [-90000, -85000, -80000],
+      "investing_cash_flow": [-22000, -20000, -18000], 
+      "financing_cash_flow": [-90000, -85000, -80000], 
       "free_cash_flow": [100151, 90540, 97000]
     },
-    "key_ratios": {},
+    "key_ratios": {}, 
     "dcf_assumptions": {
       "fcf_projection_years_total": 10, "initial_high_growth_period_years": 3,
-      "initial_high_growth_rate": 0.08, "stable_growth_rate": 0.04,
+      "initial_high_growth_rate": 0.08, "stable_growth_rate": 0.04, 
       "discount_rate": 0.09, "terminal_growth_rate_perpetuity": 0.025
     },
     "market_data": {
-      "share_price": 190.00, "shares_outstanding": 15500000000,
-      "annual_debt_service_placeholder": "10000",
+      "share_price": 190.00, "shares_outstanding": 15500000000, 
+      "annual_debt_service_placeholder": "10000", 
       "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"
     }
   },
@@ -103,35 +103,35 @@ jpm_data_package = {
   "company_info": {
     "name": "JPMorgan Chase & Co.", "ticker": "JPM", "industry_sector": "Financials", "country": "USA"
   },
-  "financial_data_detailed": {
-    "income_statement": {
-      "revenue": [132250, 128695, 145000],
+  "financial_data_detailed": { 
+    "income_statement": { 
+      "revenue": [132250, 128695, 145000], 
       "net_income": [48334, 37676, 42000],
-      "ebitda": [65000, 55000, 60000]
+      "ebitda": [65000, 55000, 60000] 
     },
     "balance_sheet": {
       "total_assets": [3872000, 3744000, 3900000],
-      "total_liabilities": [3560000, 3450000, 3600000],
+      "total_liabilities": [3560000, 3450000, 3600000], 
       "shareholders_equity": [312000, 294000, 300000],
       "cash_and_equivalents": [500000, 480000, 520000],
-      "short_term_debt": [200000, 180000, 190000],
+      "short_term_debt": [200000, 180000, 190000], 
       "long_term_debt": [300000, 280000, 290000]
     },
-    "cash_flow_statement": {
+    "cash_flow_statement": { 
       "operating_cash_flow": [70000, 60000, 65000],
       "investing_cash_flow": [-10000, -8000, -9000],
       "financing_cash_flow": [-30000, -25000, -28000],
-      "free_cash_flow": [60000, 52000, 56000]
+      "free_cash_flow": [60000, 52000, 56000] 
     },
-    "key_ratios": {},
-    "dcf_assumptions": {
+    "key_ratios": {}, 
+    "dcf_assumptions": { 
       "fcf_projection_years_total": 5, "initial_high_growth_period_years": 2,
       "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.03,
       "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
     },
     "market_data": {
-      "share_price": 195.00, "shares_outstanding": 2900000000,
-      "annual_debt_service_placeholder": "20000",
+      "share_price": 195.00, "shares_outstanding": 2900000000, 
+      "annual_debt_service_placeholder": "20000", 
       "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"
     }
   },
@@ -248,9 +248,9 @@ class DataRetrievalAgent(Agent):
                         "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
                         "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
                     },
-                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000,
-                                    "annual_debt_service_placeholder": "1000",
-                                    "payment_history_placeholder": "Unknown",
+                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                    "annual_debt_service_placeholder": "1000", 
+                                    "payment_history_placeholder": "Unknown", 
                                     "interest_capitalization_placeholder": "Unknown"}
                 },
                 "qualitative_company_info": {
@@ -377,9 +377,9 @@ class DataRetrievalAgent(Agent):
                         "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
                         "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
                     },
-                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000,
-                                    "annual_debt_service_placeholder": "1000",
-                                    "payment_history_placeholder": "Unknown",
+                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                    "annual_debt_service_placeholder": "1000", 
+                                    "payment_history_placeholder": "Unknown", 
                                     "interest_capitalization_placeholder": "Unknown"}
                 },
                 "qualitative_company_info": {
