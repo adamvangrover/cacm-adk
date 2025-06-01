@@ -1,3 +1,15 @@
+"""
+Generates a synthetic library of comprehensive financial analysis reports.
+
+This script iterates through a predefined list of company tickers,
+constructs a dynamic CACM workflow instance for each, and invokes the
+Orchestrator to perform a multi-agent analysis. The results, including
+raw outputs from individual agents and a final human-readable Markdown report,
+are compiled into a "Full Report Object" for each company.
+
+These objects are then written to a JSONL (JSON Lines) file, where each
+line is a complete JSON report object for one company.
+"""
 import asyncio
 import json
 import os
@@ -40,6 +52,18 @@ GENERIC_RISK_FACTORS_TEMPLATE = "Key risk factors for {company_id} include marke
 
 # --- Helper Functions ---
 def get_company_specific_texts(company_id):
+    """
+    Retrieves specific business overview and risk factor texts for a given company_id.
+
+    For MSFT, AAPL, JPM, it returns curated texts. For TESTCORP and other
+    generic company IDs, it uses formatted template strings.
+
+    Args:
+        company_id (str): The ticker or identifier for the company.
+
+    Returns:
+        dict: A dictionary containing "business_overview" and "risk_factors" strings.
+    """
     if company_id == "MSFT":
         return {
             "business_overview": MSFT_BUSINESS_OVERVIEW,
@@ -67,6 +91,23 @@ def get_company_specific_texts(company_id):
         }
 
 def construct_cacm_for_company(company_id: str, company_texts: dict):
+    """
+    Constructs a dynamic CACM workflow instance for a given company.
+
+    This function adapts a standard comprehensive analysis workflow structure,
+    populating it with company-specific details like ID, name, and qualitative texts.
+    For the synthetic library generation, it uses default (empty or None) values
+    for user-configurable inputs like FAA summary guidance or DCF overrides.
+
+    Args:
+        company_id (str): The company ID for which to construct the workflow.
+        company_texts (dict): A dictionary containing "business_overview" and
+                            "risk_factors" text for the company.
+
+    Returns:
+        tuple: (workflow_id_str, cacm_instance_dict)
+               The generated unique workflow ID and the CACM instance data.
+    """
     # Based on examples/msft_comprehensive_analysis_workflow.json and notebook's dynamic construction
     # For synthetic library, FAA summary guidance and DCF overrides will use defaults (i.e., not passed or passed as None)
     
@@ -172,6 +213,25 @@ def construct_cacm_for_company(company_id: str, company_texts: dict):
 
 def assemble_full_report_object(company_id: str, company_name_processed: str, workflow_id_used: str,
                                 cacm_inputs: dict, workflow_outputs: dict, company_texts: dict):
+    """
+    Assembles the "Full Report Object" from various data sources post-workflow execution.
+
+    This object is structured to be one line in the output JSONL file and contains
+    metadata about the run, key inputs, ingested texts, raw outputs from each
+    analytical agent, and the final generated Markdown report.
+
+    Args:
+        company_id (str): The original company ID.
+        company_name_processed (str): Company name as used/processed in the workflow.
+        workflow_id_used (str): The unique ID of the CACM instance that was run.
+        cacm_inputs (dict): The "inputs" section of the CACM instance data used for the run.
+        workflow_outputs (dict): The dictionary of outputs returned by `Orchestrator.run_cacm()`.
+        company_texts (dict): Dictionary containing the "business_overview" and "risk_factors"
+                            text used for this company.
+
+    Returns:
+        dict: The comprehensive "Full Report Object".
+    """
     # Structure as defined in Plan Step 2
     report_obj = {
         "company_id": company_id,
