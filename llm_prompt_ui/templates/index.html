@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Prompt Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>LLM Prompt Interface</h1>
+
+    <div id="prompt-buttons">
+        <button class="prompt-button" data-prompt="Explain quantum computing in simple terms.">Explain Quantum Computing</button>
+        <button class="prompt-button" data-prompt="What are the latest advancements in AI?">Latest AI Advancements</button>
+        <button class="prompt-button" data-prompt="Write a short story about a friendly robot.">Story about a Robot</button>
+        <button class="prompt-button" data-prompt="Suggest three fun activities for a rainy day.">Rainy Day Activities</button>
+    </div>
+
+    <div id="response-area">
+        <h2>Response:</h2>
+        <p id="llm-response">Click a button to see a prompt here.</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
