@@ -6,8 +6,19 @@ from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 from cacm_adk_core.context.shared_context import SharedContext
 
+# cacm_adk_core/agents/data_retrieval_agent.py
+import logging
+from typing import Dict, Any, Optional
+import os # Added for environment variable
+import requests # Added for API calls
+import json # Added for json.JSONDecodeError
+
+from cacm_adk_core.agents.base_agent import Agent
+from cacm_adk_core.semantic_kernel_adapter import KernelService
+from cacm_adk_core.context.shared_context import SharedContext
+
 # --- Mock Data Packages ---
-msft_data_package = { # Ensuring MSFT data is also at module level for consistency
+msft_data_package = {
   "company_info": {
     "name": "Microsoft Corp.", "ticker": "MSFT", "industry_sector": "Technology", "country": "USA"
   },
@@ -147,94 +158,265 @@ jpm_data_package = {
   "collateral_and_debt_details": {"loan_to_value_ratio": None, "collateral_type": "Various forms of collateral for specific loan types; parent company debt largely unsecured.", "other_credit_enhancements": "Regulatory capital, diversified assets."}
 }
 
+testcorp_data_package = {
+    "company_info": {"name": "TESTCORP Inc.", "industry_sector": "Technology", "country": "USA"},
+    "financial_data_detailed": {
+        "income_statement": {"revenue": [1000, 1100, 1250], "net_income": [100, 120, 150], "ebitda": [150, 170, 200]},
+        "balance_sheet": {"total_assets": [2000, 2100, 2200], "total_liabilities": [800, 850, 900],
+                          "shareholders_equity": [1200, 1250, 1300], "cash_and_equivalents": [200, 250, 300],
+                          "short_term_debt": [50,50,50], "long_term_debt": [500,450, 400]},
+        "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70],
+                                "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
+        "key_ratios": {"debt_to_equity_ratio": 0.6923, "net_profit_margin": 0.12, "current_ratio": 2.44, "interest_coverage_ratio": 5.0},
+        "dcf_assumptions": {
+            "fcf_projection_years_total": 10, "initial_high_growth_period_years": 5, "initial_high_growth_rate": 0.10,
+            "stable_growth_rate": 0.05, "discount_rate": 0.09, "terminal_growth_rate_perpetuity": 0.025
+        },
+        "market_data": {"share_price": 65.00, "shares_outstanding": 10000000, "annual_debt_service_placeholder": "60", "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"}
+    },
+    "qualitative_company_info": {"management_assessment": "Experienced", "competitive_advantages": "Strong IP", "revenue_cashflow_stability_notes_placeholder": "Stable", "financial_deterioration_notes_placeholder": "None noted."},
+    "industry_data_context": {"outlook": "Positive"},
+    "economic_data_context": {"overall_outlook": "Stable"},
+    "collateral_and_debt_details": {"loan_to_value_ratio": 0.6, "collateral_type": "Accounts Receivable, Inventory", "other_credit_enhancements": "Standard covenants in place."}
+}
+
 
 class DataRetrievalAgent(Agent):
     """
-    Agent responsible for retrieving data required by other agents.
-    It can fetch data based on company_id and data_type.
-    Includes a mechanism for data override for testing purposes.
+    Agent responsible for retrieving various types of data for specified companies.
+
+    It serves different data packages based on the company_id and other inputs:
+    1.  Direct `data_override` from `current_step_inputs`.
+    2.  `dra_company_data_override` from `shared_context` (via initial CACM inputs).
+    3.  Live data from Alpha Vantage if `api_source='AlphaVantage'` and API key is available (Company Overview & Global Quote).
+    4.  Specific, detailed mock data for "MSFT", "AAPL", "JPM", "TESTCORP".
+    5.  Generic placeholder data for any other `company_id`.
     """
 
     def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
         super().__init__(agent_name="DataRetrievalAgent", kernel_service=kernel_service)
         self.config = agent_config if agent_config else {}
         self.logger.info(f"DataRetrievalAgent initialized. Config: {self.config}")
+        # Store API key from config if provided, preferring env var later
+        self.api_key_config = self.config.get("api_key") 
+
+    def _get_alpha_vantage_key(self, current_step_inputs: Dict[str, Any]) -> Optional[str]:
+        # Order of precedence for API key:
+        # 1. current_step_inputs['api_key']
+        # 2. self.api_key_config (from agent_config at init)
+        # 3. Environment variable ALPHA_VANTAGE_API_KEY
+        if current_step_inputs.get("api_key"):
+            return current_step_inputs["api_key"]
+        if self.api_key_config:
+            return self.api_key_config
+        return os.environ.get("ALPHA_VANTAGE_API_KEY")
+
+    def _fetch_alpha_vantage_overview(self, company_id: str, api_key: str) -> Optional[Dict[str, Any]]:
+        url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={company_id}&apikey={api_key}"
+        self.logger.info(f"Fetching Alpha Vantage OVERVIEW for {company_id}")
+        try:
+            response = requests.get(url, timeout=10) # Added timeout
+            response.raise_for_status() # Raise HTTPError for bad responses (4XX or 5XX)
+            data = response.json()
+            if data.get("Note"): # Handle API call frequency limit note
+                self.logger.warning(f"Alpha Vantage API Note for OVERVIEW {company_id}: {data['Note']}")
+                return None # Or handle as an error indicating rate limit
+            if not data or data.get("Symbol") != company_id: # Basic check if data is empty or for wrong symbol
+                 self.logger.warning(f"Alpha Vantage returned no/invalid OVERVIEW data for {company_id}. Response: {data}")
+                 return None
+            return data
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Alpha Vantage API request for OVERVIEW {company_id} failed: {e}")
+            return None
+        except json.JSONDecodeError as e: # Ensure json is imported
+            self.logger.error(f"Failed to parse JSON from Alpha Vantage OVERVIEW for {company_id}: {e}")
+            return None
+
+
+    def _fetch_alpha_vantage_global_quote(self, company_id: str, api_key: str) -> Optional[Dict[str, Any]]:
+        url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={company_id}&apikey={api_key}"
+        self.logger.info(f"Fetching Alpha Vantage GLOBAL_QUOTE for {company_id}")
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            if data.get("Note"):
+                self.logger.warning(f"Alpha Vantage API Note for GLOBAL_QUOTE {company_id}: {data['Note']}")
+                return None
+            if not data.get("Global Quote") or not data["Global Quote"].get("01. symbol"): # Check if Global Quote and symbol exist
+                 self.logger.warning(f"Alpha Vantage returned no/invalid GLOBAL_QUOTE data for {company_id}. Response: {data}")
+                 return None
+            return data.get("Global Quote")
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Alpha Vantage API request for GLOBAL_QUOTE {company_id} failed: {e}")
+            return None
+        except json.JSONDecodeError as e: # Ensure json is imported
+            self.logger.error(f"Failed to parse JSON from Alpha Vantage GLOBAL_QUOTE for {company_id}: {e}")
+            return None
+
+    def _transform_av_data_to_package(self, company_id: str, overview_data: Optional[Dict[str,Any]], quote_data: Optional[Dict[str,Any]]) -> Optional[Dict[str, Any]]:
+        if not overview_data and not quote_data:
+            return None
+        
+        self.logger.info(f"Transforming Alpha Vantage data for {company_id}")
+        # Basic transformation - this needs to be significantly built out
+        # to match the full company_data_package structure.
+        
+        package = {
+            "company_info": {},
+            "financial_data_detailed": {"income_statement": {}, "balance_sheet": {}, "cash_flow_statement": {}, "key_ratios": {}, "dcf_assumptions": {}, "market_data": {}},
+            "qualitative_company_info": {},
+            "industry_data_context": {},
+            "economic_data_context": {},
+            "collateral_and_debt_details": {}
+        }
+
+        if overview_data:
+            package["company_info"]["name"] = overview_data.get("Name", company_id)
+            package["company_info"]["ticker"] = overview_data.get("Symbol", company_id)
+            package["company_info"]["industry_sector"] = overview_data.get("Sector", "N/A")
+            package["company_info"]["country"] = overview_data.get("Country", "N/A")
+            
+            package["qualitative_company_info"]["business_model_strength"] = overview_data.get("Description", "N/A") # Using Description as a proxy
+            package["qualitative_company_info"]["competitive_advantages"] = "Refer to company description and industry analysis." # Placeholder
+            
+            shares_outstanding_str = overview_data.get("SharesOutstanding", "0")
+            package["financial_data_detailed"]["market_data"]["shares_outstanding"] = float(shares_outstanding_str) if shares_outstanding_str and shares_outstanding_str != "None" else 0
+
+
+            if overview_data.get("RevenueTTM") and overview_data.get("RevenueTTM") != "None":
+                package["financial_data_detailed"]["income_statement"]["revenue"] = [float(overview_data.get("RevenueTTM"))]
+            if overview_data.get("NetIncomeTTM") and overview_data.get("NetIncomeTTM") != "None":
+                package["financial_data_detailed"]["income_statement"]["net_income"] = [float(overview_data.get("NetIncomeTTM"))]
+            if overview_data.get("EBITDA") and overview_data.get("EBITDA") != "None":
+                package["financial_data_detailed"]["income_statement"]["ebitda"] = [float(overview_data.get("EBITDA"))]
+
+        if quote_data:
+            share_price_str = quote_data.get("05. price", "0")
+            package["financial_data_detailed"]["market_data"]["share_price"] = float(share_price_str) if share_price_str and share_price_str != "None" else 0.0
+            
+        package["source_api"] = "AlphaVantage"
+        self.logger.debug(f"Transformed AV Package for {company_id}: {package}")
+        return package
+
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
+        """
+        Retrieves data for a specified company based on the inputs.
+
+        The data retrieval follows a specific order of precedence:
+        1.  `data_override` in `current_step_inputs`: If provided, this entire data package is returned.
+        2.  `dra_company_data_override` in `shared_context.get_global_parameter("initial_inputs")`: 
+            If found, this data package (from CACM inputs) is returned.
+        3.  Live data from Alpha Vantage if `api_source='AlphaVantage'` and API key is available (Company Overview & Global Quote).
+        4.  Specific, detailed mock data for "MSFT", "AAPL", "JPM", "TESTCORP".
+        5.  Generic placeholder data for any other `company_id`.
+
+        Args:
+            task_description (str): A description of the task for logging/context.
+            current_step_inputs (Dict[str, Any]): A dictionary of inputs for this step, potentially including:
+                - "company_id" (str): The identifier of the company for which data is requested. (Required unless an override is used extensively)
+                - "data_type" (str, optional): Specifies the type of data to retrieve (e.g., "get_company_financials"). Defaults to "get_company_financials". Currently primarily influences logging.
+                - "data_override" (Dict[str, Any], optional): A complete data package to be returned directly, bypassing other retrieval logic.
+                - "api_source" (str, optional): If specified (e.g., "AlphaVantage"), indicates a desire to use an external API. (Conceptual integration for Alpha Vantage)
+                - "api_key_override" (str, optional): An API key to use for the external API, if `api_source` is specified. (Conceptual)
+            shared_context (SharedContext): The shared context object for the current CACM run, used to check for global overrides.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the status of the operation and the retrieved data or an error message.
+                - {"status": "success", "data": <data_package_dict>, "message": <optional_message_str>}
+                - {"status": "error", "message": <error_message_str>}
+        """
         self.logger.info(f"{self.agent_name} received task: {task_description} with inputs: {current_step_inputs}")
 
         company_id = current_step_inputs.get("company_id")
-        data_type = current_step_inputs.get("data_type", "get_company_financials") # Default data_type
+        data_type = current_step_inputs.get("data_type", "get_company_financials")
         data_override = current_step_inputs.get("data_override")
+        api_source = current_step_inputs.get("api_source")
 
-        # Check shared_context for a global override if not provided in direct inputs
-        # This allows the workflow to provide the override via cacm.inputs
-        if not data_override:
-            initial_inputs = shared_context.get_global_parameter("initial_inputs")
-            if initial_inputs and isinstance(initial_inputs.get("dra_company_data_override"), dict):
-                 # Assuming the override is passed as a dict with a "value" field, as per cacm.inputs structure
-                override_input_value = initial_inputs["dra_company_data_override"].get("value")
-                if override_input_value:
-                    self.logger.info("Found 'dra_company_data_override' in shared_context initial_inputs.")
-                    data_override = override_input_value
-
-
+        # 1. Check direct data_override
         if data_override:
             self.logger.info(f"Using data_override for company_id: {company_id}, data_type: {data_type}")
             return {"status": "success", "data": data_override}
 
+        # 2. Check shared_context for a global override
+        # This allows the workflow to provide the override via cacm.inputs
+        initial_inputs = shared_context.get_global_parameter("initial_inputs")
+        if initial_inputs and isinstance(initial_inputs.get("dra_company_data_override"), dict):
+            override_input_value = initial_inputs["dra_company_data_override"].get("value")
+            if override_input_value:
+                self.logger.info("Found 'dra_company_data_override' in shared_context initial_inputs.")
+                # Note: data_override from current_step_inputs takes precedence if both are somehow present.
+                # This logic assumes if data_override was in current_step_inputs, we'd have returned already.
+                return {"status": "success", "data": override_input_value, "message": "Used shared_context override."}
+        
         if not company_id:
-            self.logger.error("Missing 'company_id' in inputs.")
-            return {"status": "error", "message": "Missing 'company_id' in inputs."}
+            self.logger.error("Missing 'company_id' in inputs for data retrieval (and no override provided).")
+            return {"status": "error", "message": "Missing 'company_id' in inputs and no override found."}
 
-        # MSFT-specific data package
-        elif company_id == "MSFT":
-            self.logger.info(f"Returning MSFT-specific data for company_id: {company_id}, data_type: {data_type}")
-            # msft_data_package is now defined at module level
+        # 3. Attempt Alpha Vantage API call if specified
+        if api_source == "AlphaVantage":
+            api_key = self._get_alpha_vantage_key(current_step_inputs)
+            if not api_key:
+                self.logger.warning("Alpha Vantage API key not found. Skipping API call, will try mock data.")
+            else:
+                overview_data = self._fetch_alpha_vantage_overview(company_id, api_key)
+                quote_data = self._fetch_alpha_vantage_global_quote(company_id, api_key)
+                
+                av_package = self._transform_av_data_to_package(company_id, overview_data, quote_data)
+                if av_package:
+                    self.logger.info(f"Successfully retrieved and transformed data from Alpha Vantage for {company_id}")
+                    return {"status": "success", "data": av_package, "message": f"Data retrieved from Alpha Vantage for {company_id}."}
+                else:
+                    self.logger.warning(f"Failed to get sufficient data from Alpha Vantage for {company_id}. Falling back to mocks.")
+        
+        # 4. Fallback to specific mock data
+        if company_id == "MSFT":
+            self.logger.info(f"Returning MSFT-specific mock data for {company_id}")
             return {"status": "success", "data": msft_data_package}
-
         elif company_id == "AAPL":
-            self.logger.info(f"Returning AAPL-specific data for company_id: {company_id}, data_type: {data_type}")
+            self.logger.info(f"Returning AAPL-specific mock data for {company_id}")
             return {"status": "success", "data": aapl_data_package}
-
         elif company_id == "JPM":
-            self.logger.info(f"Returning JPM-specific data for company_id: {company_id}, data_type: {data_type}")
+            self.logger.info(f"Returning JPM-specific mock data for {company_id}")
             return {"status": "success", "data": jpm_data_package}
-
-        # Mock data for TESTCORP (should be checked after MSFT, AAPL, JPM)
         elif company_id == "TESTCORP":
-            self.logger.info(f"Returning mock data for TESTCORP, data_type: {data_type}")
-            testcorp_data = { # Renamed from mock_data to avoid conflict if msft_data_package was not module level
-                "company_info": {"name": "TESTCORP Inc.", "industry_sector": "Technology", "country": "USA"},
-                "financial_data_detailed": {
-                    "income_statement": {"revenue": [1000, 1100, 1250], "net_income": [100, 120, 150], "ebitda": [150, 170, 200]},
-                    "balance_sheet": {"total_assets": [2000, 2100, 2200], "total_liabilities": [800, 850, 900],
-                                      "shareholders_equity": [1200, 1250, 1300], "cash_and_equivalents": [200, 250, 300],
-                                      "short_term_debt": [50,50,50], "long_term_debt": [500,450, 400]},
-                    "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70],
-                                            "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
-                    "key_ratios": {"debt_to_equity_ratio": 0.6923, "net_profit_margin": 0.12, "current_ratio": 2.44, "interest_coverage_ratio": 5.0},
-                    "dcf_assumptions": {
-                        "fcf_projection_years_total": 10,
-                        "initial_high_growth_period_years": 5,
-                        "initial_high_growth_rate": 0.10,
-                        "stable_growth_rate": 0.05,
-                        "discount_rate": 0.09,
-                        "terminal_growth_rate_perpetuity": 0.025
-                    },
-                    "market_data": {"share_price": 65.00, "shares_outstanding": 10000000, "annual_debt_service_placeholder": "60", "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"}
-                },
-                "qualitative_company_info": {"management_assessment": "Experienced", "competitive_advantages": "Strong IP", "revenue_cashflow_stability_notes_placeholder": "Stable", "financial_deterioration_notes_placeholder": "None noted."},
-                "industry_data_context": {"outlook": "Positive"},
-                "economic_data_context": {"overall_outlook": "Stable"},
-                "collateral_and_debt_details": {"loan_to_value_ratio": 0.6, "collateral_type": "Accounts Receivable, Inventory", "other_credit_enhancements": "Standard covenants in place."}
-            }
-            return {"status": "success", "data": testcorp_data}
+            self.logger.info(f"Returning TESTCORP-specific mock data for {company_id}")
+            return {"status": "success", "data": testcorp_data_package} # Now refers to module-level variable
 
-        else: # For any other company_id
-            self.logger.info(f"Returning generic placeholder data for company_id: {company_id}, data_type: {data_type}")
-            generic_data_package = {
-                "company_info": {"name": f"{company_id} (Generic Data)", "ticker": company_id, "industry_sector": "N/A", "country": "N/A"},
+        # 5. Fallback to generic placeholder data
+        self.logger.info(f"Returning generic placeholder data for unknown company_id: {company_id}")
+        generic_data_package = {
+            "company_info": {"name": f"{company_id} (Generic Data)", "ticker": company_id, "industry_sector": "N/A", "country": "N/A"},
+            "financial_data_detailed": {
+                "income_statement": {"revenue": [1000000, 1100000], "net_income": [10000, 12000], "ebitda": [15000, 17000]},
+                "balance_sheet": {"total_assets": [200000, 210000], "total_liabilities": [80000, 85000],
+                                  "shareholders_equity": [120000, 125000], "cash_and_equivalents": [20000, 25000],
+                                  "short_term_debt": [5000,5000], "long_term_debt": [50000,45000]},
+                "cash_flow_statement": {"operating_cash_flow": [18000, 20000], "investing_cash_flow": [-5000, -6000],
+                                        "financing_cash_flow": [-3000, -4000], "free_cash_flow": [13000, 14000]},
+                "key_ratios": {}, # Let FAA calculate these
+                "dcf_assumptions": { # Generic assumptions
+                    "fcf_projection_years_total": 5, "initial_high_growth_period_years": 2,
+                    "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
+                    "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
+                },
+                "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                "annual_debt_service_placeholder": "1000", 
+                                "payment_history_placeholder": "Unknown", 
+                                "interest_capitalization_placeholder": "Unknown"}
+            },
+            "qualitative_company_info": {
+                "management_assessment": "N/A", "competitive_advantages": "N/A",
+                "business_model_strength": "N/A",
+                "revenue_cashflow_stability_notes_placeholder": "Data not available for detailed assessment.",
+                "financial_deterioration_notes_placeholder": "Data not available for detailed assessment."
+            },
+            "industry_data_context": {"outlook": "N/A"},
+            "economic_data_context": {"overall_outlook": "N/A"},
+            "collateral_and_debt_details": {"loan_to_value_ratio": None, "collateral_type": "N/A", "other_credit_enhancements": "N/A"}
+        }
+        return {"status": "success", "data": generic_data_package, "message": f"Provided generic placeholder data for {company_id}."}
                 "financial_data_detailed": {
                     "income_statement": {"revenue": [1000000, 1100000], "net_income": [10000, 12000], "ebitda": [15000, 17000]},
                     "balance_sheet": {"total_assets": [200000, 210000], "total_liabilities": [80000, 85000],
