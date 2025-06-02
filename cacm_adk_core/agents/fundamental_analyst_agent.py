@@ -8,22 +8,22 @@ import logging
 import pandas as pd
 import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union 
-from core.agents.agent_base import AgentBase
-from semantic_kernel import Kernel # Added for type hinting
+from typing import Dict, Any, Optional, Union
+from cacm_adk_core.agents.base_agent import Agent
+from cacm_adk_core.semantic_kernel_adapter import KernelService
+from cacm_adk_core.context.shared_context import SharedContext
+# from semantic_kernel import Kernel # No longer needed directly for type hint in init
 import asyncio # Added import
-import yaml # Added for example usage block
+# import yaml # Not used in agent logic
+# from unittest.mock import patch # Not used in agent logic
 
-# Placeholder for message queue interaction (replace with real implementation later)
-# from core.system.message_queue import MessageQueue
-from unittest.mock import patch # Added for example usage
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') # Handled by orchestrator/base
 # For XAI debug logs, ensure the logger level is set to DEBUG if you want to see them.
 # Example: logging.getLogger().setLevel(logging.DEBUG) in the main application or test setup.
 
-class FundamentalAnalystAgent(AgentBase):
+class FundamentalAnalystAgent(Agent):
     """
     Agent for performing fundamental analysis of companies.
 
@@ -32,28 +32,64 @@ class FundamentalAnalystAgent(AgentBase):
     It relies on DataRetrievalAgent for fetching company data via A2A communication.
     """
 
-    def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
-        super().__init__(config, kernel) 
+    def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            agent_name="FundamentalAnalystAgent",
+            kernel_service=kernel_service,
+            skills_plugin_name="FundamentalAnalysisSkill"
+        )
+        self.config = agent_config if agent_config else {} # Store agent_config
         self.persona = self.config.get('persona', "Financial Analyst")
         self.description = self.config.get('description', "Performs fundamental company analysis.")
-        # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
-        # to set up connections via self.add_peer_agent(peer_instance)
+        # Peer agent management is now handled by the base Agent class via self.get_or_create_agent()
 
-
-    async def execute(self, company_id: str) -> Dict[str, Any]:
+    async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
         """
         Performs fundamental analysis on a given company.
+
+        This involves:
+        1. Retrieving company data via DataRetrievalAgent.
+        2. Calculating key financial ratios.
+        3. Performing DCF valuation (with potential overrides from inputs).
+        4. Calculating Enterprise Value.
+        5. Assessing overall financial health.
+        6. Generating a textual analysis summary using an SK skill (with potential custom guidance from inputs).
+
+        Args:
+            task_description (str): Description of the analysis task.
+            current_step_inputs (Dict[str, Any]): Inputs for this step, including:
+                - "company_id" (str): The unique identifier for the company. Required.
+                - "summary_guidance_prompt_addon" (str, optional): Custom guidance for the
+                  SK skill generating the analysis summary.
+                - "dcf_override_discount_rate" (float, optional): Value to override the
+                  default/data-derived DCF discount rate.
+                - "dcf_override_terminal_growth_rate" (float, optional): Value to override
+                  the default/data-derived DCF terminal growth rate.
+            shared_context (SharedContext): The shared context for the current CACM run.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the status and the analysis results:
+                - {"status": "success", "data": <analysis_package_dict>}
+                - {"status": "error", "message": <error_message_str>}
+                The <analysis_package_dict> includes financial_ratios, dcf_valuation,
+                enterprise_value, financial_health, and analysis_summary.
         """
-        logging.info(f"Executing fundamental analysis for company_id: {company_id}")
-        logging.debug(f"FAA_XAI:EXECUTE_INPUT: company_id='{company_id}'")
+        self.current_run_inputs = current_step_inputs # Store for access in helper methods
+        company_id = self.current_run_inputs.get("company_id")
+        if not company_id:
+            logging.error("FAA_RUN_ERROR: 'company_id' not found in current_step_inputs.")
+            return {"status": "error", "message": "'company_id' is required but was not provided."}
+
+        logging.info(f"Executing fundamental analysis for company_id: {company_id} (Task: {task_description})")
+        logging.debug(f"FAA_XAI:RUN_INPUT: company_id='{company_id}', task_description='{task_description}', inputs='{current_step_inputs}'")
 
         try:
-            company_data = await self.retrieve_company_data(company_id) 
+            company_data = await self.retrieve_company_data(company_id, shared_context)
             if company_data is None:
                 logging.error(f"Failed to retrieve company data for {company_id} via A2A.")
-                return {"error": f"Could not retrieve data for company {company_id}"}
-            
-            logging.debug(f"FAA_XAI:EXECUTE_COMPANY_DATA_KEYS: {list(company_data.keys())}")
+                return {"status": "error", "message": f"Could not retrieve data for company {company_id}"}
+
+            logging.debug(f"FAA_XAI:RUN_COMPANY_DATA_KEYS: {list(company_data.keys())}")
 
 
             financial_ratios = self.calculate_financial_ratios(company_data)
@@ -61,12 +97,12 @@ class FundamentalAnalystAgent(AgentBase):
             comps_valuation = self.calculate_comps_valuation(company_data) # Placeholder
             enterprise_value_result = self.calculate_enterprise_value(company_data)
             financial_health = self.assess_financial_health(financial_ratios)
-            
+
             analysis_summary = await self.generate_analysis_summary(
-                company_id, 
-                financial_ratios, 
-                dcf_valuation_result, 
-                comps_valuation, 
+                company_id,
+                financial_ratios,
+                dcf_valuation_result,
+                comps_valuation,
                 financial_health,
                 enterprise_value_result
             )
@@ -78,36 +114,59 @@ class FundamentalAnalystAgent(AgentBase):
                 "comps_valuation": comps_valuation,
                 "enterprise_value": enterprise_value_result,
                 "financial_health": financial_health,
-                "analysis_summary": analysis_summary,
-                "error": None
+                "analysis_summary": analysis_summary
             }
-            logging.debug(f"FAA_XAI:EXECUTE_OUTPUT: {result_package}")
-            return result_package
+            logging.debug(f"FAA_XAI:RUN_OUTPUT_SUCCESS: {result_package}")
+            return {"status": "success", "data": result_package}
 
         except Exception as e:
             logging.exception(f"Error during fundamental analysis of {company_id}: {e}")
-            return {"error": f"An error occurred during analysis: {e}"}
+            logging.debug(f"FAA_XAI:RUN_OUTPUT_ERROR: Exception {e}")
+            return {"status": "error", "message": f"An error occurred during analysis: {e}"}
 
-    async def retrieve_company_data(self, company_id: str) -> Optional[Dict[str, Any]]:
+    async def retrieve_company_data(self, company_id: str, shared_context: SharedContext) -> Optional[Dict[str, Any]]:
         """
-        Retrieves company data by sending a message to the DataRetrievalAgent.
+        Retrieves comprehensive company data by invoking the DataRetrievalAgent.
+
+        This method uses the agent-to-agent (A2A) communication pattern facilitated
+        by `self.get_or_create_agent()` to request data for the specified `company_id`.
+        It expects the DataRetrievalAgent to return a structured data package.
+
+        Args:
+            company_id (str): The identifier of the company for which to retrieve data.
+            shared_context (SharedContext): The shared context of the current run.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the company data package
+            if successful, otherwise None.
         """
-        if 'DataRetrievalAgent' in self.peer_agents:
-            logging.info(f"Requesting company financials for {company_id} from DataRetrievalAgent.")
-            request_data = {'data_type': 'get_company_financials', 'company_id': company_id}
-            try:
-                response = await self.send_message('DataRetrievalAgent', request_data)
-                logging.debug(f"Data received from DataRetrievalAgent for {company_id}: {response is not None}")
-                if response: 
-                    return response 
-                else:
-                    logging.warning(f"DataRetrievalAgent returned no data for {company_id}.")
-                    return None
-            except Exception as e:
-                logging.exception(f"Error sending message to DataRetrievalAgent for {company_id}: {e}")
+        dra_agent_name = "DataRetrievalAgent" # This should match the name/key used for DRA registration
+        logging.info(f"Attempting to get or create '{dra_agent_name}' to retrieve data for {company_id}.")
+
+        try:
+            # Note: get_or_create_agent now expects agent_name and shared_context
+            dra_agent = await self.get_or_create_agent(dra_agent_name, shared_context)
+            if not dra_agent:
+                logging.error(f"Could not get or create {dra_agent_name}. Cannot retrieve company data for {company_id}.")
                 return None
-        else:
-            logging.error("DataRetrievalAgent not found in peer agents. Cannot retrieve company data.")
+
+            task_description_for_dra = "Retrieve financial data for a company"
+            inputs_for_dra = {"company_id": company_id, "data_type": "get_company_financials"} # Example inputs
+
+            logging.info(f"Requesting company financials for {company_id} from {dra_agent_name}.")
+            response_from_dra = await dra_agent.run(task_description_for_dra, inputs_for_dra, shared_context)
+
+            if response_from_dra and response_from_dra.get("status") == "success":
+                company_data = response_from_dra.get("data")
+                logging.debug(f"Data received from {dra_agent_name} for {company_id}: {company_data is not None}")
+                return company_data
+            else:
+                error_msg = response_from_dra.get('message', 'Unknown error from DRA') if response_from_dra else 'No response from DRA'
+                logging.warning(f"{dra_agent_name} failed to provide data for {company_id}. Status: {response_from_dra.get('status') if response_from_dra else 'N/A'}, Message: {error_msg}")
+                return None
+
+        except Exception as e:
+            logging.exception(f"Error communicating with {dra_agent_name} for {company_id}: {e}")
             return None
 
     def calculate_financial_ratios(self, company_data: Dict[str, Any]) -> Dict[str, float]:
@@ -196,13 +255,29 @@ class FundamentalAnalystAgent(AgentBase):
     async def generate_analysis_summary(self, company_id: str, financial_ratios: Dict[str, float],
                                       dcf_valuation: Optional[float], comps_valuation: Optional[float],
                                       financial_health: str, enterprise_value: Optional[float]) -> str:
-        # ... (existing summary generation logic, SK or fallback) ...
-        # This method's logging is mostly for SK call, fallback summary is straightforward
-        # For XAI, the inputs to this are already logged by `execute` and prior calc methods.
-        # Logging within the SK call path is already present.
-        # Fallback summary construction is direct.
+        """
+        Generates a textual summary of the fundamental analysis using a Semantic Kernel skill.
 
-        if self.kernel and hasattr(self.kernel, 'skills'): # Check for skills attribute
+        It compiles various analytical components (ratios, valuation, health assessment)
+        into a structured input for the "SummarizeAnalysis" SK skill.
+        If `summary_guidance_prompt_addon` is present in `self.current_run_inputs`
+        (passed from the `run` method's inputs), it will be used to customize or
+        replace the default prompt for the SK skill.
+
+        Args:
+            company_id (str): Company identifier.
+            financial_ratios (Dict[str, float]): Calculated financial ratios.
+            dcf_valuation (Optional[float]): DCF valuation result.
+            comps_valuation (Optional[float]): Comparables valuation result (currently placeholder).
+            financial_health (str): Assessed financial health string.
+            enterprise_value (Optional[float]): Calculated enterprise value.
+
+        Returns:
+            str: The generated analysis summary text. Falls back to a basic formatted
+                 string if SK skill execution fails or kernel is not available.
+        """
+        kernel = self.get_kernel()
+        if kernel:
             try:
                 ratios_str_parts = []
                 if financial_ratios:
@@ -213,35 +288,65 @@ class FundamentalAnalystAgent(AgentBase):
                 dcf_summary = f"Value: {dcf_valuation:.2f}" if dcf_valuation is not None else "Not available"
                 comps_summary = f"Value: {comps_valuation:.2f}" if comps_valuation is not None else "Not available"
                 enterprise_value_summary_str = f"Value: {enterprise_value:.2f}" if enterprise_value is not None else "Not available"
-                
-                user_prompt_for_conclusion = self.config.get(
-                    "summarize_analysis_user_prompt", 
-                    "Provide a brief overall conclusion based on the data."
+
+                DEFAULT_FAA_SUMMARY_PROMPT = (
+                    "Provide a comprehensive analysis conclusion based on the provided data. "
+                    "Your summary should cover the following aspects clearly:\n"
+                    "- Start with an overall assessment of the company's financial health (as provided) and briefly justify it.\n"
+                    "- Discuss key insights derived from the financial ratios. Highlight any ratios that are particularly strong, weak, or show significant trends.\n"
+                    "- Explain the implications of the DCF valuation and Enterprise Value, if available. What do these values suggest about the company's intrinsic worth or market perception?\n"
+                    "- If available, comment on the estimated default likelihood and recovery rate.\n"
+                    "- Conclude with a balanced view, mentioning both positive aspects and potential concerns or areas requiring further investigation.\n"
+                    "Ensure the analysis is objective and data-driven."
                 )
 
-                input_vars = {
+                base_prompt = self.config.get("summarize_analysis_user_prompt", DEFAULT_FAA_SUMMARY_PROMPT)
+                summary_guidance_prompt_addon = self.current_run_inputs.get("summary_guidance_prompt_addon")
+
+                if summary_guidance_prompt_addon and isinstance(summary_guidance_prompt_addon, str) and summary_guidance_prompt_addon.strip():
+                    # If addon is provided, use it as the main prompt. This matches notebook's intent.
+                    final_user_prompt = summary_guidance_prompt_addon
+                    logging.info("Using summary guidance from 'summary_guidance_prompt_addon' input for SK.")
+                else:
+                    final_user_prompt = base_prompt
+                    logging.info("Using default/config summary prompt for SK.")
+
+                input_vars = { # SK arguments are typically flat key-value pairs
                     "company_id": company_id,
                     "financial_health": financial_health,
                     "ratios_summary": ratios_summary_str,
                     "dcf_valuation_summary": dcf_summary,
                     "comps_valuation_summary": comps_summary,
-                    "enterprise_value_summary": enterprise_value_summary_str, 
-                    "user_provided_key_insights_or_conclusion_prompt": user_prompt_for_conclusion
+                    "enterprise_value_summary": enterprise_value_summary_str,
+                    "user_provided_key_insights_or_conclusion_prompt": final_user_prompt
                 }
                 
-                logging.info(f"Attempting to generate summary for {company_id} using Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis'.")
+                skill_name = "SummarizeAnalysis"
+                logging.info(f"Attempting to generate summary for {company_id} using Semantic Kernel skill '{self.skills_plugin_name}.{skill_name}'.")
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_INPUT: {input_vars}")
-                summary = await self.run_semantic_kernel_skill("FundamentalAnalysisSkill", "SummarizeAnalysis", input_vars)
+
+                # Use the invoke_skill method from the base Agent class or directly use kernel.invoke
+                # Assuming invoke_skill handles finding the function and invoking
+                # result = await self.invoke_skill(skill_name, input_vars)
+                # If invoke_skill is not available, or for more direct control:
+                if not kernel.plugins or self.skills_plugin_name not in kernel.plugins or skill_name not in kernel.plugins[self.skills_plugin_name]:
+                    logging.error(f"Skill '{self.skills_plugin_name}.{skill_name}' not found in kernel plugins.")
+                    raise ValueError(f"Skill '{self.skills_plugin_name}.{skill_name}' not found.")
+
+                sk_function = kernel.plugins[self.skills_plugin_name][skill_name]
+                result = await kernel.invoke(sk_function, **input_vars) # Pass input_vars as keyword arguments
+                summary = str(result)
+
                 logging.debug(f"FAA_XAI:GEN_SUMMARY_SK_OUTPUT: '{summary}'")
                 logging.info(f"Successfully generated summary for {company_id} using SK.")
                 return summary
-            except AttributeError as e: 
+            except AttributeError as e:
                 logging.warning(f"Semantic Kernel or skill method not available, or attribute error: {e}. Falling back to string formatting for summary.")
-            except ValueError as e: 
-                logging.warning(f"Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis' execution failed: {e}. Falling back to string formatting.")
+            except ValueError as e:
+                logging.warning(f"Semantic Kernel skill '{self.skills_plugin_name}.{skill_name}' execution failed: {e}. Falling back to string formatting.")
             except Exception as e:
                 logging.error(f"An unexpected error occurred while using Semantic Kernel for summary: {e}. Falling back to string formatting.")
-        
+
         logging.warning(f"Generating summary for {company_id} using fallback string formatting.")
         summary = f"Fundamental Analysis for {company_id}:\n\n"
         if financial_ratios:
@@ -299,11 +404,22 @@ class FundamentalAnalystAgent(AgentBase):
         pass
 
 
-        Calculates the Discounted Cash Flow (DCF) valuation of the company using a two-stage FCF projection model.
+        Calculates the Discounted Cash Flow (DCF) valuation of the company.
+
+        Uses a two-stage Free Cash Flow (FCF) projection model.
+        It can utilize override values for `discount_rate` and `terminal_growth_rate_perpetuity`
+        if they are provided in `self.current_run_inputs` (passed from the `run` method's inputs)
+        and are valid (e.g., rate > 0). Otherwise, it uses values from the
+        `dcf_assumptions` section of the input `company_data`.
 
         Args:
             company_data (Dict[str, Any]): The comprehensive data package for the company,
-                                         expected to contain 'financial_data_detailed'.
+                                         expected to contain 'financial_data_detailed'
+                                         which includes 'cash_flow_statement' and 'dcf_assumptions'.
+
+        Returns:
+            Optional[float]: The calculated DCF valuation, or None if critical data is missing
+                             or assumptions are invalid (e.g., discount rate <= terminal growth rate).
         """
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
         logging.debug(f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
@@ -323,10 +439,20 @@ class FundamentalAnalystAgent(AgentBase):
 
             dcf_assumptions = financial_details.get('dcf_assumptions', {})
             
-            # Core rates from existing assumptions
+            # Get override values from current_run_inputs
+            override_discount_rate = self.current_run_inputs.get("dcf_override_discount_rate")
+            override_terminal_growth_rate = self.current_run_inputs.get("dcf_override_terminal_growth_rate")
+
+            # Core rates from existing assumptions or overrides
             discount_rate = dcf_assumptions.get('discount_rate')
-            # Terminal growth rate for perpetuity calculation (after explicit projection period)
+            if override_discount_rate is not None and isinstance(override_discount_rate, float) and override_discount_rate > 0:
+                discount_rate = override_discount_rate
+                logging.info(f"FAA_XAI:DCF_OVERRIDE: Using override discount rate: {discount_rate}")
+
             terminal_growth_rate_perpetuity = dcf_assumptions.get('terminal_growth_rate') 
+            if override_terminal_growth_rate is not None and isinstance(override_terminal_growth_rate, float) and override_terminal_growth_rate >= 0: # Allow 0 for terminal growth
+                terminal_growth_rate_perpetuity = override_terminal_growth_rate
+                logging.info(f"FAA_XAI:DCF_OVERRIDE: Using override terminal growth rate: {terminal_growth_rate_perpetuity}")
             
             # New parameters for two-stage growth model
             fcf_projection_years_total = int(dcf_assumptions.get('fcf_projection_years_total', 10)) # Default 10 years
@@ -459,97 +585,12 @@ class FundamentalAnalystAgent(AgentBase):
         # ... (existing code, note the type hint vs usage in generate_analysis_summary) ...
         pass
 
-    def send_message(self, message: Dict[str, Any]):
-        # ... (existing code) ...
-        pass
+    # Obsolete send_message - peer communication is via agent.run()
+    # def send_message(self, message: Dict[str, Any]):
+    #     # ... (existing code) ...
+    #     pass
 
 
 # Example Usage (for testing):
-if __name__ == '__main__':
-    # To see XAI debug logs for the example, uncomment the next line:
-    # logging.getLogger().setLevel(logging.DEBUG) 
-    
-    agent_specific_config = {
-        "persona": "Test Fundamental Analyst",
-        "description": "Test instance for fundamental analysis.",
-        "summarize_analysis_user_prompt": "Provide a detailed conclusion based on the findings." 
-    }
-    
-    mock_data_package_template = {
-        "company_info": {"name": "TestCompany Corp", "industry_sector": "Tech", "country": "USA"},
-        "financial_data_detailed": {
-            "income_statement": {"revenue": [1000, 1100, 1250], "net_income": [100, 120, 150], "ebitda": [150, 170, 200]},
-            "balance_sheet": {"total_assets": [2000, 2100, 2200], "total_liabilities": [800, 850, 900], 
-                              "shareholders_equity": [1200, 1250, 1300], "cash_and_equivalents": [200, 250, 300], 
-                              "short_term_debt": [50,50,50], "long_term_debt": [500,450, 400]},
-            "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70], 
-                                    "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
-            "key_ratios": {"debt_to_equity_ratio": 0.58, "net_profit_margin": 0.20, "current_ratio": 2.95, "interest_coverage_ratio": 13.6},
-            "dcf_assumptions": {
-                "fcf_projection_years_total": 10,
-                "initial_high_growth_period_years": 5,
-                "initial_high_growth_rate": 0.10,
-                "stable_growth_rate": 0.05,
-                "discount_rate": 0.09,
-                "terminal_growth_rate_perpetuity": 0.025 # Matches DataRetrievalAgent
-            },
-            "market_data": {"share_price": 65.00, "shares_outstanding": 10000000} 
-        },
-        "qualitative_company_info": {"management_assessment": "Experienced", "competitive_advantages": "Strong IP"},
-        "industry_data_context": {"outlook": "Positive"},
-        "economic_data_context": {"overall_outlook": "Stable"},
-        "collateral_and_debt_details": {"loan_to_value_ratio": 0.6} 
-    }
-
-    async def mock_send_message(target_agent_name, message):
-        # logging.info(f"MOCKED send_message to {target_agent_name} with {message}") # Already logged by AgentBase
-        if target_agent_name == 'DataRetrievalAgent' and message.get('data_type') == 'get_company_financials':
-            company_id = message.get('company_id')
-            if company_id == "ABC_TEST": # Changed to match example in prev subtask for DRA
-                data = json.loads(json.dumps(mock_data_package_template)) 
-                data["company_info"]["name"] = "ABC_TEST Corp"
-                return data
-            elif company_id == "FAIL_TEST": 
-                return None
-        return None
-
-    class MockSKFunction:
-        async def invoke(self, variables=None):
-            class MockSKResult:
-                def __init__(self, value_str): self._value = value_str
-                def __str__(self): return self._value
-            return MockSKResult(f"SK Summary for {variables['company_id']}: Health {variables['financial_health']}. EV: {variables['enterprise_value_summary']}.")
-
-    class MockSKSkillsCollection:
-        def get_function(self, skill_collection_name, skill_name):
-            if skill_collection_name == "FundamentalAnalysisSkill" and skill_name == "SummarizeAnalysis":
-                return MockSKFunction()
-            return None
-        
-    class MockKernel:
-        def __init__(self): self.skills = MockSKSkillsCollection()
-        async def run_async(self, sk_function, input_vars=None, **kwargs):
-            if sk_function: return await sk_function.invoke(variables=input_vars)
-            return "Mock kernel run_async failed: No function"
-
-    async def run_tests():
-        # logging.getLogger().setLevel(logging.DEBUG) # Example: Uncomment to see XAI debug logs
-
-        mock_kernel_instance = MockKernel()
-        agent_with_kernel_and_mock_a2a = FundamentalAnalystAgent(config=agent_specific_config, kernel=mock_kernel_instance)
-        
-        with patch.object(agent_with_kernel_and_mock_a2a, 'send_message', new=mock_send_message):
-            print("\n--- Test with SK Kernel and Mocked A2A (ABC_TEST) ---")
-            analysis_result_sk_abc = await agent_with_kernel_and_mock_a2a.execute("ABC_TEST")
-            print(f"Analysis Summary (SK): {analysis_result_sk_abc.get('analysis_summary', 'No summary available.')}")
-            print(f"Calculated EV: {analysis_result_sk_abc.get('enterprise_value')}") 
-            assert "EV: Value: " in analysis_result_sk_abc.get("analysis_summary", "") 
-            assert analysis_result_sk_abc.get('enterprise_value') is not None 
-
-            print("\n--- Test with SK Kernel and Mocked A2A (FAIL_TEST for data retrieval) ---")
-            analysis_result_sk_fail = await agent_with_kernel_and_mock_a2a.execute("FAIL_TEST")
-            print(f"Analysis Result (FAIL_TEST): {analysis_result_sk_fail}") 
-            assert "Could not retrieve data for company FAIL_TEST" in analysis_result_sk_fail.get("error", "")
-
-    if __name__ == '__main__':
-        asyncio.run(run_tests())
+# The if __name__ == '__main__': block should be removed as agents are run by the orchestrator.
+# Test code would typically reside in a separate test file/suite.

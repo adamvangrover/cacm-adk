@@ -1,0 +1,11 @@
+{
+    "client_data_url": "http://localhost:8001/clients",
+    "market_data_url": "http://localhost:8002/market",
+    "company_financials_url": "http://localhost:8003/companies",
+    "industry_reports_url": "http://localhost:8004/reports",
+    "bank_product_data_url": "http://localhost:8005/products",
+    "knowledge_graph_url": "http://localhost:8006/graph",
+    "financial_modeling_url": "http://localhost:8007/model",
+    "reporting_url": "http://localhost:8008/reports",
+    "nlp_url": "http://localhost:8009/nlp"
+}

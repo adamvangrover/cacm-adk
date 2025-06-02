@@ -16,6 +16,23 @@ class DataIngestionAgent(Agent):
         super().__init__(agent_name="DataIngestionAgent", kernel_service=kernel_service)
 
     def _read_file_content_or_default(self, file_path: Optional[str], default_value: Any, data_type: str = "text") -> Any:
+        """
+        Conceptually reads content from a file path or returns a default value.
+
+        In its current implementation, this method simulates file reading by returning
+        hardcoded sample data based on the `data_type` if `file_path` is provided.
+        If `file_path` is None or empty, it returns `default_value`.
+        This method is intended to be replaced with actual file I/O in a production setting.
+
+        Args:
+            file_path (Optional[str]): The conceptual path to the file.
+            default_value (Any): The value to return if file_path is not provided.
+            data_type (str): A string indicating the type of data to simulate reading
+                             (e.g., "risk_text", "mock_financials_json").
+
+        Returns:
+            Any: The conceptual file content or the default_value.
+        """
         if file_path:
             self.logger.info(f"Conceptually reading {data_type} data from file: {file_path}")
             # In a real scenario, actual file reading and parsing would happen here.
@@ -37,6 +54,41 @@ class DataIngestionAgent(Agent):
         return default_value
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
+        """
+        Ingests various types of data into SharedContext based on inputs.
+
+        This agent processes several optional inputs from `current_step_inputs`.
+        For inputs that specify file paths (e.g., `riskFactorsFilePath`), it uses
+        the `_read_file_content_or_default` method to conceptually load data.
+        Direct data inputs (e.g., `riskFactorsText`) can also be provided and
+        are often used as fallbacks if file paths are not given.
+
+        The ingested data is stored in `SharedContext` under specific keys for
+        downstream agents to use.
+
+        Args:
+            task_description (str): Description of the ingestion task.
+            current_step_inputs (Dict[str, Any]): Optional inputs, including:
+                - "companyName" (str): Company name.
+                - "companyTicker" (str): Company ticker.
+                - "riskFactorsFilePath" (str): Conceptual path to risk factors text file.
+                - "riskFactorsText" (str): Direct risk factors text.
+                - "mockFinancialsFilePath" (str): Conceptual path to mock financials JSON.
+                - "mockStructuredFinancialsForLLMSummary" (dict): Direct mock financials.
+                  (Used for 'business_overview_text' in ReportGenerationAgent via SharedContext key 'structured_financials_for_summary')
+                - "fullFinancialStatementFilePath" (str): Conceptual path to expanded financials.
+                - "financialStatementData" (dict): Direct basic or expanded financials.
+            shared_context (SharedContext): The context where ingested data will be stored.
+
+        Returns:
+            Dict[str, Any]: A dictionary summarizing the ingestion operation:
+                - {"ingestion_summary": {
+                      "status": "success",
+                      "agent": self.agent_name,
+                      "message": "Data ingestion processed...",
+                      "attempted_to_store_keys": List[str]
+                  }}
+        """
         self.logger.info(f"'{self.agent_name}' received task: {task_description} with inputs: {current_step_inputs}")
         self.logger.info(f"Operating with SharedContext ID: {shared_context.get_session_id()} (CACM ID: {shared_context.get_cacm_id()})")
 
