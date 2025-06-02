@@ -1,57 +1,78 @@
-import json
-
-current_catalog_json_string = """
 {
   "computeCapabilities": [
     {
       "id": "model:FinancialMetricsScorer_v1",
       "name": "Financial Metrics Scorer",
       "description": "Calculates a score component from financial data.",
-      "inputs": {"financial_data": "object"},
-      "outputs": {"component_score": "number"}
+      "inputs": {
+        "financial_data": "object"
+      },
+      "outputs": {
+        "component_score": "number"
+      }
     },
     {
       "id": "model:QualitativeMetricsScorer_v1",
       "name": "Qualitative Metrics Scorer",
       "description": "Calculates a score component from qualitative data.",
-      "inputs": {"qualitative_data": "object"},
-      "outputs": {"component_score": "number"}
+      "inputs": {
+        "qualitative_data": "object"
+      },
+      "outputs": {
+        "component_score": "number"
+      }
     },
     {
       "id": "logic:WeightedAverageAdjuster_v1",
       "name": "Weighted Average Adjuster",
       "description": "Combines component scores using weights and applies adjustments.",
       "inputs": {
-        "score1": "number", "weight1": "number", 
-        "score2": "number", 
+        "score1": "number",
+        "weight1": "number",
+        "score2": "number",
         "base_score_params": "object"
       },
-      "outputs": {"final_score": "number", "calculated_segment": "string"}
+      "outputs": {
+        "final_score": "number",
+        "calculated_segment": "string"
+      }
     },
     {
       "id": "connector:LoadData_v1",
       "name": "Data Loader",
       "description": "Loads data from a specified source configuration.",
-      "inputs": {"source_config": "object"},
-      "outputs": {"data": "object"}
+      "inputs": {
+        "source_config": "object"
+      },
+      "outputs": {
+        "data": "object"
+      }
     },
     {
       "id": "logic:AggregateFields_v2",
       "name": "Field Aggregator",
       "description": "Aggregates fields from multiple data inputs based on a map.",
       "inputs": {
-        "data1": "object", "data2": "object",
+        "data1": "object",
+        "data2": "object",
         "field_map_config": "string",
         "deduplication_rule": "string"
       },
-      "outputs": {"aggregated_result": "object"}
+      "outputs": {
+        "aggregated_result": "object"
+      }
     },
     {
       "id": "compute:CalculateRatio",
       "name": "Ratio Calculator",
       "description": "Calculates a ratio from numerator and denominator.",
-      "inputs": {"numerator": "number", "denominator": "number"},
-      "outputs": {"result": "number"}
+      "inputs": {
+        "numerator": "number",
+        "denominator": "number"
+      },
+      "outputs": {
+        "result": "number"
+      }
     },
     {
       "id": "cc:CalculateRatio_v1",
@@ -60,11 +81,23 @@ current_catalog_json_string = """
       "skill_plugin_name": "BasicCalculations",
       "skill_function_name": "calculate_ratio",
       "inputs": [
-        {"name": "numerator", "type": "float", "description": "The numerator value."},
-        {"name": "denominator", "type": "float", "description": "The denominator value."}
+        {
+          "name": "numerator",
+          "type": "float",
+          "description": "The numerator value."
+        },
+        {
+          "name": "denominator",
+          "type": "float",
+          "description": "The denominator value."
+        }
       ],
       "outputs": [
-        {"name": "result", "type": "float", "description": "The calculated ratio (numerator/denominator)."}
+        {
+          "name": "result",
+          "type": "float",
+          "description": "The calculated ratio (numerator/denominator)."
+        }
       ]
     },
     {
@@ -74,12 +107,29 @@ current_catalog_json_string = """
       "skill_plugin_name": "BasicCalculations",
       "skill_function_name": "simple_scorer",
       "inputs": [
-        {"name": "financial_metric", "type": "float", "description": "The metric value to score."},
-        {"name": "threshold", "type": "float", "description": "The threshold value to compare against."},
-        {"name": "operator", "type": "string", "description": "Comparison operator (e.g., '>', '<', '=='). Defaults to '>' if not provided.", "optional": true}
+        {
+          "name": "financial_metric",
+          "type": "float",
+          "description": "The metric value to score."
+        },
+        {
+          "name": "threshold",
+          "type": "float",
+          "description": "The threshold value to compare against."
+        },
+        {
+          "name": "operator",
+          "type": "string",
+          "description": "Comparison operator (e.g., '>', '<', '=='). Defaults to '>' if not provided.",
+          "optional": true
+        }
       ],
       "outputs": [
-        {"name": "assessment", "type": "string", "description": "String indicating the result of the comparison (e.g., 'Above Threshold')."}
+        {
+          "name": "assessment",
+          "type": "string",
+          "description": "String indicating the result of the comparison (e.g., 'Above Threshold')."
+        }
       ]
     },
     {
@@ -87,13 +137,22 @@ current_catalog_json_string = """
       "name": "Financial Analysis Agent",
       "description": "Agent that calculates ratios and generates textual summaries using skills and SharedContext.",
       "agent_type": "AnalysisAgent",
-      "skill_plugin_name": "FinancialAnalysis", 
-      "skill_function_name": "calculate_basic_ratios", 
-      "inputs": [ 
-          {"name": "roundingPrecision", "type": "integer", "optional": true, "description": "Precision for rounding calculated ratios."}
+      "skill_plugin_name": "FinancialAnalysis",
+      "skill_function_name": "calculate_basic_ratios",
+      "inputs": [
+        {
+          "name": "roundingPrecision",
+          "type": "integer",
+          "optional": true,
+          "description": "Precision for rounding calculated ratios."
+        }
       ],
       "outputs": [
-          {"name": "analysis_summary_output", "type": "object", "description": "Summary of analysis performed, including status, messages, and results from skills."}
+        {
+          "name": "analysis_summary_output",
+          "type": "object",
+          "description": "Summary of analysis performed, including status, messages, and results from skills."
+        }
       ]
     },
     {
@@ -102,29 +161,94 @@ current_catalog_json_string = """
       "description": "Agent responsible for ingesting initial data from various sources (direct inputs or conceptual file paths) into SharedContext for subsequent agents to use.",
       "agent_type": "DataIngestionAgent",
       "inputs": [
-          {"name": "companyName", "type": "string", "optional": true, "description": "Company name. Stored in SharedContext if provided."},
-          {"name": "companyTicker", "type": "string", "optional": true, "description": "Company stock ticker. Stored in SharedContext if provided."},
-          {"name": "financialStatementData", "type": "object", "optional": true, "description": "Direct input for financial data. Used as a fallback if 'fullFinancialStatementFilePath' is not provided, or for basic ratio compatibility. The agent may attempt to derive an expanded structure from this if possible."},
-          {"name": "mockStructuredFinancialsForLLMSummary", "type": "object", "optional": true, "description": "Direct input for mock structured financials, typically for LLM summary generation. Used as fallback if 'mockFinancialsFilePath' is not provided."},
-          {"name": "riskFactorsText", "type": "string", "optional": true, "description": "Direct input for risk factors text. Used as fallback if 'riskFactorsFilePath' is not provided."},
-          {"name": "riskFactorsFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing risk factors text. If provided, its content is prioritized over 'riskFactorsText'."},
-          {"name": "mockFinancialsFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing mock structured financials. If provided, its content is prioritized over 'mockStructuredFinancialsForLLMSummary'."},
-          {"name": "fullFinancialStatementFilePath", "type": "string", "optional": true, "description": "Conceptual path to a file containing full/expanded financial statement data. If provided, its content is prioritized over 'financialStatementData' for populating 'financial_data_for_ratios_expanded'."},
-          {"name": "documentURI", "type": "string", "optional": true, "description": "A URI for a primary document. Currently not processed by the agent; intended for future extension."},
-          {"name": "documentType", "type": "string", "optional": true, "description": "Type of the primary document if URI is provided. Currently not processed by the agent; intended for future extension."}
+        {
+          "name": "companyName",
+          "type": "string",
+          "optional": true,
+          "description": "Company name. Stored in SharedContext if provided."
+        },
+        {
+          "name": "companyTicker",
+          "type": "string",
+          "optional": true,
+          "description": "Company stock ticker. Stored in SharedContext if provided."
+        },
+        {
+          "name": "financialStatementData",
+          "type": "object",
+          "optional": true,
+          "description": "Direct input for financial data. Used as a fallback if 'fullFinancialStatementFilePath' is not provided, or for basic ratio compatibility. The agent may attempt to derive an expanded structure from this if possible."
+        },
+        {
+          "name": "mockStructuredFinancialsForLLMSummary",
+          "type": "object",
+          "optional": true,
+          "description": "Direct input for mock structured financials, typically for LLM summary generation. Used as fallback if 'mockFinancialsFilePath' is not provided."
+        },
+        {
+          "name": "riskFactorsText",
+          "type": "string",
+          "optional": true,
+          "description": "Direct input for risk factors text. Used as fallback if 'riskFactorsFilePath' is not provided."
+        },
+        {
+          "name": "riskFactorsFilePath",
+          "type": "string",
+          "optional": true,
+          "description": "Conceptual path to a file containing risk factors text. If provided, its content is prioritized over 'riskFactorsText'."
+        },
+        {
+          "name": "mockFinancialsFilePath",
+          "type": "string",
+          "optional": true,
+          "description": "Conceptual path to a file containing mock structured financials. If provided, its content is prioritized over 'mockStructuredFinancialsForLLMSummary'."
+        },
+        {
+          "name": "fullFinancialStatementFilePath",
+          "type": "string",
+          "optional": true,
+          "description": "Conceptual path to a file containing full/expanded financial statement data. If provided, its content is prioritized over 'financialStatementData' for populating 'financial_data_for_ratios_expanded'."
+        },
+        {
+          "name": "documentURI",
+          "type": "string",
+          "optional": true,
+          "description": "A URI for a primary document. Currently not processed by the agent; intended for future extension."
+        },
+        {
+          "name": "documentType",
+          "type": "string",
+          "optional": true,
+          "description": "Type of the primary document if URI is provided. Currently not processed by the agent; intended for future extension."
+        }
       ],
       "outputs": [
-          {
-            "name": "ingestion_summary", 
-            "type": "object", 
-            "description": "Summary of the data ingestion process, including status and a list of keys for data items the agent attempted to store in SharedContext.",
-            "properties": {
-                "status": {"type": "string", "description": "Indicates the status of the ingestion (e.g., 'success')."},
-                "agent": {"type": "string", "description": "Name of the agent performing the ingestion."},
-                "message": {"type": "string", "description": "A message detailing the outcome or process."},
-                "attempted_to_store_keys": {"type": "array", "items": {"type": "string"}, "description": "List of keys the agent attempted to store in SharedContext."}
+        {
+          "name": "ingestion_summary",
+          "type": "object",
+          "description": "Summary of the data ingestion process, including status and a list of keys for data items the agent attempted to store in SharedContext.",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Indicates the status of the ingestion (e.g., 'success')."
+            },
+            "agent": {
+              "type": "string",
+              "description": "Name of the agent performing the ingestion."
+            },
+            "message": {
+              "type": "string",
+              "description": "A message detailing the outcome or process."
+            },
+            "attempted_to_store_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of keys the agent attempted to store in SharedContext."
             }
           }
+        }
       ]
     },
     {
@@ -133,11 +257,23 @@ current_catalog_json_string = """
       "description": "Agent responsible for assembling the final report from SharedContext.",
       "agent_type": "ReportGenerationAgent",
       "inputs": [
-        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."}
+        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."},
+        {"name": "fundamental_analysis_data_ref", "type": "object", "optional": true, "description": "Output from a fundamental analysis step. Orchestrator wraps this in 'value'."},
+        {"name": "snc_analysis_data_ref", "type": "object", "optional": true, "description": "Output from an SNC analysis step. Orchestrator wraps this in 'value'."},
+        {"name": "catalyst_data_ref", "type": "object", "optional": true, "description": "Output from a Catalyst agent step. Orchestrator wraps this in 'value'."},
+        {"name": "output_dir", "type": "string", "optional": true, "description": "Directory where the report file should be conceptually saved. Passed from CACM input."}
       ],
       "outputs": [
-          {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."},
-          {"name": "report_file_path", "type": "string", "description": "Conceptual path to the generated report file."}
+        {
+          "name": "report_package",
+          "type": "object",
+          "description": "A package containing the report content and its conceptual file path.",
+          "properties": {
+            "content": {"type": "string", "description": "The report content."},
+            "file_path": {"type": "string", "description": "The conceptual file path of the report."},
+            "status_message": {"type": "string", "description": "Status message from report generation."}
+          }
+        }
       ]
     },
     {
@@ -196,8 +332,17 @@ current_catalog_json_string = """
           "type": "object",
           "description": "The SNC analysis results, including the rating and rationale.",
           "properties": {
-            "rating": {"type": ["string", "null"], "description": "The assigned SNC rating (e.g., Pass, Substandard) or null if not determined."},
-            "rationale": {"type": "string", "description": "The justification for the assigned SNC rating."}
+            "rating": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The assigned SNC rating (e.g., Pass, Substandard) or null if not determined."
+            },
+            "rationale": {
+              "type": "string",
+              "description": "The justification for the assigned SNC rating."
+            }
           }
         }
       ]
@@ -276,55 +421,54 @@ current_catalog_json_string = """
       ],
       "outputs": [
         {
-          "name": "catalyst_output", 
+          "name": "catalyst_output",
           "type": "object",
           "description": "The output from the CatalystAgent, typically including identified opportunities, deal structures, or reports."
+        }
+      ]
+    },
+    {
+      "id": "urn:adk:capability:knowledge_graph_query_agent:v1",
+      "name": "Knowledge Graph Query Agent",
+      "description": "Executes a SPARQL query against a specified local Knowledge Graph (RDF/TTL) file and returns the results.",
+      "agent_type": "KnowledgeGraphAgent",
+      "inputs": [
+        {
+          "name": "sparql_query",
+          "type": "string",
+          "description": "The SPARQL query to be executed."
+        },
+        {
+          "name": "kg_file_path",
+          "type": "string",
+          "optional": true,
+          "description": "Path to the local Knowledge Graph file (e.g., .ttl, .rdf). Defaults to 'knowledge_graph_instantiations/kb_core_instances.ttl' relative to project root if not provided."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "query_results_package",
+          "type": "object",
+          "description": "The results of the SPARQL query execution.",
+          "properties": {
+            "query_executed": {
+              "type": "string"
+            },
+            "kg_file_used": {
+              "type": "string"
+            },
+            "results_count": {
+              "type": "integer"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
         }
       ]
     }
   ]
 }
-"""
-
-data = json.loads(current_catalog_json_string)
-
-new_kg_capability = {
-  "id": "urn:adk:capability:knowledge_graph_query_agent:v1",
-  "name": "Knowledge Graph Query Agent",
-  "description": "Executes a SPARQL query against a specified local Knowledge Graph (RDF/TTL) file and returns the results.",
-  "agent_type": "KnowledgeGraphAgent",
-  "inputs": [
-    {
-      "name": "sparql_query",
-      "type": "string",
-      "description": "The SPARQL query to be executed."
-    },
-    {
-      "name": "kg_file_path",
-      "type": "string",
-      "optional": true,
-      "description": "Path to the local Knowledge Graph file (e.g., .ttl, .rdf). Defaults to 'knowledge_graph_instantiations/kb_core_instances.ttl' relative to project root if not provided."
-    }
-  ],
-  "outputs": [
-    {
-      "name": "query_results_package",
-      "type": "object",
-      "description": "The results of the SPARQL query execution.",
-      "properties": {
-        "query_executed": {"type": "string"},
-        "kg_file_used": {"type": "string"},
-        "results_count": {"type": "integer"},
-        "results": {
-          "type": "array",
-          "items": {"type": "object"}
-        }
-      }
-    }
-  ]
-}
-
-data["computeCapabilities"].append(new_kg_capability)
-
-# Output the modified JSON with an indent of 2 for pretty printing
-print(json.dumps(data, indent=2))

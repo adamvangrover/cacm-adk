@@ -112,7 +112,8 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
                     "description": "Generate the final credit report.",
                     "computeCapabilityRef": "urn:adk:capability:standard_report_generator:v1",
                     "inputBindings": { 
-                         "report_title_detail": "cacm.inputs.reportTitleDetailInput"
+                         "report_title_detail": "cacm.inputs.reportTitleDetailInput",
+                         "fundamental_analysis_data_ref": "cacm.outputs.final_analysis_output"
                     },
                     "outputBindings": {
                         "generated_report_text": "cacm.outputs.final_credit_report_text",
@@ -143,11 +144,11 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         ratios_data_from_output = outputs["final_analysis_output"]["value"]
         self.assertIn("calculated_ratios", ratios_data_from_output)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["current_ratio"], 3.2) 
-        self.assertEqual(ratios_data_from_output["calculated_ratios"]["debt_to_equity_ratio"], 0.474) 
+        self.assertEqual(ratios_data_from_output["calculated_ratios"]["debt_to_equity_ratio"], 0.47)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["gross_profit_margin"], 40.0)
-        self.assertEqual(ratios_data_from_output["calculated_ratios"]["net_profit_margin"], 8.333)
-        self.assertEqual(ratios_data_from_output["calculated_ratios"]["return_on_assets_ROA"], 13.889)
-        self.assertEqual(ratios_data_from_output["calculated_ratios"]["return_on_equity_ROE"], 26.316)
+        self.assertEqual(ratios_data_from_output["calculated_ratios"]["net_profit_margin"], 8.33)
+        self.assertEqual(ratios_data_from_output["calculated_ratios"]["return_on_assets_ROA"], 13.89)
+        self.assertEqual(ratios_data_from_output["calculated_ratios"]["return_on_equity_ROE"], 26.32)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["debt_ratio"], 0.25)
 
         self.assertIn("final_credit_report_text", outputs, "Final credit report text key missing in outputs.")
@@ -158,11 +159,11 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertIn("**Company Name:** AlphaTech Innovations", report_text_value)
         self.assertIn("**Ticker:** ATI", report_text_value)
         self.assertIn("- **Current Ratio:** 3.2", report_text_value) 
-        self.assertIn("- **Debt To Equity Ratio:** 0.474", report_text_value) 
+        self.assertIn("- **Debt To Equity Ratio:** 0.47", report_text_value)
         self.assertIn("- **Gross Profit Margin:** 40.0", report_text_value)
-        self.assertIn("- **Net Profit Margin:** 8.333", report_text_value)
-        self.assertIn("- **Return On Assets Roa:** 13.889", report_text_value)
-        self.assertIn("- **Return On Equity Roe:** 26.316", report_text_value)
+        self.assertIn("- **Net Profit Margin:** 8.33", report_text_value)
+        self.assertIn("- **Return On Assets Roa:** 13.89", report_text_value)
+        self.assertIn("- **Return On Equity Roe:** 26.32", report_text_value)
         self.assertIn("- **Debt Ratio:** 0.25", report_text_value)
         
         self.assertIn("[LLM Placeholder: Financial Performance Summary. Inputs: Y1 Revenue 2800000 USD", report_text_value)
