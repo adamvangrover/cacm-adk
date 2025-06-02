@@ -44,7 +44,7 @@
       "description": "Ingest MSFT-specific text data (Business Overview, Risk Factors) and Catalyst parameters into SharedContext.",
       "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
       "inputBindings": {
-        "companyName": {"value": "Microsoft Corp."},
+        "companyName": {"value": "Microsoft Corp."}, 
         "companyTicker": {"value": "MSFT"},
         "riskFactorsText": "cacm.inputs.msft_risk_factors_text",
         "mockStructuredFinancialsForLLMSummary": "cacm.inputs.msft_business_overview_text",
@@ -80,8 +80,8 @@
       "stepId": "step4_catalyst_insights",
       "description": "Generate strategic insights for MSFT using CatalystWrapperAgent.",
       "computeCapabilityRef": "urn:adk:capability:catalyst_wrapper_agent:v1",
-      "inputBindings": {
-        "client_id": "cacm.inputs.catalyst_input_params.value.client_id",
+      "inputBindings": { 
+        "client_id": "cacm.inputs.catalyst_input_params.value.client_id", 
         "company_id": "cacm.inputs.catalyst_input_params.value.company_id",
         "industry": "cacm.inputs.catalyst_input_params.value.industry"
       },
@@ -95,7 +95,7 @@
       "computeCapabilityRef": "urn:adk:capability:standard_report_generator:v1",
       "inputBindings": {
         "report_title_detail": "cacm.inputs.report_generation_title_detail",
-        "fundamental_analysis_data_ref": "cacm.outputs.raw_fundamental_analysis",
+        "fundamental_analysis_data_ref": "cacm.outputs.raw_fundamental_analysis", 
         "snc_analysis_data_ref": "cacm.outputs.raw_snc_analysis",
         "catalyst_data_ref": "cacm.outputs.raw_catalyst_output"
       },
