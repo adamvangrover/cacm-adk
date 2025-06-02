@@ -21,6 +21,20 @@
         <p id="llm-response">Click a button to see a prompt here.</p>
     </div>
 
+    <div class="tab-interface-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="doordashReportTab">DoorDash Report</button>
+            <button class="tab-button" data-tab="notebookTab">Interactive Credit Report Generator</button>
+        </div>
+
+        <div class="tab-content-area">
+            <div id="doordashReportTab" class="tab-content active"></div>
+            <div id="notebookTab" class="tab-content">
+                <iframe src="{{ url_for('static', filename='notebook_embeds/interactive_credit_report.html') }}" width="100%" height="800px" frameborder="0" title="Interactive Credit Report Notebook"></iframe>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
