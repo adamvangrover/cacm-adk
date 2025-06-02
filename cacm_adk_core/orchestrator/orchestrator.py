@@ -18,6 +18,11 @@ from cacm_adk_core.context.shared_context import SharedContext # Added
 # from cacm_adk_core.agents.data_ingestion_agent import DataIngestionAgent
 # from cacm_adk_core.agents.analysis_agent import AnalysisAgent
 # from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent
+from cacm_adk_core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from cacm_adk_core.agents.SNC_analyst_agent import SNCAnalystAgent
+from cacm_adk_core.agents.data_retrieval_agent import DataRetrievalAgent
+from cacm_adk_core.agents.catalyst_wrapper_agent import CatalystWrapperAgent
+from cacm_adk_core.agents.knowledge_graph_agent import KnowledgeGraphAgent
 
 
 class Orchestrator:
@@ -44,10 +49,17 @@ class Orchestrator:
         from cacm_adk_core.agents.data_ingestion_agent import DataIngestionAgent
         from cacm_adk_core.agents.analysis_agent import AnalysisAgent
         from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent
+        # FundamentalAnalystAgent and SNCAnalystAgent are already imported at the top level
+        # DataRetrievalAgent is also imported at the top level
         
         self.register_agent("DataIngestionAgent", DataIngestionAgent)
-        self.register_agent("AnalysisAgent", AnalysisAgent)
+        self.register_agent("AnalysisAgent", AnalysisAgent) # Placeholder, might be replaced or removed if DRA is the one
         self.register_agent("ReportGenerationAgent", ReportGenerationAgent)
+        self.register_agent("FundamentalAnalystAgent", FundamentalAnalystAgent)
+        self.register_agent("SNCAnalystAgent", SNCAnalystAgent)
+        self.register_agent("DataRetrievalAgent", DataRetrievalAgent)
+        self.register_agent("CatalystWrapperAgent", CatalystWrapperAgent)
+        self.register_agent("KnowledgeGraphAgent", KnowledgeGraphAgent) # Added KnowledgeGraphAgent registration
         print(f"INFO: Orchestrator: Registered {len(self.agents)} agent types.")
 
     def register_agent(self, agent_name_key: str, agent_class: Type[Agent]):
@@ -521,72 +533,34 @@ if __name__ == '__main__':
     # We need to add an entry for DataIngestionAgent in the catalog for this to fully work.
     # Let's assume "urn:adk:capability:basic_document_ingestor:v1" will be its ID.
     # (This would ideally be added to compute_capability_catalog.json in a prior step if not there)
-    if "urn:adk:capability:basic_document_ingestor:v1" not in orch.compute_catalog:
-        orch.compute_catalog["urn:adk:capability:basic_document_ingestor:v1"] = {
-            "id": "urn:adk:capability:basic_document_ingestor:v1",
-            "name": "Basic Document Ingestor (Agent)",
-            "description": "Ingests a document and updates shared context.",
-            "agent_type": "DataIngestionAgent",
-            "inputs": [
-                {"name": "document_type", "type": "string", "description": "Type of the document (e.g., 10K_FILING)."},
-                {"name": "document_id", "type": "string", "description": "Unique ID for the document."}
-            ],
-            "outputs": [ # DataIngestionAgent returns this structure
-                {"name": "ingestion_status", "type": "object", "description": "Status of ingestion."}
-            ]
-        }
-        logger_main.info("Added temporary 'urn:adk:capability:basic_document_ingestor:v1' to catalog for test.")
+    # Removing the temporary addition of "urn:adk:capability:basic_document_ingestor:v1"
+    # as the new test workflow does not use DataIngestionAgent.
+    # if "urn:adk:capability:basic_document_ingestor:v1" not in orch.compute_catalog:
+    #     orch.compute_catalog["urn:adk:capability:basic_document_ingestor:v1"] = {
+    #         "id": "urn:adk:capability:basic_document_ingestor:v1",
+    #         "name": "Basic Document Ingestor (Agent)",
+    #         "description": "Ingests a document and updates shared context.",
+    #         "agent_type": "DataIngestionAgent",
+    #         "inputs": [
+    #             {"name": "document_type", "type": "string", "description": "Type of the document (e.g., 10K_FILING)."},
+    #             {"name": "document_id", "type": "string", "description": "Unique ID for the document."}
+    #         ],
+    #         "outputs": [ # DataIngestionAgent returns this structure
+    #             {"name": "ingestion_status", "type": "object", "description": "Status of ingestion."}
+    #         ]
+    #     }
+    #     logger_main.info("Added temporary 'urn:adk:capability:basic_document_ingestor:v1' to catalog for test.")
 
-
-    sample_cacm_instance_for_agent = {
-        "cacmId": "test_multi_agent_workflow_002",
-        "name": "Test Workflow with Data Ingestion and Analysis Agents",
-        "description": "A sample CACM to test multi-agent interaction and shared context.",
-        "inputs": {
-            "main_document_type": {"value": "10K_FILING", "description": "Type of the main document to process."},
-            "main_document_identifier": {"value": "SEC_XYZ_10K_2023", "description": "Identifier for the main document."},
-            "analysis_financial_data": {
-                "value": { 
-                    "current_assets": 3000.0, "current_liabilities": 1500.0,
-                    "total_debt": 1000.0, "total_equity": 2000.0
-                },
-                "description": "Financial statement data for ratio analysis."
-            },
-            "report_rounding_precision": {"value": 3, "description": "Rounding precision for reports."}
-        },
-        "outputs": {
-            "final_analysis_output": {"type": "object", "description": "Output from the analysis agent."},
-            "data_ingestion_summary": {"type": "object", "description": "Summary from data ingestion."}
-        },
-        "workflow": [
-            {
-                "stepId": "step1_ingest_document",
-                "description": "Ingest the primary financial document.",
-                "computeCapabilityRef": "urn:adk:capability:basic_document_ingestor:v1",
-                "inputBindings": {
-                    "document_type": "cacm.inputs.main_document_type",
-                    "document_id": "cacm.inputs.main_document_identifier"
-                },
-                "outputBindings": { 
-                    # Assuming DataIngestionAgent returns a dict with a summary or status
-                    "ingestion_outcome": "cacm.outputs.data_ingestion_summary"
-                }
-            },
-            {
-                "stepId": "step2_perform_analysis",
-                "description": "Perform financial ratio analysis using an agent, potentially using ingested data from context.",
-                "computeCapabilityRef": "urn:adk:capability:financial_ratios_calculator:v1", 
-                "inputBindings": { # Inputs for AnalysisAgent's run method's `current_step_inputs`
-                    "financial_data": "cacm.inputs.analysis_financial_data", 
-                    "rounding_precision": "cacm.inputs.report_rounding_precision"
-                    # AnalysisAgent will internally try to get ReportGenAgent and might use shared_context
-                },
-                "outputBindings": {
-                    "ratios_from_skill": "cacm.outputs.final_analysis_output" 
-                }
-            }
-        ]
-    }
+    # Load the new test workflow
+    # sample_cacm_instance_for_agent = {} # This will be loaded specifically for the MSFT workflow
+    # test_workflow_path = os.path.join(BASE_DIR, "examples/test_integrated_agents_workflow.json")
+    # if not os.path.exists(test_workflow_path):
+    #     logger_main.error(f"Test workflow file not found: {test_workflow_path}")
+    #     # Exiting or skipping test if file not found
+    # else:
+    #     with open(test_workflow_path, 'r') as f:
+    #         sample_cacm_instance_for_agent = json.load(f)
+    #     logger_main.info(f"Loaded test workflow from: {test_workflow_path}")
 
     # Create a dummy validator if needed, or ensure Orchestrator handles it being None for this test
     # For this test, let's assume validation is not the focus and Orchestrator init handles validator=None
@@ -600,9 +574,62 @@ if __name__ == '__main__':
 
 
     async def run_agent_test():
-        success, logs, outputs = await orch.run_cacm(sample_cacm_instance_for_agent)
-        logger_main.info(f"run_cacm success: {success}")
-        logger_main.info(f"run_cacm logs:\n" + "\n".join(logs))
-        logger_main.info(f"run_cacm outputs:\n{json.dumps(outputs, indent=2)}")
+        logger_main.info("\n--- Orchestrator Test: MSFT Comprehensive Analysis Workflow ---")
+        msft_workflow_path = os.path.join(BASE_DIR, "examples/msft_comprehensive_analysis_workflow.json")
+
+        if not os.path.exists(msft_workflow_path):
+            logger_main.error(f"MSFT comprehensive workflow file not found: {msft_workflow_path}")
+            return
+
+        with open(msft_workflow_path, 'r') as f:
+            msft_cacm_instance = json.load(f)
+
+        logger_main.info(f"Loaded MSFT comprehensive workflow from: {msft_workflow_path}")
+
+        success_msft, logs_msft, outputs_msft = await orch.run_cacm(msft_cacm_instance)
+
+        logger_main.info(f"MSFT Comprehensive Analysis test success: {success_msft}")
+        logger_main.info(f"MSFT Comprehensive Analysis test logs:\n" + "\n".join(logs_msft))
+        logger_main.info(f"MSFT Comprehensive Analysis test outputs:\n{json.dumps(outputs_msft, indent=2)}")
+
+        # Commenting out other test runs to focus output
+        # # Test for Integrated FundamentalAnalystAgent & SNCAnalystAgent
+        # logger_main.info("\n--- Orchestrator Test: Integrated FAA & SNCAA Workflow ---")
+        # test_integrated_workflow_path = os.path.join(BASE_DIR, "examples/test_integrated_agents_workflow.json")
+        # if not os.path.exists(test_integrated_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_integrated_workflow_path}")
+        # else:
+        #     with open(test_integrated_workflow_path, 'r') as f:
+        #         integrated_cacm_instance = json.load(f)
+        #     success_integrated, logs_integrated, outputs_integrated = await orch.run_cacm(integrated_cacm_instance)
+        #     logger_main.info(f"Integrated FAA & SNCAA test success: {success_integrated}")
+        #     logger_main.info(f"Integrated FAA & SNCAA test logs:\n" + "\n".join(logs_integrated))
+        #     logger_main.info(f"Integrated FAA & SNCAA test outputs:\n{json.dumps(outputs_integrated, indent=2)}")
+
+        # # Test for DataIngestionAgent
+        # logger_main.info("\n--- Orchestrator Test: DataIngestionAgent Workflow ---")
+        # test_dia_workflow_path = os.path.join(BASE_DIR, "examples/test_data_ingestion_agent_workflow.json")
+        # if not os.path.exists(test_dia_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_dia_workflow_path}")
+        # else:
+        #     with open(test_dia_workflow_path, 'r') as f:
+        #         dia_cacm_instance = json.load(f)
+        #     success_dia, logs_dia, outputs_dia = await orch.run_cacm(dia_cacm_instance)
+        #     logger_main.info(f"DataIngestionAgent test success: {success_dia}")
+        #     logger_main.info(f"DataIngestionAgent test logs:\n" + "\n".join(logs_dia))
+        #     logger_main.info(f"DataIngestionAgent test outputs:\n{json.dumps(outputs_dia, indent=2)}")
+
+        # # Test for CatalystWrapperAgent
+        # logger_main.info("\n--- Orchestrator Test: CatalystWrapperAgent Workflow ---")
+        # test_cwa_workflow_path = os.path.join(BASE_DIR, "examples/test_catalyst_wrapper_agent_workflow.json")
+        # if not os.path.exists(test_cwa_workflow_path):
+        #     logger_main.error(f"Test workflow file not found: {test_cwa_workflow_path}")
+        # else:
+        #     with open(test_cwa_workflow_path, 'r') as f:
+        #         cwa_cacm_instance = json.load(f)
+        #     success_cwa, logs_cwa, outputs_cwa = await orch.run_cacm(cwa_cacm_instance)
+        #     logger_main.info(f"CatalystWrapperAgent test success: {success_cwa}")
+        #     logger_main.info(f"CatalystWrapperAgent test logs:\n" + "\n".join(logs_cwa))
+        #     logger_main.info(f"CatalystWrapperAgent test outputs:\n{json.dumps(outputs_cwa, indent=2)}")
 
     asyncio.run(run_agent_test())
