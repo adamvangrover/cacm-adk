@@ -20,8 +20,9 @@ from cacm_adk_core.context.shared_context import SharedContext # Added
 # from cacm_adk_core.agents.report_generation_agent import ReportGenerationAgent
 from cacm_adk_core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from cacm_adk_core.agents.SNC_analyst_agent import SNCAnalystAgent
-from cacm_adk_core.agents.data_retrieval_agent import DataRetrievalAgent # Added for DRA registration
+from cacm_adk_core.agents.data_retrieval_agent import DataRetrievalAgent
 from cacm_adk_core.agents.catalyst_wrapper_agent import CatalystWrapperAgent
+from cacm_adk_core.agents.knowledge_graph_agent import KnowledgeGraphAgent
 
 
 class Orchestrator:
@@ -57,7 +58,8 @@ class Orchestrator:
         self.register_agent("FundamentalAnalystAgent", FundamentalAnalystAgent)
         self.register_agent("SNCAnalystAgent", SNCAnalystAgent)
         self.register_agent("DataRetrievalAgent", DataRetrievalAgent)
-        self.register_agent("CatalystWrapperAgent", CatalystWrapperAgent) # Added CatalystWrapperAgent registration
+        self.register_agent("CatalystWrapperAgent", CatalystWrapperAgent)
+        self.register_agent("KnowledgeGraphAgent", KnowledgeGraphAgent) # Added KnowledgeGraphAgent registration
         print(f"INFO: Orchestrator: Registered {len(self.agents)} agent types.")
 
     def register_agent(self, agent_name_key: str, agent_class: Type[Agent]):

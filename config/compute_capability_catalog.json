@@ -1,3 +1,6 @@
+import json
+
+current_catalog_json_string = """
 {
   "computeCapabilities": [
     {
@@ -140,7 +143,7 @@
     {
       "id": "urn:adk:capability:fundamental_analyst_agent:v1",
       "name": "Fundamental Analyst Agent",
-      "description": "Performs fundamental analysis of a company, including financial ratios, DCF valuation, and financial health assessment.",
+      "description": "Performs fundamental analysis of a company, including financial ratios, DCF valuation, and financial health assessment. Supports custom summary guidance and DCF parameter overrides.",
       "agent_type": "FundamentalAnalystAgent",
       "inputs": [
         {
@@ -202,7 +205,7 @@
     {
       "id": "urn:adk:capability:data_retrieval_agent:v1",
       "name": "Data Retrieval Agent",
-      "description": "Retrieves various types of data (e.g., company financials, market data) based on inputs. Supports data overrides for testing.",
+      "description": "Retrieves various types of data (e.g., company financials, market data) using mock data, overrides, or external APIs (e.g., Alpha Vantage). Supports data overrides for testing.",
       "agent_type": "DataRetrievalAgent",
       "inputs": [
         {
@@ -221,6 +224,18 @@
           "type": "object",
           "optional": true,
           "description": "Allows passing a complete data package to be returned directly by the agent, bypassing other retrieval logic."
+        },
+        {
+          "name": "api_source",
+          "type": "string",
+          "optional": true,
+          "description": "Specifies the external API to use for data retrieval (e.g., 'AlphaVantage'). If omitted, defaults to mock/predefined data sources."
+        },
+        {
+          "name": "api_key",
+          "type": "string",
+          "optional": true,
+          "description": "API key for the specified 'api_source'. If omitted, the agent may try to use a preconfigured key or an environment variable."
         }
       ],
       "outputs": [
@@ -269,3 +284,47 @@
     }
   ]
 }
+"""
+
+data = json.loads(current_catalog_json_string)
+
+new_kg_capability = {
+  "id": "urn:adk:capability:knowledge_graph_query_agent:v1",
+  "name": "Knowledge Graph Query Agent",
+  "description": "Executes a SPARQL query against a specified local Knowledge Graph (RDF/TTL) file and returns the results.",
+  "agent_type": "KnowledgeGraphAgent",
+  "inputs": [
+    {
+      "name": "sparql_query",
+      "type": "string",
+      "description": "The SPARQL query to be executed."
+    },
+    {
+      "name": "kg_file_path",
+      "type": "string",
+      "optional": true,
+      "description": "Path to the local Knowledge Graph file (e.g., .ttl, .rdf). Defaults to 'knowledge_graph_instantiations/kb_core_instances.ttl' relative to project root if not provided."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "query_results_package",
+      "type": "object",
+      "description": "The results of the SPARQL query execution.",
+      "properties": {
+        "query_executed": {"type": "string"},
+        "kg_file_used": {"type": "string"},
+        "results_count": {"type": "integer"},
+        "results": {
+          "type": "array",
+          "items": {"type": "object"}
+        }
+      }
+    }
+  ]
+}
+
+data["computeCapabilities"].append(new_kg_capability)
+
+# Output the modified JSON with an indent of 2 for pretty printing
+print(json.dumps(data, indent=2))
