@@ -130,8 +130,10 @@ class ReportGenerationAgent(Agent):
             "status": "success",
             "agent": self.agent_name,
             "message": "Report generated successfully and conceptually saved to file.",
-            "generated_report_text": final_report_string,
-            "report_file_path": conceptual_file_path 
+            "report_package": {
+                "content": final_report_string,
+                "file_path": conceptual_file_path
+            }
         }
 
     async def receive_analysis_results(self, sending_agent_name: str, results: Dict[str, Any]):
@@ -182,8 +184,8 @@ if __name__ == '__main__':
             shared_context=test_shared_context
         )
         print("\n--- Generated Report Text ---")
-        print(result.get("generated_report_text"))
-        print(f"\nConceptual file path: {result.get('report_file_path')}")
+        print(result.get("report_package", {}).get("content"))
+        print(f"\nConceptual file path: {result.get('report_package', {}).get('file_path')}")
         print(f"Agent status: {result.get('status')}, message: {result.get('message')}")
         
         print("\n--- SharedContext after Report Generation ---")
