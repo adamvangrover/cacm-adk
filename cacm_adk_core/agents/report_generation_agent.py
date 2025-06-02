@@ -46,8 +46,12 @@ class ReportGenerationAgent(Agent):
         
         # Fundamental Analysis Section
         report_parts.append("\n## 2. Fundamental Analysis")
-        if fundamental_analysis_data and isinstance(fundamental_analysis_data, dict) and fundamental_analysis_data.get('status') == "success":
+        self.logger.debug(f"RGA received fundamental_analysis_data: {json.dumps(fundamental_analysis_data, indent=2) if fundamental_analysis_data else 'None'}")
+        is_faa_success = fundamental_analysis_data and isinstance(fundamental_analysis_data, dict) and fundamental_analysis_data.get('status') == "success"
+        self.logger.debug(f"RGA fundamental_analysis_data status check: {is_faa_success if fundamental_analysis_data else 'Data is None'}")
+        if is_faa_success:
             faa_data = fundamental_analysis_data.get('data', {})
+            self.logger.debug(f"RGA extracted faa_data: {json.dumps(faa_data, indent=2)}")
             report_parts.append("### Key Financial Ratios:")
             ratios = faa_data.get('financial_ratios', {})
             if ratios:
@@ -69,8 +73,12 @@ class ReportGenerationAgent(Agent):
 
         # SNC Analysis Section
         report_parts.append("\n## 3. Shared National Credit (SNC) Analysis")
-        if snc_analysis_data and isinstance(snc_analysis_data, dict) and snc_analysis_data.get('status') == "success":
+        self.logger.debug(f"RGA received snc_analysis_data: {json.dumps(snc_analysis_data, indent=2) if snc_analysis_data else 'None'}")
+        is_snc_success = snc_analysis_data and isinstance(snc_analysis_data, dict) and snc_analysis_data.get('status') == "success"
+        self.logger.debug(f"RGA snc_analysis_data status check: {is_snc_success if snc_analysis_data else 'Data is None'}")
+        if is_snc_success:
             sncaa_data = snc_analysis_data.get('data', {})
+            self.logger.debug(f"RGA extracted sncaa_data: {json.dumps(sncaa_data, indent=2)}")
             report_parts.append(f"**SNC Rating:** {sncaa_data.get('rating', '[Rating not provided]')}")
             report_parts.append("\n**Rationale:**")
             report_parts.append(sncaa_data.get('rationale', '[Rationale not provided]'))
@@ -81,8 +89,12 @@ class ReportGenerationAgent(Agent):
 
         # Catalyst Strategic Insights Section
         report_parts.append("\n## 4. Catalyst Strategic Insights")
-        if catalyst_data and isinstance(catalyst_data, dict) and catalyst_data.get('status') == "success":
+        self.logger.debug(f"RGA received catalyst_data: {json.dumps(catalyst_data, indent=2) if catalyst_data else 'None'}")
+        is_catalyst_success = catalyst_data and isinstance(catalyst_data, dict) and catalyst_data.get('status') == "success"
+        self.logger.debug(f"RGA catalyst_data status check: {is_catalyst_success if catalyst_data else 'Data is None'}")
+        if is_catalyst_success:
             cat_data = catalyst_data.get('data', {})
+            self.logger.debug(f"RGA extracted cat_data: {json.dumps(cat_data, indent=2)}")
             report_parts.append("```json")
             report_parts.append(json.dumps(cat_data, indent=2))
             report_parts.append("```")

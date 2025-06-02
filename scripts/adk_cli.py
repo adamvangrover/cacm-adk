@@ -4,6 +4,10 @@ import json
 import os
 import asyncio # Added for async orchestrator calls
 import click # type: ignore
+import logging # Added for DEBUG logging setup
+
+# Configure logging at DEBUG level as early as possible
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Adjust import paths based on running CLI from project root
 # This assumes .venv is activated and project root is in PYTHONPATH, or running with python -m scripts.adk_cli
