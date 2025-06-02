@@ -1,0 +1,16 @@
+{
+  "company_id": "META",
+  "financial_ratios": {
+    "revenue_growth": 0.10000000000000009,
+    "net_profit_margin": 0.01090909090909091,
+    "return_on_equity": 0.096,
+    "debt_to_equity": 0.68,
+    "current_ratio": 2.4705882352941178,
+    "ebitda_margin": 0.015454545454545455
+  },
+  "dcf_valuation": null,
+  "comps_valuation": null,
+  "enterprise_value": 10025000.0,
+  "financial_health": "Moderate",
+  "analysis_summary": "Fundamental Analysis for META:\n\nKey Financial Ratios:\n  - revenue_growth: 0.10\n  - net_profit_margin: 0.01\n  - return_on_equity: 0.10\n  - debt_to_equity: 0.68\n  - current_ratio: 2.47\n  - ebitda_margin: 0.02\nFinancial Health: Moderate\nDCF Valuation: Not available\nComps Valuation: Not available\nEnterprise Value: 10025000.00\nEstimated Default Likelihood: N/A\n\n(Summary generated using fallback string formatting.)"
+}

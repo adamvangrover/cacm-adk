@@ -88,7 +88,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
         ]
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "success")
-        self.assertEqual(result["message"], "Analysis phase completed successfully. All results stored in SharedContext.")
+        self.assertEqual(result["message"], "Analysis phase completed successfully.")
         self.assertEqual(self.mock_kernel.invoke.call_count, 4) # Ratio + 3 summaries
         self.assertEqual(result["ratios_from_skill"], ratio_payload)
 
@@ -112,7 +112,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
         
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "error")
-        self.assertEqual(result["message"], "Error: 'calculate_basic_ratios' function not found in plugin.")
+        self.assertEqual(result["message"], "Error: 'calculate_basic_ratios' function not found.")
 
     async def test_run_ratio_skill_invocation_exception(self):
         self.shared_context.set_data("financial_data_for_ratios_expanded", {"current_assets": 1})
@@ -135,7 +135,7 @@ class TestAnalysisAgent(unittest.IsolatedAsyncioTestCase):
 
         result = await self.analysis_agent.run("task", {}, self.shared_context)
         self.assertEqual(result["status"], "warning") # Warning because summarization was skipped
-        self.assertIn("ReportingAnalysisSkills plugin not found", result["message"])
+        self.assertEqual(result["message"], 'Analysis completed with summarization plugin not found.')
         self.mock_kernel.invoke.assert_called_once() # Only ratio skill called
 
 if __name__ == '__main__':

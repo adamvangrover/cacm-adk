@@ -8,7 +8,7 @@ import logging
 import pandas as pd
 import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, List
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 from cacm_adk_core.context.shared_context import SharedContext
@@ -403,12 +403,13 @@ class FundamentalAnalystAgent(Agent):
         # ... (existing code) ...
         pass
 
-
+    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
+        """
         Calculates the Discounted Cash Flow (DCF) valuation of the company.
 
         Uses a two-stage Free Cash Flow (FCF) projection model.
         It can utilize override values for `discount_rate` and `terminal_growth_rate_perpetuity`
-        if they are provided in `self.current_run_inputs` (passed from the `run` method's inputs)
+        if they are provided in 'self.current_run_inputs' (passed from the 'run' method's inputs)
         and are valid (e.g., rate > 0). Otherwise, it uses values from the
         `dcf_assumptions` section of the input `company_data`.
 
