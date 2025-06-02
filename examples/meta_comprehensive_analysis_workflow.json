@@ -1,0 +1,122 @@
+{
+  "version": "0.2.0",
+  "cacmId": "meta_comprehensive_analysis_001",
+  "name": "Meta Platforms Comprehensive Analysis Workflow",
+  "description": "Orchestrates multiple agents to perform a detailed analysis of Meta Platforms, Inc. (META) and generate a report.",
+  "inputs": {
+    "target_company_id": {
+      "type": "string",
+      "value": "META",
+      "description": "The company ID for analysis (should be META)."
+    },
+    "meta_business_overview_text": {
+      "type": "string",
+      "value": "Meta Platforms, Inc. is a global technology company that builds products to connect people and businesses. Key products include Facebook, Instagram, WhatsApp, Messenger, and Meta Quest. Meta's strategy focuses on building the metaverse, advancing artificial intelligence, and growing its Family of Apps.",
+      "description": "Business overview text for META."
+    },
+    "meta_risk_factors_text": {
+      "type": "string",
+      "value": "Meta Platforms faces significant risks, including intense competition in social media, messaging, and virtual/augmented reality. Regulatory scrutiny concerning data privacy, antitrust, content moderation, and potential impacts of AI are major concerns. Changes in user engagement, advertising market fluctuations, and macroeconomic conditions can affect revenue. The company's substantial investments in the metaverse are speculative and may not yield expected returns. Cybersecurity threats and the ability to innovate in areas like AI and AR/VR are also critical.",
+      "description": "Risk factors text for META."
+    },
+    "catalyst_input_params": {
+      "type": "object",
+      "value": {
+        "client_id": "META_Strategy_Dept",
+        "company_id": "META",
+        "industry": "SocialMediaMetaverseAI",
+        "task_description_catalyst": "Evaluate potential strategic partnerships for Meta in the AR/VR content space to accelerate metaverse adoption. Focus on companies with unique IP or established user bases."
+      },
+      "description": "Input parameters for the CatalystWrapperAgent for META."
+    },
+    "report_generation_title_detail": {
+        "type": "string",
+        "value": "Comprehensive Analysis for Meta Platforms, Inc. (META)",
+        "description": "Specific detail for the report title for META."
+    }
+  },
+  "outputs": {
+    "final_generated_report_details": {
+      "type": "object",
+      "description": "Details of the generated report for META, including content and conceptual file path."
+    },
+    "raw_fundamental_analysis": {
+      "type": "object",
+      "description": "Raw output from the Fundamental Analyst Agent for META."
+    },
+    "raw_snc_analysis": {
+      "type": "object",
+      "description": "Raw output from the SNC Analyst Agent for META."
+    },
+    "raw_catalyst_output": {
+      "type": "object",
+      "description": "Raw output from the Catalyst Wrapper Agent for META."
+    }
+  },
+  "workflow": [
+    {
+      "stepId": "step1_ingest_meta_data",
+      "description": "Ingest META-specific text data (Business Overview, Risk Factors) and Catalyst parameters into SharedContext.",
+      "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
+      "inputBindings": {
+        "companyName": "Meta Platforms, Inc.",
+        "companyTicker": "META",
+        "riskFactorsText": "cacm.inputs.meta_risk_factors_text",
+        "mockStructuredFinancialsForLLMSummary": "cacm.inputs.meta_business_overview_text",
+        "catalystParamsForContext": "cacm.inputs.catalyst_input_params"
+      },
+      "outputBindings": {
+        "ingestion_summary": "intermediate.step1_ingestion_summary"
+      }
+    },
+    {
+      "stepId": "step2_fundamental_analysis",
+      "description": "Perform fundamental financial analysis for META.",
+      "computeCapabilityRef": "urn:adk:capability:fundamental_analyst_agent:v1",
+      "inputBindings": {
+        "company_id": "cacm.inputs.target_company_id"
+      },
+      "outputBindings": {
+        "analysis_result": "cacm.outputs.raw_fundamental_analysis"
+      }
+    },
+    {
+      "stepId": "step3_snc_analysis",
+      "description": "Perform SNC analysis for META.",
+      "computeCapabilityRef": "urn:adk:capability:snc_analyst_agent:v1",
+      "inputBindings": {
+        "company_id": "cacm.inputs.target_company_id"
+      },
+      "outputBindings": {
+        "snc_analysis_result": "cacm.outputs.raw_snc_analysis"
+      }
+    },
+    {
+      "stepId": "step4_catalyst_insights",
+      "description": "Generate strategic insights for META using CatalystWrapperAgent.",
+      "computeCapabilityRef": "urn:adk:capability:catalyst_wrapper_agent:v1",
+      "inputBindings": {
+        "client_id": "cacm.inputs.catalyst_input_params.value.client_id",
+        "company_id": "cacm.inputs.catalyst_input_params.value.company_id",
+        "industry": "cacm.inputs.catalyst_input_params.value.industry"
+      },
+      "outputBindings": {
+        "catalyst_output": "cacm.outputs.raw_catalyst_output"
+      }
+    },
+    {
+      "stepId": "step5_generate_report",
+      "description": "Compile all analysis into a final report for META.",
+      "computeCapabilityRef": "urn:adk:capability:standard_report_generator:v1",
+      "inputBindings": {
+        "report_title_detail": "cacm.inputs.report_generation_title_detail",
+        "fundamental_analysis_data_ref": "cacm.outputs.raw_fundamental_analysis",
+        "snc_analysis_data_ref": "cacm.outputs.raw_snc_analysis",
+        "catalyst_data_ref": "cacm.outputs.raw_catalyst_output"
+      },
+      "outputBindings": {
+        "report_package": "cacm.outputs.final_generated_report_details"
+      }
+    }
+  ]
+}

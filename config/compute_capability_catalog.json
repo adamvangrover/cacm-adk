@@ -1,7 +1,3 @@
-import json
-
-# This is the content read from the file in the previous step
-current_catalog_json_string = """
 {
   "computeCapabilities": [
     {
@@ -131,14 +127,24 @@ current_catalog_json_string = """
     {
       "id": "urn:adk:capability:standard_report_generator:v1",
       "name": "Standard Report Generator Agent",
-      "description": "Agent responsible for assembling the final report from SharedContext.",
+      "description": "Agent responsible for assembling the final report from SharedContext and direct data references.",
       "agent_type": "ReportGenerationAgent",
       "inputs": [
-        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."}
+        {"name": "report_title_detail", "type": "string", "optional": true, "description": "Specific detail to add to the report title."},
+        {"name": "fundamental_analysis_data_ref", "type": "object", "optional": true, "description": "Reference to fundamental analysis data output."},
+        {"name": "snc_analysis_data_ref", "type": "object", "optional": true, "description": "Reference to SNC analysis data output."},
+        {"name": "catalyst_data_ref", "type": "object", "optional": true, "description": "Reference to Catalyst data output."}
       ],
       "outputs": [
-          {"name": "final_report_text", "type": "string", "description": "The fully assembled credit report text."},
-          {"name": "report_file_path", "type": "string", "description": "Conceptual path to the generated report file."}
+          {
+            "name": "report_package",
+            "type": "object",
+            "description": "The output package from the report generation agent, containing report content and file path.",
+            "properties": {
+                "content": {"type": "string", "description": "The fully assembled credit report text."},
+                "file_path": {"type": "string", "description": "Conceptual path to the generated report file."}
+            }
+          }
       ]
     },
     {
@@ -151,6 +157,24 @@ current_catalog_json_string = """
           "name": "company_id",
           "type": "string",
           "description": "The unique identifier for the company to be analyzed."
+        },
+        {
+          "name": "summary_guidance_prompt_addon",
+          "type": "string",
+          "optional": true,
+          "description": "Additional user-provided guidance or a full custom prompt for the analysis summary generation."
+        },
+        {
+          "name": "dcf_override_discount_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF discount rate (e.g., 0.085 for 8.5%). If 0 or not provided, uses default from agent's data source."
+        },
+        {
+          "name": "dcf_override_terminal_growth_rate",
+          "type": "float",
+          "optional": true,
+          "description": "Override for the DCF terminal growth rate (e.g., 0.025 for 2.5%). If 0 or not provided, uses default from agent's data source."
         }
       ],
       "outputs": [
@@ -255,51 +279,3 @@ current_catalog_json_string = """
     }
   ]
 }
-"""
-
-data = json.loads(current_catalog_json_string)
-
-# Find the FundamentalAnalystAgent capability
-faa_capability_id = "urn:adk:capability:fundamental_analyst_agent:v1"
-faa_capability = None
-for capability in data["computeCapabilities"]:
-    if capability["id"] == faa_capability_id:
-        faa_capability = capability
-        break
-
-if faa_capability:
-    new_inputs = [
-        {
-          "name": "summary_guidance_prompt_addon",
-          "type": "string",
-          "optional": true,
-          "description": "Additional user-provided guidance or a full custom prompt for the analysis summary generation."
-        },
-        {
-          "name": "dcf_override_discount_rate",
-          "type": "float",
-          "optional": true,
-          "description": "Override for the DCF discount rate (e.g., 0.085 for 8.5%). If 0 or not provided, uses default from agent's data source."
-        },
-        {
-          "name": "dcf_override_terminal_growth_rate",
-          "type": "float",
-          "optional": true,
-          "description": "Override for the DCF terminal growth rate (e.g., 0.025 for 2.5%). If 0 or not provided, uses default from agent's data source."
-        }
-    ]
-    # Ensure 'inputs' list exists
-    if "inputs" not in faa_capability:
-        faa_capability["inputs"] = []
-    
-    # Add new inputs, checking for duplicates if necessary (though not strictly required by prompt)
-    existing_input_names = {inp["name"] for inp in faa_capability["inputs"]}
-    for new_input in new_inputs:
-        if new_input["name"] not in existing_input_names:
-            faa_capability["inputs"].append(new_input)
-else:
-    # This case should ideally not happen if the catalog is consistent
-    print(f"ERROR: Capability with ID '{faa_capability_id}' not found in the catalog.")
-
-# Output the modified JSON with an indent of 2 for pretty printing
-print(json.dumps(data, indent=2))
