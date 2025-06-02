@@ -30,8 +30,8 @@ from cacm_adk_core.semantic_kernel_adapter import KernelService
 
 # --- Configuration ---
 TARGET_COMPANIES = [
-    "MSFT", "TESTCORP",
-    "AAPL", "GOOGL", "AMZN", "JNJ", "PFE",
+    "MSFT", "TESTCORP", 
+    "AAPL", "GOOGL", "AMZN", "JNJ", "PFE", 
     "TSLA", "MCD", "BA", "CAT", "JPM", "V", "XOM"
 ]
 OUTPUT_FILE_PATH = os.path.join(PROJECT_ROOT, "default_synthetic_library_v1", "synthetic_reports.jsonl")
@@ -263,7 +263,6 @@ def assemble_full_report_object(company_id: str, company_name_processed: str, wo
 
 async def main():
     print("Starting Synthetic Library Generation...")
-
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
         print(f"Created output directory: {OUTPUT_DIR}")
@@ -286,7 +285,6 @@ async def main():
         print(f"--- Processing company: {company_id} ---")
         company_specific_texts = get_company_specific_texts(company_id)
         workflow_id, cacm_instance_data = construct_cacm_for_company(company_id, company_specific_texts)
-
         print(f"Running workflow {workflow_id} for {company_id}...")
         success, logs, outputs = await orch.run_cacm(cacm_instance_data)
 
@@ -327,7 +325,6 @@ async def main():
         # For display here, pretty print. For JSONL, each obj is one line.
         print(json.dumps(obj, indent=2))
         print("---")
-
     print(f"\nWriting {len(all_report_objects)} report objects to JSONL file: {OUTPUT_FILE_PATH}...")
     try:
         with open(OUTPUT_FILE_PATH, 'w') as f:
@@ -336,7 +333,6 @@ async def main():
         print(f"Synthetic library successfully generated at {OUTPUT_FILE_PATH}")
     except IOError as e:
         print(f"ERROR: Could not write to output file {OUTPUT_FILE_PATH}: {e}")
-
     print("Synthetic Library Generation script finished.")
 
 

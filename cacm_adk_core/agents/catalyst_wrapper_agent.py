@@ -28,7 +28,7 @@ class CatalystWrapperAgent(Agent):
         """
         Wraps and executes the original CatalystAgent with the provided inputs.
 
-        This method instantiates the `OriginalCatalystAgent` (from
+        This method instantiates the `OriginalCatalystAgent` (from 
         `cacm_adk_core.agents.catalyst_agent.py`), passes the necessary
         parameters to its `run` method, and then formats the output.
 
@@ -38,8 +38,8 @@ class CatalystWrapperAgent(Agent):
                 - "client_id" (str): The client identifier. Required.
                 - "company_id" (str): The company identifier. Required.
                 - "industry" (str): The industry context. Required.
-                - "catalyst_config_path" (str, optional): Path to the
-                  `catalyst_config.json` file if different from the default
+                - "catalyst_config_path" (str, optional): Path to the 
+                  `catalyst_config.json` file if different from the default 
                   (`config/catalyst_config.json`).
             shared_context (SharedContext): The shared context object (not directly
                                             used by this wrapper's core logic but
@@ -68,7 +68,7 @@ class CatalystWrapperAgent(Agent):
             # Instantiate the original CatalystAgent
             # It loads its own config (URLs etc.) from the path provided.
             original_catalyst = OriginalCatalystAgent(config_path=self.catalyst_config_path)
-
+            
             # Run the original CatalystAgent's logic
             # The original run method is synchronous, so we call it directly.
             # If it were async, we'd await it.
@@ -82,7 +82,7 @@ class CatalystWrapperAgent(Agent):
             )
 
             self.logger.info(f"Original CatalystAgent execution completed. Result type: {type(catalyst_result)}")
-
+            
             # Ensure the result is a dictionary (it should be based on CatalystAgent's code)
             if not isinstance(catalyst_result, dict):
                 # If it's a JSON string, try to parse it.

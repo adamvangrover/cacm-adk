@@ -56,9 +56,11 @@ def main():
                     error_count +=1
                     continue
 
+
                 current_company_id_for_error = f"unknown_at_line_{line_number}"
                 try:
                     report_object = json.loads(stripped_line)
+
 
                     company_id = report_object.get("company_id", f"unknown_company_L{line_number}")
                     current_company_id_for_error = company_id # Update for more specific error logging

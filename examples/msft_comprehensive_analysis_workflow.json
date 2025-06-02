@@ -1,21 +1,26 @@
 {
+  "version": "0.2.0",
   "cacmId": "msft_comprehensive_analysis_001",
   "name": "Microsoft Comprehensive Analysis Workflow",
   "description": "Orchestrates multiple agents to perform a detailed analysis of Microsoft Corp. (MSFT) and generate a report.",
   "inputs": {
     "target_company_id": {
+      "type": "string",
       "value": "MSFT",
       "description": "The company ID for analysis (should be MSFT)."
     },
     "msft_business_overview_text": {
+      "type": "string",
       "value": "Microsoft Corporation is a global technology leader that enables digital transformation for the era of an intelligent cloud and an intelligent edge. Its mission is to empower every person and every organization on the planet to achieve more. The company develops, licenses, and supports a wide range of software products, services, devices, and solutions. Key segments include Productivity and Business Processes (Office, LinkedIn, Dynamics), Intelligent Cloud (Azure, Server Products), and More Personal Computing (Windows, Devices, Gaming, Search). Microsoft's strategy focuses on innovation and growth in high-priority areas such as cloud computing, artificial intelligence, gaming, and business applications, while maintaining its strong position in traditional software markets.",
       "description": "Business overview text for MSFT."
     },
     "msft_risk_factors_text": {
+      "type": "string",
       "value": "Microsoft faces a variety of significant risks. Intense competition across all its markets, including from established and emerging technology companies, could adversely affect its business. Cybersecurity threats, data breaches, and disruptions to its cloud services (Azure) represent major operational risks. Evolving global regulations, particularly in areas of data privacy (like GDPR), antitrust, and AI ethics, could impose substantial compliance costs and impact business models. Changes in macroeconomic conditions, such as recessions, inflation, or fluctuating foreign currency exchange rates, may reduce IT spending and demand for Microsoft's products. The company's ability to innovate and adapt to rapidly changing technologies, such as the ongoing developments in AI, is critical to its continued success. Dependence on key personnel and the ability to attract and retain talent are also important risk factors.",
       "description": "Risk factors text for MSFT."
     },
     "catalyst_input_params": {
+      "type": "object",
       "value": {
         "client_id": "MSFT_Strategy_Dept",
         "company_id": "MSFT",
@@ -25,18 +30,28 @@
       "description": "Input parameters for the CatalystWrapperAgent."
     },
     "report_generation_title_detail": {
+        "type": "string",
         "value": "Comprehensive Analysis for Microsoft Corp. (MSFT)",
         "description": "Specific detail for the report title."
     }
   },
   "outputs": {
-    "final_generated_report": {
-      "type": "string",
-      "description": "The comprehensive analysis report for MSFT."
+    "final_generated_report_details": {
+      "type": "object",
+      "description": "Details of the generated report, including content and conceptual file path."
     },
-    "raw_fundamental_analysis": {"type": "object"},
-    "raw_snc_analysis": {"type": "object"},
-    "raw_catalyst_output": {"type": "object"}
+    "raw_fundamental_analysis": {
+      "type": "object",
+      "description": "Raw output from the Fundamental Analyst Agent."
+    },
+    "raw_snc_analysis": {
+      "type": "object",
+      "description": "Raw output from the SNC Analyst Agent."
+    },
+    "raw_catalyst_output": {
+      "type": "object",
+      "description": "Raw output from the Catalyst Wrapper Agent."
+    }
   },
   "workflow": [
     {
@@ -100,7 +115,7 @@
         "catalyst_data_ref": "cacm.outputs.raw_catalyst_output"
       },
       "outputBindings": {
-        "final_report_text": "cacm.outputs.final_generated_report"
+        "report_package": "cacm.outputs.final_generated_report_details"
       }
     }
   ]

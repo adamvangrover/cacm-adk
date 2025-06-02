@@ -1,9 +1,9 @@
 # cacm_adk_core/agents/data_retrieval_agent.py
 import logging
 from typing import Dict, Any, Optional
-import os
-import requests
-import json
+import os 
+import requests 
+import json 
 
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
@@ -69,24 +69,24 @@ aapl_data_package = {
       "total_liabilities": [290435, 270500, 280000],
       "shareholders_equity": [62320, 64550, 70000],
       "cash_and_equivalents": [61555, 55700, 60000],
-      "short_term_debt": [15000, 14000, 13000],
+      "short_term_debt": [15000, 14000, 13000], 
       "long_term_debt": [98967, 95000, 90000]
     },
     "cash_flow_statement": {
       "operating_cash_flow": [122151, 110540, 115000],
-      "investing_cash_flow": [-22000, -20000, -18000],
-      "financing_cash_flow": [-90000, -85000, -80000],
+      "investing_cash_flow": [-22000, -20000, -18000], 
+      "financing_cash_flow": [-90000, -85000, -80000], 
       "free_cash_flow": [100151, 90540, 97000]
     },
-    "key_ratios": {},
+    "key_ratios": {}, 
     "dcf_assumptions": {
       "fcf_projection_years_total": 10, "initial_high_growth_period_years": 3,
-      "initial_high_growth_rate": 0.08, "stable_growth_rate": 0.04,
+      "initial_high_growth_rate": 0.08, "stable_growth_rate": 0.04, 
       "discount_rate": 0.09, "terminal_growth_rate_perpetuity": 0.025
     },
     "market_data": {
-      "share_price": 190.00, "shares_outstanding": 15500000000,
-      "annual_debt_service_placeholder": "10000",
+      "share_price": 190.00, "shares_outstanding": 15500000000, 
+      "annual_debt_service_placeholder": "10000", 
       "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"
     }
   },
@@ -106,35 +106,35 @@ jpm_data_package = {
   "company_info": {
     "name": "JPMorgan Chase & Co.", "ticker": "JPM", "industry_sector": "Financials", "country": "USA"
   },
-  "financial_data_detailed": {
-    "income_statement": {
-      "revenue": [132250, 128695, 145000],
+  "financial_data_detailed": { 
+    "income_statement": { 
+      "revenue": [132250, 128695, 145000], 
       "net_income": [48334, 37676, 42000],
-      "ebitda": [65000, 55000, 60000]
+      "ebitda": [65000, 55000, 60000] 
     },
     "balance_sheet": {
       "total_assets": [3872000, 3744000, 3900000],
-      "total_liabilities": [3560000, 3450000, 3600000],
+      "total_liabilities": [3560000, 3450000, 3600000], 
       "shareholders_equity": [312000, 294000, 300000],
       "cash_and_equivalents": [500000, 480000, 520000],
-      "short_term_debt": [200000, 180000, 190000],
+      "short_term_debt": [200000, 180000, 190000], 
       "long_term_debt": [300000, 280000, 290000]
     },
-    "cash_flow_statement": {
+    "cash_flow_statement": { 
       "operating_cash_flow": [70000, 60000, 65000],
       "investing_cash_flow": [-10000, -8000, -9000],
       "financing_cash_flow": [-30000, -25000, -28000],
-      "free_cash_flow": [60000, 52000, 56000]
+      "free_cash_flow": [60000, 52000, 56000] 
     },
-    "key_ratios": {},
-    "dcf_assumptions": {
+    "key_ratios": {}, 
+    "dcf_assumptions": { 
       "fcf_projection_years_total": 5, "initial_high_growth_period_years": 2,
       "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.03,
       "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
     },
     "market_data": {
-      "share_price": 195.00, "shares_outstanding": 2900000000,
-      "annual_debt_service_placeholder": "20000",
+      "share_price": 195.00, "shares_outstanding": 2900000000, 
+      "annual_debt_service_placeholder": "20000", 
       "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"
     }
   },
@@ -179,18 +179,18 @@ class DataRetrievalAgent(Agent):
 
     The agent follows a specific data sourcing strategy:
     1.  **Direct Override (Input):** Uses `data_override` from `current_step_inputs` if provided.
-    2.  **Direct Override (SharedContext):** Uses `dra_company_data_override` from `shared_context`
+    2.  **Direct Override (SharedContext):** Uses `dra_company_data_override` from `shared_context` 
         (populated from initial CACM inputs) if `data_override` is not in step inputs.
-    3.  **Live API (Conceptual):** If `api_source` (e.g., "AlphaVantage") is specified in
-        `current_step_inputs` and an API key is available/configured, it attempts to
+    3.  **Live API (Conceptual):** If `api_source` (e.g., "AlphaVantage") is specified in 
+        `current_step_inputs` and an API key is available/configured, it attempts to 
         fetch live data (currently implemented for Company Overview and Global Quote).
     4.  **Specific Mock Data:** Returns detailed, pre-defined mock data for specific
         tickers: "MSFT", "AAPL", "JPM", "TESTCORP".
-    5.  **Generic Placeholder Data:** For any other company ID, returns a generic,
+    5.  **Generic Placeholder Data:** For any other company ID, returns a generic, 
         structurally complete placeholder data package.
 
-    Configuration for API keys (e.g., Alpha Vantage) is typically handled via
-    environment variables (e.g., `ALPHA_VANTAGE_API_KEY`) or can be passed via
+    Configuration for API keys (e.g., Alpha Vantage) is typically handled via 
+    environment variables (e.g., `ALPHA_VANTAGE_API_KEY`) or can be passed via 
     agent configuration at initialization or as `api_key` in `current_step_inputs`.
     """
 
@@ -199,7 +199,7 @@ class DataRetrievalAgent(Agent):
         self.config = agent_config if agent_config else {}
         self.logger.info(f"DataRetrievalAgent initialized. Config: {self.config}")
         # Store API key from config if provided, preferring env var later
-        self.api_key_config = self.config.get("api_key")
+        self.api_key_config = self.config.get("api_key") 
 
     def _get_alpha_vantage_key(self, current_step_inputs: Dict[str, Any]) -> Optional[str]:
         # Order of precedence for API key:
@@ -258,11 +258,11 @@ class DataRetrievalAgent(Agent):
     def _transform_av_data_to_package(self, company_id: str, overview_data: Optional[Dict[str,Any]], quote_data: Optional[Dict[str,Any]]) -> Optional[Dict[str, Any]]:
         if not overview_data and not quote_data:
             return None
-
+        
         self.logger.info(f"Transforming Alpha Vantage data for {company_id}")
         # Basic transformation - this needs to be significantly built out
         # to match the full company_data_package structure.
-
+        
         package = {
             "company_info": {},
             "financial_data_detailed": {"income_statement": {}, "balance_sheet": {}, "cash_flow_statement": {}, "key_ratios": {}, "dcf_assumptions": {}, "market_data": {}},
@@ -277,10 +277,10 @@ class DataRetrievalAgent(Agent):
             package["company_info"]["ticker"] = overview_data.get("Symbol", company_id)
             package["company_info"]["industry_sector"] = overview_data.get("Sector", "N/A")
             package["company_info"]["country"] = overview_data.get("Country", "N/A")
-
+            
             package["qualitative_company_info"]["business_model_strength"] = overview_data.get("Description", "N/A") # Using Description as a proxy
             package["qualitative_company_info"]["competitive_advantages"] = "Refer to company description and industry analysis." # Placeholder
-
+            
             shares_outstanding_str = overview_data.get("SharesOutstanding", "0")
             package["financial_data_detailed"]["market_data"]["shares_outstanding"] = float(shares_outstanding_str) if shares_outstanding_str and shares_outstanding_str != "None" else 0
 
@@ -295,7 +295,7 @@ class DataRetrievalAgent(Agent):
         if quote_data:
             share_price_str = quote_data.get("05. price", "0")
             package["financial_data_detailed"]["market_data"]["share_price"] = float(share_price_str) if share_price_str and share_price_str != "None" else 0.0
-
+            
         package["source_api"] = "AlphaVantage"
         self.logger.debug(f"Transformed AV Package for {company_id}: {package}")
         return package
@@ -308,24 +308,24 @@ class DataRetrievalAgent(Agent):
         Args:
             task_description (str): A description of the task for logging and context.
             current_step_inputs (Dict[str, Any]): Inputs for this execution step, including:
-                - "company_id" (str): The identifier of the company for data retrieval.
+                - "company_id" (str): The identifier of the company for data retrieval. 
                                       Required unless a full `data_override` is provided.
-                - "data_type" (str, optional): Specifies the type of data to retrieve
-                                               (e.g., "get_company_financials").
-                                               Defaults to "get_company_financials".
+                - "data_type" (str, optional): Specifies the type of data to retrieve 
+                                               (e.g., "get_company_financials"). 
+                                               Defaults to "get_company_financials". 
                                                Currently, this primarily influences logging and internal logic
                                                rather than selecting different mock data structures per type.
-                - "data_override" (Dict[str, Any], optional): A complete data package that,
-                                                              if provided, will be returned directly,
+                - "data_override" (Dict[str, Any], optional): A complete data package that, 
+                                                              if provided, will be returned directly, 
                                                               bypassing all other retrieval logic.
-                - "api_source" (str, optional): Specifies an external API to use
-                                                (e.g., "AlphaVantage"). If provided, the agent
+                - "api_source" (str, optional): Specifies an external API to use 
+                                                (e.g., "AlphaVantage"). If provided, the agent 
                                                 will attempt to fetch live data.
-                - "api_key" (str, optional): The API key for the specified `api_source`.
-                                             If not provided here, the agent will try to find it in
+                - "api_key" (str, optional): The API key for the specified `api_source`. 
+                                             If not provided here, the agent will try to find it in 
                                              its initial configuration or environment variables.
-            shared_context (SharedContext): The shared context for the current CACM run,
-                                            used to check for global data overrides
+            shared_context (SharedContext): The shared context for the current CACM run, 
+                                            used to check for global data overrides 
                                             (e.g., `dra_company_data_override` from initial CACM inputs).
 
         Returns:
@@ -355,7 +355,7 @@ class DataRetrievalAgent(Agent):
                 # Note: data_override from current_step_inputs takes precedence if both are somehow present.
                 # This logic assumes if data_override was in current_step_inputs, we'd have returned already.
                 return {"status": "success", "data": override_input_value, "message": "Used shared_context override."}
-
+        
         if not company_id:
             self.logger.error("Missing 'company_id' in inputs for data retrieval (and no override provided).")
             return {"status": "error", "message": "Missing 'company_id' in inputs and no override found."}
@@ -368,14 +368,14 @@ class DataRetrievalAgent(Agent):
             else:
                 overview_data = self._fetch_alpha_vantage_overview(company_id, api_key)
                 quote_data = self._fetch_alpha_vantage_global_quote(company_id, api_key)
-
+                
                 av_package = self._transform_av_data_to_package(company_id, overview_data, quote_data)
                 if av_package:
                     self.logger.info(f"Successfully retrieved and transformed data from Alpha Vantage for {company_id}")
                     return {"status": "success", "data": av_package, "message": f"Data retrieved from Alpha Vantage for {company_id}."}
                 else:
                     self.logger.warning(f"Failed to get sufficient data from Alpha Vantage for {company_id}. Falling back to mocks.")
-
+        
         # 4. Fallback to specific mock data
         if company_id == "MSFT":
             self.logger.info(f"Returning MSFT-specific mock data for {company_id}")
@@ -407,9 +407,9 @@ class DataRetrievalAgent(Agent):
                     "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
                     "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
                 },
-                "market_data": {"share_price": 10.00, "shares_outstanding": 1000000,
-                                "annual_debt_service_placeholder": "1000",
-                                "payment_history_placeholder": "Unknown",
+                "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
+                                "annual_debt_service_placeholder": "1000", 
+                                "payment_history_placeholder": "Unknown", 
                                 "interest_capitalization_placeholder": "Unknown"}
             },
             "qualitative_company_info": {

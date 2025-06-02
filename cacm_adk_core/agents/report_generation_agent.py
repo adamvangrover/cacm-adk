@@ -9,11 +9,11 @@ from cacm_adk_core.context.shared_context import SharedContext
 
 class ReportGenerationAgent(Agent):
     """
-    Agent responsible for assembling a comprehensive report by consolidating
+    Agent responsible for assembling a comprehensive report by consolidating 
     outputs from various analytical agents and relevant data from SharedContext.
 
     It primarily uses structured data passed via `current_step_inputs` (which are typically
-    bound to the outputs of upstream agents like FundamentalAnalystAgent, SNCAnalystAgent,
+    bound to the outputs of upstream agents like FundamentalAnalystAgent, SNCAnalystAgent, 
     and CatalystWrapperAgent) and textual data (like company overview and risk factors)
     retrieved directly from `SharedContext`.
     """
@@ -25,33 +25,33 @@ class ReportGenerationAgent(Agent):
         Assembles a comprehensive Markdown report from various data sources.
 
         This method constructs a report by:
-        1.  Retrieving structured analysis results (from FundamentalAnalystAgent,
+        1.  Retrieving structured analysis results (from FundamentalAnalystAgent, 
             SNCAnalystAgent, CatalystWrapperAgent) passed directly via `current_step_inputs`.
-        2.  Fetching general textual information (e.g., company overview, risk factors)
-            from `SharedContext`, assuming they were populated by an earlier agent
+        2.  Fetching general textual information (e.g., company overview, risk factors) 
+            from `SharedContext`, assuming they were populated by an earlier agent 
             (like DataIngestionAgent).
-        3.  Formatting these pieces of information into different sections of a
+        3.  Formatting these pieces of information into different sections of a 
             Markdown document.
 
         Args:
             task_description (str): A description of the task (e.g., "Generate comprehensive report for MSFT").
-            current_step_inputs (Dict[str, Any]): Inputs for this step, typically bound from
+            current_step_inputs (Dict[str, Any]): Inputs for this step, typically bound from 
                                                 outputs of previous agents. Expected keys include:
                 - "report_title_detail" (str, optional): Specific text to include in the report title.
-                - "fundamental_analysis_data_ref" (dict, optional): The structured output
+                - "fundamental_analysis_data_ref" (dict, optional): The structured output 
                   from `FundamentalAnalystAgent` (includes status, data object with ratios, summaries, etc.).
-                - "snc_analysis_data_ref" (dict, optional): The structured output from
+                - "snc_analysis_data_ref" (dict, optional): The structured output from 
                   `SNCAnalystAgent` (includes status, data object with rating and rationale).
-                - "catalyst_data_ref" (dict, optional): The structured output from
+                - "catalyst_data_ref" (dict, optional): The structured output from 
                   `CatalystWrapperAgent` (includes status, data object with Catalyst insights).
-            shared_context (SharedContext): The shared context object used to retrieve
-                                            common textual data like company name, business overview,
+            shared_context (SharedContext): The shared context object used to retrieve 
+                                            common textual data like company name, business overview, 
                                             and risk factors.
 
         Returns:
             Dict[str, Any]: A dictionary containing the execution status and results:
-                - {"status": "success",
-                   "agent": self.agent_name,
+                - {"status": "success", 
+                   "agent": self.agent_name, 
                    "message": "Report generated successfully...",
                    "generated_report_text": <markdown_string>,
                    "report_file_path": <conceptual_path_to_saved_report_str>
@@ -98,7 +98,7 @@ class ReportGenerationAgent(Agent):
                     report_parts.append(f"- **{key.replace('_', ' ').title()}:** {value:.2f}" if isinstance(value, float) else f"- **{key.replace('_', ' ').title()}:** {value}")
             else:
                 report_parts.append("- No financial ratios provided.")
-
+            
             report_parts.append(f"\n### DCF Valuation: ${faa_data.get('dcf_valuation', 'N/A'):,.2f}" if isinstance(faa_data.get('dcf_valuation'), (int,float)) else f"\n### DCF Valuation: {faa_data.get('dcf_valuation', 'N/A')}")
             report_parts.append(f"### Enterprise Value: ${faa_data.get('enterprise_value', 'N/A'):,.2f}" if isinstance(faa_data.get('enterprise_value'), (int,float)) else f"### Enterprise Value: {faa_data.get('enterprise_value', 'N/A')}")
             report_parts.append(f"### Financial Health Assessment: {faa_data.get('financial_health', 'N/A')}")
@@ -180,9 +180,9 @@ class ReportGenerationAgent(Agent):
     async def receive_analysis_results(self, sending_agent_name: str, results: Dict[str, Any]):
         """
         Stores results received directly from another agent.
-
-        This method is intended for scenarios where an agent might push its results
-        directly to this ReportGenerationAgent, outside the typical orchestrator-managed
+        
+        This method is intended for scenarios where an agent might push its results 
+        directly to this ReportGenerationAgent, outside the typical orchestrator-managed 
         workflow step bindings. This could be considered a legacy pattern or used for
         specific inter-agent communication needs not covered by the standard flow.
 

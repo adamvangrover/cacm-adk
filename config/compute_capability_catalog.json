@@ -115,8 +115,8 @@ current_catalog_json_string = """
       ],
       "outputs": [
           {
-            "name": "ingestion_summary",
-            "type": "object",
+            "name": "ingestion_summary", 
+            "type": "object", 
             "description": "Summary of the data ingestion process, including status and a list of keys for data items the agent attempted to store in SharedContext.",
             "properties": {
                 "status": {"type": "string", "description": "Indicates the status of the ingestion (e.g., 'success')."},
@@ -276,7 +276,7 @@ current_catalog_json_string = """
       ],
       "outputs": [
         {
-          "name": "catalyst_output",
+          "name": "catalyst_output", 
           "type": "object",
           "description": "The output from the CatalystAgent, typically including identified opportunities, deal structures, or reports."
         }

@@ -70,7 +70,7 @@ class SNCAnalystAgent(Agent):
 
         Returns:
             Dict[str, Any]: A dictionary with the execution status and results:
-                - {"status": "success", "data": {"rating": str|None, "rationale": str}}
+                - {"status": "success", "data": {"rating": str|None, "rationale": str}} 
                   (rating is the string value of the SNCRating enum or None)
                 - {"status": "error", "message": str}
         """
@@ -94,7 +94,7 @@ class SNCAnalystAgent(Agent):
             inputs_for_dra = {'company_id': company_id, 'data_type': 'get_company_financials'}
             task_description_for_dra = f"Retrieve financial data for SNC analysis of {company_id}"
             logging.debug(f"SNC_ANALYSIS_A2A_REQUEST: Requesting data from {dra_agent_name}: {inputs_for_dra}")
-
+            
             response_from_dra = await dra_agent.run(task_description_for_dra, inputs_for_dra, shared_context)
             logging.debug(f"SNC_ANALYSIS_A2A_RESPONSE: Received response: {response_from_dra is not None}")
 
@@ -102,7 +102,7 @@ class SNCAnalystAgent(Agent):
                 error_msg = f"Failed to retrieve company data package for {company_id} from {dra_agent_name}. Response: {response_from_dra}"
                 logging.error(error_msg)
                 return {"status": "error", "message": error_msg}
-
+            
             company_data_package = response_from_dra.get("data")
             if not company_data_package:
                 error_msg = f"No data payload in successful response from {dra_agent_name} for {company_id}."
@@ -113,7 +113,7 @@ class SNCAnalystAgent(Agent):
             error_msg = f"Exception during data retrieval from {dra_agent_name} for {company_id}: {e}"
             logging.exception(error_msg) # Log full exception
             return {"status": "error", "message": error_msg}
-
+            
         company_info = company_data_package.get('company_info', {})
         financial_data_detailed = company_data_package.get('financial_data_detailed', {})
         qualitative_company_info = company_data_package.get('qualitative_company_info', {})
@@ -251,10 +251,10 @@ class SNCAnalystAgent(Agent):
                                ) -> Tuple[Optional[SNCRating], str]:
         """
         Determines the SNC rating and generates a rationale.
-
-        This method integrates financial analysis results, qualitative assessments,
-        credit risk mitigation information, and economic context. It uses Semantic
-        Kernel skills (CollateralRiskAssessment, AssessRepaymentCapacity,
+        
+        This method integrates financial analysis results, qualitative assessments, 
+        credit risk mitigation information, and economic context. It uses Semantic 
+        Kernel skills (CollateralRiskAssessment, AssessRepaymentCapacity, 
         AssessNonAccrualStatusIndication) with guidelines from agent configuration
         to assess various risk aspects. Fallback logic based on key financial ratios
         is applied if SK skill outputs are inconclusive or unavailable.
@@ -284,11 +284,11 @@ class SNCAnalystAgent(Agent):
                     "other_collateral_notes": credit_risk_mitigation.get('collateral_notes_for_sk', "None.")
                 }
                 logging.debug(f"SNC_XAI:SK_INPUT:{skill_name_collateral}: {sk_input_vars_collateral}")
-
+                
                 sk_function_collateral = kernel.plugins[self.skills_plugin_name][skill_name_collateral]
                 result_collateral = await kernel.invoke(sk_function_collateral, **sk_input_vars_collateral)
                 sk_response_collateral_str = str(result_collateral)
-
+                
                 lines = sk_response_collateral_str.strip().splitlines()
                 if lines:
                     if "Assessment:" in lines[0]: collateral_sk_assessment_str = lines[0].split("Assessment:", 1)[1].strip().replace('[','').replace(']','')
@@ -343,7 +343,7 @@ class SNCAnalystAgent(Agent):
                 sk_function_nonaccrual = kernel.plugins[self.skills_plugin_name][skill_name_nonaccrual]
                 result_nonaccrual = await kernel.invoke(sk_function_nonaccrual, **sk_input_vars_nonaccrual)
                 sk_response_nonaccrual_str = str(result_nonaccrual)
-
+                
                 lines = sk_response_nonaccrual_str.strip().splitlines()
                 if lines:
                     if "Assessment:" in lines[0]: nonaccrual_sk_assessment_str = lines[0].split("Assessment:",1)[1].strip().replace('[','').replace(']','')

@@ -533,7 +533,7 @@ if __name__ == '__main__':
     # We need to add an entry for DataIngestionAgent in the catalog for this to fully work.
     # Let's assume "urn:adk:capability:basic_document_ingestor:v1" will be its ID.
     # (This would ideally be added to compute_capability_catalog.json in a prior step if not there)
-    # Removing the temporary addition of "urn:adk:capability:basic_document_ingestor:v1"
+    # Removing the temporary addition of "urn:adk:capability:basic_document_ingestor:v1" 
     # as the new test workflow does not use DataIngestionAgent.
     # if "urn:adk:capability:basic_document_ingestor:v1" not in orch.compute_catalog:
     #     orch.compute_catalog["urn:adk:capability:basic_document_ingestor:v1"] = {
@@ -576,18 +576,18 @@ if __name__ == '__main__':
     async def run_agent_test():
         logger_main.info("\n--- Orchestrator Test: MSFT Comprehensive Analysis Workflow ---")
         msft_workflow_path = os.path.join(BASE_DIR, "examples/msft_comprehensive_analysis_workflow.json")
-
+        
         if not os.path.exists(msft_workflow_path):
             logger_main.error(f"MSFT comprehensive workflow file not found: {msft_workflow_path}")
             return
 
         with open(msft_workflow_path, 'r') as f:
             msft_cacm_instance = json.load(f)
-
+        
         logger_main.info(f"Loaded MSFT comprehensive workflow from: {msft_workflow_path}")
-
+        
         success_msft, logs_msft, outputs_msft = await orch.run_cacm(msft_cacm_instance)
-
+        
         logger_main.info(f"MSFT Comprehensive Analysis test success: {success_msft}")
         logger_main.info(f"MSFT Comprehensive Analysis test logs:\n" + "\n".join(logs_msft))
         logger_main.info(f"MSFT Comprehensive Analysis test outputs:\n{json.dumps(outputs_msft, indent=2)}")
