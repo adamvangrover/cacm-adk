@@ -8,7 +8,7 @@ import logging
 import pandas as pd
 import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, List # Added List
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 from cacm_adk_core.context.shared_context import SharedContext
@@ -349,12 +349,8 @@ class FundamentalAnalystAgent(Agent):
         pass
 
 
-        Calculates the Discounted Cash Flow (DCF) valuation of the company using a two-stage FCF projection model.
-
-        Args:
-            company_data (Dict[str, Any]): The comprehensive data package for the company,
-                                         expected to contain 'financial_data_detailed'.
-        """
+    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
+        """Calculates DCF valuation."""
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
         logging.debug(f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
         try:

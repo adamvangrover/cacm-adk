@@ -2,6 +2,7 @@
 # scripts/adk_cli.py
 import json
 import os
+import asyncio # Added for async orchestrator calls
 import click # type: ignore
 
 # Adjust import paths based on running CLI from project root
@@ -10,6 +11,7 @@ try:
     from cacm_adk_core.template_engine.template_engine import TemplateEngine
     from cacm_adk_core.validator.validator import Validator
     from cacm_adk_core.orchestrator.orchestrator import Orchestrator
+    from cacm_adk_core.semantic_kernel_adapter import KernelService # Added import
 except ImportError:
     # Fallback for direct execution from scripts/ if core modules are not found
     # This typically means PYTHONPATH isn't set up correctly for direct script execution.
@@ -19,6 +21,7 @@ except ImportError:
     from cacm_adk_core.template_engine.template_engine import TemplateEngine
     from cacm_adk_core.validator.validator import Validator
     from cacm_adk_core.orchestrator.orchestrator import Orchestrator
+    from cacm_adk_core.semantic_kernel_adapter import KernelService # Added import for fallback
 
 
 # --- Reusable instances ---
@@ -41,7 +44,17 @@ def get_orchestrator(validator_instance):
     if not os.path.exists(DEFAULT_CATALOG_PATH):
         click.echo(f"Error: Compute Capability Catalog not found at {DEFAULT_CATALOG_PATH}. Orchestrator may not function fully.", err=True)
         # Orchestrator init handles this by creating an empty catalog, so we can proceed
-    return Orchestrator(validator=validator_instance, catalog_filepath=DEFAULT_CATALOG_PATH)
+
+    # Instantiate KernelService
+    # This assumes KernelService() can be instantiated without specific args here,
+    # or that its default setup is sufficient for CLI operations.
+    try:
+        kernel_service_instance = KernelService()
+    except Exception as e:
+        click.echo(f"Error: Failed to initialize KernelService: {e}", err=True)
+        return None
+
+    return Orchestrator(validator=validator_instance, catalog_filepath=DEFAULT_CATALOG_PATH, kernel_service=kernel_service_instance)
 
 
 @click.group()
@@ -134,10 +147,15 @@ def validate_cacm_cmd(cacm_filepath):
             click.echo(f"    Validator: {error.get('validator')}")
 
 
+async def _run_cacm_async(orchestrator, cacm_instance_data):
+    """Helper to run orchestrator's async run_cacm method."""
+    return await orchestrator.run_cacm(cacm_instance_data)
+
 @cli.command("run")
 @click.argument("cacm_filepath", type=click.Path(exists=True, dir_okay=False))
-def run_cacm_cmd(cacm_filepath):
-    """Simulates the execution of a CACM file's workflow."""
+@click.option('--output-dir', type=click.Path(), default=None, help="Directory to save generated reports. Overrides default path from agent.")
+def run_cacm_cmd(cacm_filepath, output_dir):
+    """Simulates the execution of a CACM file's workflow and saves reports."""
     validator = get_validator()
     if not validator or not validator.schema:
         click.echo("Error: Validator or schema could not be initialized for pre-run validation.", err=True)
@@ -150,7 +168,6 @@ def run_cacm_cmd(cacm_filepath):
     if not orchestrator.compute_catalog: # Check if catalog loaded properly
         click.echo("Warning: Compute capability catalog was not loaded. 'run' may provide limited capability checks.", err=True)
 
-
     try:
         with open(cacm_filepath, "r") as f:
             cacm_instance_data = json.load(f)
@@ -162,12 +179,60 @@ def run_cacm_cmd(cacm_filepath):
         return
 
     click.echo(f"Attempting to run CACM: {cacm_filepath}")
-    success = orchestrator.run_cacm(cacm_instance_data)
     
+    # Run the orchestrator
+    success, logs, outputs = asyncio.run(_run_cacm_async(orchestrator, cacm_instance_data))
+
+    # Print logs from the orchestrator
+    if logs:
+        click.echo("\n--- Orchestrator Logs ---")
+        for log_entry in logs:
+            click.echo(log_entry)
+        click.echo("--- End of Logs ---")
+
     if success:
-        click.echo(click.style("CACM workflow simulation completed.", fg="green"))
+        click.echo(click.style("\nCACM workflow execution completed successfully.", fg="green"))
+
+        if outputs:
+            click.echo(click.style("Workflow Outputs:", fg="cyan"))
+            for output_name, output_data in outputs.items():
+                output_value = output_data.get('value', None)
+                # Try to find a report package to save
+                if isinstance(output_value, dict) and 'content' in output_value and 'file_path' in output_value:
+                    report_content = output_value['content']
+                    conceptual_file_path = output_value['file_path']
+
+                    click.echo(f"  Found potential report package in output: '{output_name}'")
+
+                    final_output_path = conceptual_file_path
+                    if output_dir:
+                        if not os.path.isabs(output_dir):
+                            output_dir = os.path.abspath(output_dir)
+                        final_output_path = os.path.join(output_dir, os.path.basename(conceptual_file_path))
+
+                    try:
+                        # Ensure directory exists
+                        output_directory = os.path.dirname(final_output_path)
+                        if not os.path.exists(output_directory):
+                            os.makedirs(output_directory, exist_ok=True)
+                            click.echo(f"  Created directory: {output_directory}")
+
+                        with open(final_output_path, "w") as f:
+                            f.write(report_content)
+                        click.echo(click.style(f"  Report from '{output_name}' saved to: {final_output_path}", fg="green"))
+                    except IOError as e:
+                        click.echo(click.style(f"  Error saving report from '{output_name}' to {final_output_path}: {e}", fg="red"), err=True)
+                    except Exception as e: # Catch other potential errors like invalid paths
+                        click.echo(click.style(f"  An unexpected error occurred while saving report from '{output_name}': {e}", fg="red"), err=True)
+                else:
+                    # For non-report outputs, just print their name and type for now
+                    click.echo(f"  - {output_name}: (type: {type(output_value).__name__})")
+
+        else:
+            click.echo("No outputs returned from the workflow.")
+
     else:
-        click.echo(click.style("CACM workflow simulation failed or did not run due to validation errors.", fg="red"))
+        click.echo(click.style("\nCACM workflow execution failed or did not complete due to validation/runtime errors.", fg="red"))
 
 
 if __name__ == '__main__':
