@@ -1,17 +1,9 @@
 # cacm_adk_core/agents/data_retrieval_agent.py
 import logging
 from typing import Dict, Any, Optional
-
-from cacm_adk_core.agents.base_agent import Agent
-from cacm_adk_core.semantic_kernel_adapter import KernelService
-from cacm_adk_core.context.shared_context import SharedContext
-
-# cacm_adk_core/agents/data_retrieval_agent.py
-import logging
-from typing import Dict, Any, Optional
-import os # Added for environment variable
-import requests # Added for API calls
-import json # Added for json.JSONDecodeError
+import os 
+import requests 
+import json 
 
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
@@ -183,14 +175,23 @@ testcorp_data_package = {
 
 class DataRetrievalAgent(Agent):
     """
-    Agent responsible for retrieving various types of data for specified companies.
+    Retrieves various data packages for specified companies to be used by other agents.
 
-    It serves different data packages based on the company_id and other inputs:
-    1.  Direct `data_override` from `current_step_inputs`.
-    2.  `dra_company_data_override` from `shared_context` (via initial CACM inputs).
-    3.  Live data from Alpha Vantage if `api_source='AlphaVantage'` and API key is available (Company Overview & Global Quote).
-    4.  Specific, detailed mock data for "MSFT", "AAPL", "JPM", "TESTCORP".
-    5.  Generic placeholder data for any other `company_id`.
+    The agent follows a specific data sourcing strategy:
+    1.  **Direct Override (Input):** Uses `data_override` from `current_step_inputs` if provided.
+    2.  **Direct Override (SharedContext):** Uses `dra_company_data_override` from `shared_context` 
+        (populated from initial CACM inputs) if `data_override` is not in step inputs.
+    3.  **Live API (Conceptual):** If `api_source` (e.g., "AlphaVantage") is specified in 
+        `current_step_inputs` and an API key is available/configured, it attempts to 
+        fetch live data (currently implemented for Company Overview and Global Quote).
+    4.  **Specific Mock Data:** Returns detailed, pre-defined mock data for specific
+        tickers: "MSFT", "AAPL", "JPM", "TESTCORP".
+    5.  **Generic Placeholder Data:** For any other company ID, returns a generic, 
+        structurally complete placeholder data package.
+
+    Configuration for API keys (e.g., Alpha Vantage) is typically handled via 
+    environment variables (e.g., `ALPHA_VANTAGE_API_KEY`) or can be passed via 
+    agent configuration at initialization or as `api_key` in `current_step_inputs`.
     """
 
     def __init__(self, kernel_service: KernelService, agent_config: Optional[Dict[str, Any]] = None):
@@ -302,30 +303,35 @@ class DataRetrievalAgent(Agent):
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
         """
-        Retrieves data for a specified company based on the inputs.
-
-        The data retrieval follows a specific order of precedence:
-        1.  `data_override` in `current_step_inputs`: If provided, this entire data package is returned.
-        2.  `dra_company_data_override` in `shared_context.get_global_parameter("initial_inputs")`: 
-            If found, this data package (from CACM inputs) is returned.
-        3.  Live data from Alpha Vantage if `api_source='AlphaVantage'` and API key is available (Company Overview & Global Quote).
-        4.  Specific, detailed mock data for "MSFT", "AAPL", "JPM", "TESTCORP".
-        5.  Generic placeholder data for any other `company_id`.
+        Retrieves data for a specified company based on the inputs and configured data sources.
 
         Args:
-            task_description (str): A description of the task for logging/context.
-            current_step_inputs (Dict[str, Any]): A dictionary of inputs for this step, potentially including:
-                - "company_id" (str): The identifier of the company for which data is requested. (Required unless an override is used extensively)
-                - "data_type" (str, optional): Specifies the type of data to retrieve (e.g., "get_company_financials"). Defaults to "get_company_financials". Currently primarily influences logging.
-                - "data_override" (Dict[str, Any], optional): A complete data package to be returned directly, bypassing other retrieval logic.
-                - "api_source" (str, optional): If specified (e.g., "AlphaVantage"), indicates a desire to use an external API. (Conceptual integration for Alpha Vantage)
-                - "api_key_override" (str, optional): An API key to use for the external API, if `api_source` is specified. (Conceptual)
-            shared_context (SharedContext): The shared context object for the current CACM run, used to check for global overrides.
+            task_description (str): A description of the task for logging and context.
+            current_step_inputs (Dict[str, Any]): Inputs for this execution step, including:
+                - "company_id" (str): The identifier of the company for data retrieval. 
+                                      Required unless a full `data_override` is provided.
+                - "data_type" (str, optional): Specifies the type of data to retrieve 
+                                               (e.g., "get_company_financials"). 
+                                               Defaults to "get_company_financials". 
+                                               Currently, this primarily influences logging and internal logic
+                                               rather than selecting different mock data structures per type.
+                - "data_override" (Dict[str, Any], optional): A complete data package that, 
+                                                              if provided, will be returned directly, 
+                                                              bypassing all other retrieval logic.
+                - "api_source" (str, optional): Specifies an external API to use 
+                                                (e.g., "AlphaVantage"). If provided, the agent 
+                                                will attempt to fetch live data.
+                - "api_key" (str, optional): The API key for the specified `api_source`. 
+                                             If not provided here, the agent will try to find it in 
+                                             its initial configuration or environment variables.
+            shared_context (SharedContext): The shared context for the current CACM run, 
+                                            used to check for global data overrides 
+                                            (e.g., `dra_company_data_override` from initial CACM inputs).
 
         Returns:
-            Dict[str, Any]: A dictionary containing the status of the operation and the retrieved data or an error message.
-                - {"status": "success", "data": <data_package_dict>, "message": <optional_message_str>}
-                - {"status": "error", "message": <error_message_str>}
+            Dict[str, Any]: A dictionary containing the execution status and result:
+                - {"status": "success", "data": <company_data_package_dict>, "message": str (optional)}
+                - {"status": "error", "message": <error_description_str>}
         """
         self.logger.info(f"{self.agent_name} received task: {task_description} with inputs: {current_step_inputs}")
 
@@ -417,32 +423,3 @@ class DataRetrievalAgent(Agent):
             "collateral_and_debt_details": {"loan_to_value_ratio": None, "collateral_type": "N/A", "other_credit_enhancements": "N/A"}
         }
         return {"status": "success", "data": generic_data_package, "message": f"Provided generic placeholder data for {company_id}."}
-                "financial_data_detailed": {
-                    "income_statement": {"revenue": [1000000, 1100000], "net_income": [10000, 12000], "ebitda": [15000, 17000]},
-                    "balance_sheet": {"total_assets": [200000, 210000], "total_liabilities": [80000, 85000],
-                                      "shareholders_equity": [120000, 125000], "cash_and_equivalents": [20000, 25000],
-                                      "short_term_debt": [5000,5000], "long_term_debt": [50000,45000]},
-                    "cash_flow_statement": {"operating_cash_flow": [18000, 20000], "investing_cash_flow": [-5000, -6000],
-                                            "financing_cash_flow": [-3000, -4000], "free_cash_flow": [13000, 14000]},
-                    "key_ratios": {}, # Let FAA calculate these
-                    "dcf_assumptions": { # Generic assumptions
-                        "fcf_projection_years_total": 5, "initial_high_growth_period_years": 2,
-                        "initial_high_growth_rate": 0.05, "stable_growth_rate": 0.02,
-                        "discount_rate": 0.10, "terminal_growth_rate_perpetuity": 0.02
-                    },
-                    "market_data": {"share_price": 10.00, "shares_outstanding": 1000000, 
-                                    "annual_debt_service_placeholder": "1000", 
-                                    "payment_history_placeholder": "Unknown", 
-                                    "interest_capitalization_placeholder": "Unknown"}
-                },
-                "qualitative_company_info": {
-                    "management_assessment": "N/A", "competitive_advantages": "N/A",
-                    "business_model_strength": "N/A",
-                    "revenue_cashflow_stability_notes_placeholder": "Data not available for detailed assessment.",
-                    "financial_deterioration_notes_placeholder": "Data not available for detailed assessment."
-                },
-                "industry_data_context": {"outlook": "N/A"},
-                "economic_data_context": {"overall_outlook": "N/A"},
-                "collateral_and_debt_details": {"loan_to_value_ratio": None, "collateral_type": "N/A", "other_credit_enhancements": "N/A"}
-            }
-            return {"status": "success", "data": generic_data_package, "message": f"Provided generic placeholder data for {company_id}."}

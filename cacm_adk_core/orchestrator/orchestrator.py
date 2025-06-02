@@ -33,7 +33,6 @@ class Orchestrator:
         self.capability_function_map: Dict[str, Callable] = {} # Kept for mixed workflows
         self.agents: Dict[str, Type[Agent]] = {} # Added for agent classes
         self.agent_instances: Dict[str, Agent] = {} # Added for active agent instances per run
-        self.logger = logging.getLogger(self.__class__.__name__) # ADDED THIS LINE
         
         if load_catalog_on_init: # Conditional loading
             self.load_compute_capability_catalog(catalog_filepath)
@@ -278,7 +277,6 @@ class Orchestrator:
                 binding_value_source = step_input_bindings.get(param_name)
                 resolved_value: Any = None
                 value_found = False
-                log_messages.append(f"DEBUG_BINDING: For param '{param_name}', raw binding_value_source from workflow is: '{binding_value_source}' (Type: {type(binding_value_source).__name__})")
 
                 if binding_value_source:
                     if isinstance(binding_value_source, str) and binding_value_source.startswith("cacm.inputs."):
@@ -298,16 +296,6 @@ class Orchestrator:
                             resolved_value = step_outputs.get(prev_step_id, {}).get(prev_output_name)
                             if resolved_value is not None: value_found = True
                         else: log_messages.append(f"WARN: Orchestrator: Invalid step binding format: {binding_value_source}")
-                    elif isinstance(binding_value_source, str) and binding_value_source.startswith("cacm.outputs."):
-                        output_key = binding_value_source.split("cacm.outputs.")[-1]
-                        if output_key in final_cacm_outputs:
-                            log_messages.append(f"DEBUG_BINDING: Found output_key '{output_key}' in final_cacm_outputs. Content: {json.dumps(final_cacm_outputs[output_key], indent=2)}")
-                            # final_cacm_outputs stores entries as {'key': {'value': actual_data, ...}}
-                            resolved_value = final_cacm_outputs[output_key].get('value')
-                            value_found = True
-                            log_messages.append(f"INFO: Orchestrator: Resolved input '{param_name}' from 'cacm.outputs.{output_key}'. Value found: {resolved_value is not None}")
-                        else:
-                            log_messages.append(f"WARN: Orchestrator: Output key 'cacm.outputs.{output_key}' not found in current final_cacm_outputs for input '{param_name}'. Known keys: {list(final_cacm_outputs.keys())}")
                     else: # Direct value
                         resolved_value = binding_value_source
                         value_found = True
@@ -429,30 +417,13 @@ class Orchestrator:
                         output_key_in_cacm = cacm_output_ref_str.split("cacm.outputs.")[-1]
                         
                         # Value to set should come from the current_step_result_data
-                        # The binding_key_in_step_output is the key that the workflow author used in outputBindings
-                        # (e.g., "analysis_result" for FAA step).
-                        # This key should match one of the 'name' fields in the capability's 'outputs' definition.
-
+                        # The binding_key_in_step_output is the key in the dict returned by the function/agent
                         value_to_set = None
-                        # Check if the binding_key_in_step_output corresponds to a defined output of the capability
-                        is_defined_output = False
-                        for out_def in capability_def.get('outputs', []):
-                            if out_def['name'] == binding_key_in_step_output:
-                                is_defined_output = True
-                                break
-
-                        if is_defined_output:
-                            # If it's a defined output, the entire result of the step is considered its value.
-                            # This is crucial for agent outputs like {'status': ..., 'data': ...}
-                            # which ReportGenerationAgent expects as a whole for its *_data_ref inputs.
-                            value_to_set = current_step_result_data
-                        elif isinstance(current_step_result_data, dict):
-                            # Fallback: if not a directly defined output name (e.g. ad-hoc key from a simple skill)
-                            # try to get it from the result dict.
+                        if isinstance(current_step_result_data, dict):
                             value_to_set = current_step_result_data.get(binding_key_in_step_output)
-                            if value_to_set is None:
-                                 log_messages.append(f"WARN: Orchestrator: Fallback get for '{binding_key_in_step_output}' yielded None from step '{step_id}' result dict. This key was not a declared output name either.")
-                        # else: value_to_set remains None (e.g. if current_step_result_data is not a dict and not a single defined output)
+                        elif len(capability_def.get('outputs', [])) == 1 and capability_def['outputs'][0]['name'] == binding_key_in_step_output:
+                            # Handle cases where function returns a single value, and binding key matches that single output name
+                            value_to_set = current_step_result_data
                         
                         if value_to_set is not None:
                             # CRITICAL DEBUG LOG

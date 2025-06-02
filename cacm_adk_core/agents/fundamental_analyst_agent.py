@@ -8,7 +8,7 @@ import logging
 import pandas as pd
 import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union, List # Added List
+from typing import Dict, Any, Optional, Union
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 from cacm_adk_core.context.shared_context import SharedContext
@@ -45,7 +45,34 @@ class FundamentalAnalystAgent(Agent):
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
         """
-        Performs fundamental analysis on a given company based on task description and inputs.
+        Performs fundamental analysis on a given company.
+
+        This involves:
+        1. Retrieving company data via DataRetrievalAgent.
+        2. Calculating key financial ratios.
+        3. Performing DCF valuation (with potential overrides from inputs).
+        4. Calculating Enterprise Value.
+        5. Assessing overall financial health.
+        6. Generating a textual analysis summary using an SK skill (with potential custom guidance from inputs).
+
+        Args:
+            task_description (str): Description of the analysis task.
+            current_step_inputs (Dict[str, Any]): Inputs for this step, including:
+                - "company_id" (str): The unique identifier for the company. Required.
+                - "summary_guidance_prompt_addon" (str, optional): Custom guidance for the 
+                  SK skill generating the analysis summary.
+                - "dcf_override_discount_rate" (float, optional): Value to override the 
+                  default/data-derived DCF discount rate.
+                - "dcf_override_terminal_growth_rate" (float, optional): Value to override 
+                  the default/data-derived DCF terminal growth rate.
+            shared_context (SharedContext): The shared context for the current CACM run.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the status and the analysis results:
+                - {"status": "success", "data": <analysis_package_dict>}
+                - {"status": "error", "message": <error_message_str>}
+                The <analysis_package_dict> includes financial_ratios, dcf_valuation,
+                enterprise_value, financial_health, and analysis_summary.
         """
         self.current_run_inputs = current_step_inputs # Store for access in helper methods
         company_id = self.current_run_inputs.get("company_id")
@@ -99,7 +126,19 @@ class FundamentalAnalystAgent(Agent):
 
     async def retrieve_company_data(self, company_id: str, shared_context: SharedContext) -> Optional[Dict[str, Any]]:
         """
-        Retrieves company data by invoking the DataRetrievalAgent.
+        Retrieves comprehensive company data by invoking the DataRetrievalAgent.
+
+        This method uses the agent-to-agent (A2A) communication pattern facilitated
+        by `self.get_or_create_agent()` to request data for the specified `company_id`.
+        It expects the DataRetrievalAgent to return a structured data package.
+
+        Args:
+            company_id (str): The identifier of the company for which to retrieve data.
+            shared_context (SharedContext): The shared context of the current run.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary containing the company data package
+            if successful, otherwise None.
         """
         dra_agent_name = "DataRetrievalAgent" # This should match the name/key used for DRA registration
         logging.info(f"Attempting to get or create '{dra_agent_name}' to retrieve data for {company_id}.")
@@ -216,11 +255,27 @@ class FundamentalAnalystAgent(Agent):
     async def generate_analysis_summary(self, company_id: str, financial_ratios: Dict[str, float],
                                       dcf_valuation: Optional[float], comps_valuation: Optional[float],
                                       financial_health: str, enterprise_value: Optional[float]) -> str:
-        # ... (existing summary generation logic, SK or fallback) ...
-        # This method's logging is mostly for SK call, fallback summary is straightforward
-        # For XAI, the inputs to this are already logged by `run` and prior calc methods.
-        # Logging within the SK call path is already present.
-        # Fallback summary construction is direct.
+        """
+        Generates a textual summary of the fundamental analysis using a Semantic Kernel skill.
+
+        It compiles various analytical components (ratios, valuation, health assessment)
+        into a structured input for the "SummarizeAnalysis" SK skill.
+        If `summary_guidance_prompt_addon` is present in `self.current_run_inputs`
+        (passed from the `run` method's inputs), it will be used to customize or
+        replace the default prompt for the SK skill.
+
+        Args:
+            company_id (str): Company identifier.
+            financial_ratios (Dict[str, float]): Calculated financial ratios.
+            dcf_valuation (Optional[float]): DCF valuation result.
+            comps_valuation (Optional[float]): Comparables valuation result (currently placeholder).
+            financial_health (str): Assessed financial health string.
+            enterprise_value (Optional[float]): Calculated enterprise value.
+
+        Returns:
+            str: The generated analysis summary text. Falls back to a basic formatted
+                 string if SK skill execution fails or kernel is not available.
+        """
         kernel = self.get_kernel()
         if kernel:
             try:
@@ -349,8 +404,23 @@ class FundamentalAnalystAgent(Agent):
         pass
 
 
-    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
-        """Calculates DCF valuation."""
+        Calculates the Discounted Cash Flow (DCF) valuation of the company.
+
+        Uses a two-stage Free Cash Flow (FCF) projection model.
+        It can utilize override values for `discount_rate` and `terminal_growth_rate_perpetuity`
+        if they are provided in `self.current_run_inputs` (passed from the `run` method's inputs)
+        and are valid (e.g., rate > 0). Otherwise, it uses values from the
+        `dcf_assumptions` section of the input `company_data`.
+
+        Args:
+            company_data (Dict[str, Any]): The comprehensive data package for the company,
+                                         expected to contain 'financial_data_detailed'
+                                         which includes 'cash_flow_statement' and 'dcf_assumptions'.
+
+        Returns:
+            Optional[float]: The calculated DCF valuation, or None if critical data is missing
+                             or assumptions are invalid (e.g., discount rate <= terminal growth rate).
+        """
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
         logging.debug(f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
         try:

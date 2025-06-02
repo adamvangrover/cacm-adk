@@ -59,8 +59,8 @@
       "description": "Ingest MSFT-specific text data (Business Overview, Risk Factors) and Catalyst parameters into SharedContext.",
       "computeCapabilityRef": "urn:adk:capability:standard_data_ingestor:v1",
       "inputBindings": {
-        "companyName": "Microsoft Corp.",
-        "companyTicker": "MSFT",
+        "companyName": {"value": "Microsoft Corp."},
+        "companyTicker": {"value": "MSFT"},
         "riskFactorsText": "cacm.inputs.msft_risk_factors_text",
         "mockStructuredFinancialsForLLMSummary": "cacm.inputs.msft_business_overview_text",
         "catalystParamsForContext": "cacm.inputs.catalyst_input_params"

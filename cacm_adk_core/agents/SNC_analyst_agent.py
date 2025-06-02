@@ -49,6 +49,31 @@ class SNCAnalystAgent(Agent):
             logging.warning("OCC Guidelines SNC not found in agent configuration.")
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
+        """
+        Performs a Shared National Credit (SNC) analysis for a given company.
+
+        The process involves:
+        1. Retrieving detailed company data using DataRetrievalAgent.
+        2. Preparing financial and qualitative inputs for Semantic Kernel (SK) skills.
+        3. Performing financial analysis (using key ratios from retrieved data).
+        4. Performing qualitative analysis (based on retrieved data and SK inputs).
+        5. Evaluating credit risk mitigation factors.
+        6. Determining an SNC rating (Pass, Special Mention, Substandard, Doubtful, Loss)
+           and generating a rationale, leveraging SK skills with regulatory guidelines
+           (Comptroller's Handbook SNC, OCC Guidelines) from agent configuration.
+
+        Args:
+            task_description (str): Description of the analysis task.
+            current_step_inputs (Dict[str, Any]): Inputs for this step, must include:
+                - "company_id" (str): The unique identifier for the company to be analyzed.
+            shared_context (SharedContext): Used for A2A communication (e.g., to get DataRetrievalAgent).
+
+        Returns:
+            Dict[str, Any]: A dictionary with the execution status and results:
+                - {"status": "success", "data": {"rating": str|None, "rationale": str}} 
+                  (rating is the string value of the SNCRating enum or None)
+                - {"status": "error", "message": str}
+        """
         company_id = current_step_inputs.get('company_id')
         logging.info(f"Executing SNC analysis for company_id: {company_id} (Task: {task_description})")
         logging.debug(f"SNC_ANALYSIS_RUN_INPUT: company_id='{company_id}', inputs='{current_step_inputs}'")
@@ -69,7 +94,7 @@ class SNCAnalystAgent(Agent):
             inputs_for_dra = {'company_id': company_id, 'data_type': 'get_company_financials'}
             task_description_for_dra = f"Retrieve financial data for SNC analysis of {company_id}"
             logging.debug(f"SNC_ANALYSIS_A2A_REQUEST: Requesting data from {dra_agent_name}: {inputs_for_dra}")
-
+            
             response_from_dra = await dra_agent.run(task_description_for_dra, inputs_for_dra, shared_context)
             logging.debug(f"SNC_ANALYSIS_A2A_RESPONSE: Received response: {response_from_dra is not None}")
 
@@ -77,7 +102,7 @@ class SNCAnalystAgent(Agent):
                 error_msg = f"Failed to retrieve company data package for {company_id} from {dra_agent_name}. Response: {response_from_dra}"
                 logging.error(error_msg)
                 return {"status": "error", "message": error_msg}
-
+            
             company_data_package = response_from_dra.get("data")
             if not company_data_package:
                 error_msg = f"No data payload in successful response from {dra_agent_name} for {company_id}."
@@ -88,7 +113,7 @@ class SNCAnalystAgent(Agent):
             error_msg = f"Exception during data retrieval from {dra_agent_name} for {company_id}: {e}"
             logging.exception(error_msg) # Log full exception
             return {"status": "error", "message": error_msg}
-
+            
         company_info = company_data_package.get('company_info', {})
         financial_data_detailed = company_data_package.get('financial_data_detailed', {})
         qualitative_company_info = company_data_package.get('qualitative_company_info', {})
@@ -135,7 +160,10 @@ class SNCAnalystAgent(Agent):
             return {"status": "error", "message": error_msg}
 
     def _prepare_financial_inputs_for_sk(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, str]:
-        """Prepares stringified financial inputs required by SK skills."""
+        """
+        Prepares stringified financial data elements required by Semantic Kernel skills
+        for SNC analysis, extracted from the detailed financial data package.
+        """
         cash_flow_statement = financial_data_detailed.get("cash_flow_statement", {})
         key_ratios = financial_data_detailed.get("key_ratios", {})
         market_data = financial_data_detailed.get("market_data", {})
@@ -152,7 +180,10 @@ class SNCAnalystAgent(Agent):
         }
 
     def _prepare_qualitative_inputs_for_sk(self, qualitative_company_info: Dict[str, Any]) -> Dict[str, str]:
-        """Prepares stringified qualitative inputs required by SK skills."""
+        """
+        Prepares stringified qualitative data elements required by Semantic Kernel skills
+        for SNC analysis, extracted from the qualitative company information.
+        """
         return {
             "qualitative_notes_stability_str": qualitative_company_info.get("revenue_cashflow_stability_notes_placeholder", "Management reports stable customer contracts."),
             "notes_financial_deterioration_str": qualitative_company_info.get("financial_deterioration_notes_placeholder", "No significant deterioration noted recently.")
@@ -218,6 +249,17 @@ class SNCAnalystAgent(Agent):
                                credit_risk_mitigation: Dict[str, Any],
                                economic_data_context: Dict[str, Any]
                                ) -> Tuple[Optional[SNCRating], str]:
+        """
+        Determines the SNC rating and generates a rationale.
+        
+        This method integrates financial analysis results, qualitative assessments, 
+        credit risk mitigation information, and economic context. It uses Semantic 
+        Kernel skills (CollateralRiskAssessment, AssessRepaymentCapacity, 
+        AssessNonAccrualStatusIndication) with guidelines from agent configuration
+        to assess various risk aspects. Fallback logic based on key financial ratios
+        is applied if SK skill outputs are inconclusive or unavailable.
+        The final rating and a consolidated rationale are returned.
+        """
         logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis_keys={list(financial_analysis.keys())}, qualitative_analysis_keys={list(qualitative_analysis.keys())}, credit_mitigation_keys={list(credit_risk_mitigation.keys())}, economic_context_keys={list(economic_data_context.keys())}")
         
         rationale_parts = []
@@ -242,11 +284,11 @@ class SNCAnalystAgent(Agent):
                     "other_collateral_notes": credit_risk_mitigation.get('collateral_notes_for_sk', "None.")
                 }
                 logging.debug(f"SNC_XAI:SK_INPUT:{skill_name_collateral}: {sk_input_vars_collateral}")
-
+                
                 sk_function_collateral = kernel.plugins[self.skills_plugin_name][skill_name_collateral]
                 result_collateral = await kernel.invoke(sk_function_collateral, **sk_input_vars_collateral)
                 sk_response_collateral_str = str(result_collateral)
-
+                
                 lines = sk_response_collateral_str.strip().splitlines()
                 if lines:
                     if "Assessment:" in lines[0]: collateral_sk_assessment_str = lines[0].split("Assessment:", 1)[1].strip().replace('[','').replace(']','')
@@ -301,7 +343,7 @@ class SNCAnalystAgent(Agent):
                 sk_function_nonaccrual = kernel.plugins[self.skills_plugin_name][skill_name_nonaccrual]
                 result_nonaccrual = await kernel.invoke(sk_function_nonaccrual, **sk_input_vars_nonaccrual)
                 sk_response_nonaccrual_str = str(result_nonaccrual)
-
+                
                 lines = sk_response_nonaccrual_str.strip().splitlines()
                 if lines:
                     if "Assessment:" in lines[0]: nonaccrual_sk_assessment_str = lines[0].split("Assessment:",1)[1].strip().replace('[','').replace(']','')
