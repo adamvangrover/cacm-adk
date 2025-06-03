@@ -9,18 +9,21 @@
 @prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
 @prefix kgprop: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
 @prefix adkarch: <http://www.example.com/adk/architecture#> . # New namespace for ADK architecture
+@prefix altdata: <http://example.com/ontology/cacm_credit_ontology/0.3/alternative_data#> .
+@prefix esg: <http://example.com/ontology/cacm_credit_ontology/0.3/esg#> .
 
 # Base URI for this ontology will be defined in the next step
 
 <http://example.com/ontology/cacm_credit_ontology/0.3#>
     a owl:Ontology ;
     dcterms:title "Credit Analysis Capability Module Ontology"^^xsd:string ;
-    dcterms:description "Comprehensive expansion of the credit analysis ontology, incorporating detailed terms for valuation, risk management, macroeconomics, technical analysis, ESG factors, and LLM/ADK components based on user-provided knowledge graph structure."^^xsd:string ;
-    owl:versionInfo "0.3.0"^^xsd:string ;
-    dcterms:creator "Jules AI Agent"^^xsd:string ; # Or a more appropriate creator
-    dcterms:issued "2024-07-12"^^xsd:date ; # Assuming today's date or a relevant date
-    dcterms:modified "2024-07-12"^^xsd:date ; # Assuming today's date or a relevant date
-    rdfs:comment "This ontology is version 0.3, created to expand upon previous versions with a comprehensive set of classes and properties for credit analysis."^^xsd:string .
+    dcterms:description "Comprehensive expansion of the credit analysis ontology, incorporating detailed terms for valuation, risk management, macroeconomics, technical analysis, ESG factors, alternative data, and LLM/ADK components based on user-provided knowledge graph structure."^^xsd:string ; # Updated description
+    owl:versionInfo "0.3.0"^^xsd:string ; # Version remains 0.3.0, new additions are part of this version.
+    dcterms:creator "Jules AI Agent"^^xsd:string ; 
+    dcterms:issued "2024-07-12"^^xsd:date ; 
+    dcterms:modified "2024-07-12"^^xsd:date ; # This date should be updated upon modification. For now, keeping it as per original.
+    rdfs:comment """This ontology is version 0.3, created to expand upon previous versions with a comprehensive set of classes and properties for credit analysis.
+Additions include classes and properties for Alternative Data and ESG (Environmental, Social, and Governance) factors based on Section IV.A and Table IV.A of the 'Next-Generation AI-Powered Credit Analysis Platform' document."""^^xsd:string . # Updated comment
 
 # Definitions for classes and properties will follow this declaration.
 
@@ -638,6 +641,447 @@ adkarch:SemanticSkill rdf:type owl:Class ;
     rdfs:label "Semantic Skill"^^xsd:string ;
     rdfs:comment "A skill usable by the Semantic Kernel, can be native or LLM-based."^^xsd:string ;
     rdfs:isDefinedBy <http://example.com/adk/architecture#> .
+
+# --- Alternative Data Classes (Section IV.A, Table IV.A) ---
+
+altdata:AlternativeDataRecord rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:DataInput ;
+    rdfs:label "Alternative Data Record"^^xsd:string ;
+    rdfs:comment "A general class for records derived from alternative data sources."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:UtilityPaymentRecord rdf:type owl:Class ;
+    rdfs:subClassOf altdata:AlternativeDataRecord ;
+    rdfs:label "Utility Payment Record"^^xsd:string ;
+    rdfs:comment "Record of utility payments, indicating payment history and consistency."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:RentalPaymentRecord rdf:type owl:Class ;
+    rdfs:subClassOf altdata:AlternativeDataRecord ;
+    rdfs:label "Rental Payment Record"^^xsd:string ;
+    rdfs:comment "Record of rental payments, indicating payment history and consistency."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:TelecomActivity rdf:type owl:Class ;
+    rdfs:subClassOf altdata:AlternativeDataRecord ;
+    rdfs:label "Telecom Activity Data"^^xsd:string ;
+    rdfs:comment "Data related to telecommunications activity, such as payment consistency and plan type."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:BankAccountTransactionFeature rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ; # Represents derived features/metrics
+    rdfs:label "Bank Account Transaction Feature"^^xsd:string ;
+    rdfs:comment "Aggregated features derived from bank account transaction data, like cash flow volatility or average balance."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:SocialMediaSentiment rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ; # Processed output is a metric
+    rdfs:label "Social Media Sentiment"^^xsd:string ;
+    rdfs:comment "Processed sentiment score derived from social media sources."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:GeospatialRiskIndicator rdf:type owl:Class ;
+    rdfs:subClassOf kgclass:RiskFactor ; # This is a type of risk factor
+    rdfs:label "Geospatial Risk Indicator"^^xsd:string ;
+    rdfs:comment "Indicator of risk based on geographical location, such as exposure to natural disasters."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:SupplyChainLink rdf:type owl:Class ;
+    rdfs:label "Supply Chain Link"^^xsd:string ;
+    rdfs:comment "Represents a link or relationship within a supply chain, indicating dependencies."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:PublicWebDataInsight rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ; # An insight is a derived piece of information
+    rdfs:label "Public Web Data Insight"^^xsd:string ;
+    rdfs:comment "Insights derived from public web data, such as sentiment, events, or relevance scores."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Alternative Data Properties (Datatype Properties) ---
+
+altdata:paymentStatus rdf:type owl:DatatypeProperty ;
+    rdfs:label "Payment Status"^^xsd:string ;
+    rdfs:comment "Status of a payment (e.g., 'on-time', 'late', 'missed')."^^xsd:string ;
+    rdfs:domain altdata:UtilityPaymentRecord ;
+    rdfs:domain altdata:RentalPaymentRecord ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:paymentDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "Payment Date"^^xsd:string ;
+    rdfs:comment "Date a payment was made or was due."^^xsd:string ;
+    rdfs:domain altdata:UtilityPaymentRecord ;
+    rdfs:domain altdata:RentalPaymentRecord ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:utilityType rdf:type owl:DatatypeProperty ;
+    rdfs:label "Utility Type"^^xsd:string ;
+    rdfs:comment "Type of utility (e.g., 'electricity', 'water', 'gas')."^^xsd:string ;
+    rdfs:domain altdata:UtilityPaymentRecord ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:paymentConsistency rdf:type owl:DatatypeProperty ; # Could be a qualitative score or a quantitative metric
+    rdfs:label "Payment Consistency"^^xsd:string ;
+    rdfs:comment "Consistency of telecom payments (e.g., 'consistent', 'inconsistent', or a score)."^^xsd:string ;
+    rdfs:domain altdata:TelecomActivity ;
+    rdfs:range xsd:string ; 
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:planType rdf:type owl:DatatypeProperty ;
+    rdfs:label "Plan Type"^^xsd:string ;
+    rdfs:comment "Type of telecom plan (e.g., 'prepaid', 'postpaid')."^^xsd:string ;
+    rdfs:domain altdata:TelecomActivity ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:cashFlowVolatility rdf:type owl:DatatypeProperty ;
+    rdfs:label "Cash Flow Volatility"^^xsd:string ; # Could be a numerical score
+    rdfs:comment "Volatility of cash flow observed in bank account transactions."^^xsd:string ;
+    rdfs:domain altdata:BankAccountTransactionFeature ;
+    rdfs:range xsd:string ; # Or xsd:float if a score
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:averageBalance rdf:type owl:DatatypeProperty ;
+    rdfs:label "Average Balance"^^xsd:string ;
+    rdfs:comment "Average balance maintained in a bank account."^^xsd:string ;
+    rdfs:domain altdata:BankAccountTransactionFeature ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:spendingCategoryFocus rdf:type owl:DatatypeProperty ;
+    rdfs:label "Spending Category Focus"^^xsd:string ;
+    rdfs:comment "Primary categories of spending observed from bank transactions."^^xsd:string ;
+    rdfs:domain altdata:BankAccountTransactionFeature ;
+    rdfs:range xsd:string ; # Could be a list of strings or a JSON string
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:sentimentScore rdf:type owl:DatatypeProperty ;
+    rdfs:label "Sentiment Score"^^xsd:string ;
+    rdfs:comment "Numerical score representing sentiment (e.g., -1 to 1, or 0 to 1)."^^xsd:string ;
+    rdfs:domain altdata:SocialMediaSentiment ;
+    rdfs:domain altdata:PublicWebDataInsight ; # Sentiment can also be a public web data insight
+    rdfs:range xsd:float ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:sentimentSource rdf:type owl:DatatypeProperty ;
+    rdfs:label "Sentiment Source"^^xsd:string ;
+    rdfs:comment "Source of the sentiment data (e.g., 'Twitter', 'News Article')."^^xsd:string ;
+    rdfs:domain altdata:SocialMediaSentiment ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:sentimentDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "Sentiment Date"^^xsd:string ;
+    rdfs:comment "Date the sentiment was recorded or pertains to."^^xsd:string ;
+    rdfs:domain altdata:SocialMediaSentiment ;
+    rdfs:range xsd:date ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:riskType rdf:type owl:DatatypeProperty ;
+    rdfs:label "Geospatial Risk Type"^^xsd:string ;
+    rdfs:comment "Type of geospatial risk (e.g., 'flood', 'wildfire', 'earthquake')."^^xsd:string ;
+    rdfs:domain altdata:GeospatialRiskIndicator ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:exposureLevel rdf:type owl:DatatypeProperty ;
+    rdfs:label "Exposure Level"^^xsd:string ;
+    rdfs:comment "Level of exposure to the geospatial risk (e.g., 'high', 'medium', 'low', or a score)."^^xsd:string ;
+    rdfs:domain altdata:GeospatialRiskIndicator ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:locationRef rdf:type owl:DatatypeProperty ; # Could be an object property if linking to a Location class
+    rdfs:label "Location Reference"^^xsd:string ;
+    rdfs:comment "Reference to the specific location for the geospatial risk."^^xsd:string ;
+    rdfs:domain altdata:GeospatialRiskIndicator ;
+    rdfs:range xsd:string ; # e.g., coordinates, address, or an identifier
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:supplierName rdf:type owl:DatatypeProperty ;
+    rdfs:label "Supplier Name"^^xsd:string ;
+    rdfs:comment "Name of the supplier in a supply chain link."^^xsd:string ;
+    rdfs:domain altdata:SupplyChainLink ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:customerName rdf:type owl:DatatypeProperty ;
+    rdfs:label "Customer Name"^^xsd:string ;
+    rdfs:comment "Name of the customer in a supply chain link."^^xsd:string ;
+    rdfs:domain altdata:SupplyChainLink ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:linkStrength rdf:type owl:DatatypeProperty ;
+    rdfs:label "Link Strength"^^xsd:string ;
+    rdfs:comment "Strength of the supply chain link (e.g., 'strong', 'weak', or a score)."^^xsd:string ;
+    rdfs:domain altdata:SupplyChainLink ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:linkType rdf:type owl:DatatypeProperty ;
+    rdfs:label "Link Type"^^xsd:string ;
+    rdfs:comment "Type of supply chain link (e.g., 'critical supplier', 'sole source')."^^xsd:string ;
+    rdfs:domain altdata:SupplyChainLink ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:insightType rdf:type owl:DatatypeProperty ;
+    rdfs:label "Insight Type"^^xsd:string ;
+    rdfs:comment "Type of insight from public web data (e.g., 'emerging risk', 'positive sentiment', 'key event')."^^xsd:string ;
+    rdfs:domain altdata:PublicWebDataInsight ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:source rdf:type owl:DatatypeProperty ;
+    rdfs:label "Source"^^xsd:string ;
+    rdfs:comment "Source of the public web data insight (e.g., URL, website name)."^^xsd:string ;
+    rdfs:domain altdata:PublicWebDataInsight ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:textSnippet rdf:type owl:DatatypeProperty ;
+    rdfs:label "Text Snippet"^^xsd:string ;
+    rdfs:comment "Relevant text snippet from the public web data."^^xsd:string ;
+    rdfs:domain altdata:PublicWebDataInsight ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:relevanceScore rdf:type owl:DatatypeProperty ;
+    rdfs:label "Relevance Score"^^xsd:string ;
+    rdfs:comment "Score indicating the relevance of the insight."^^xsd:string ;
+    rdfs:domain altdata:PublicWebDataInsight ;
+    rdfs:range xsd:float ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- ESG Data Classes (Section IV.A) ---
+
+esg:ESGMetric rdf:type owl:Class ;
+    rdfs:subClassOf cacm_ont:Metric ;
+    rdfs:label "ESG Metric"^^xsd:string ;
+    rdfs:comment "A metric related to Environmental, Social, or Governance factors."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:EnvironmentalFactor rdf:type owl:Class ;
+    rdfs:subClassOf esg:ESGMetric ; # Could also be a direct subclass of kgclass:RiskFactor if viewed primarily as risk
+    rdfs:label "Environmental Factor"^^xsd:string ;
+    rdfs:comment "An ESG factor related to environmental impact and sustainability."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:SocialFactor rdf:type owl:Class ;
+    rdfs:subClassOf esg:ESGMetric ; # Could also be a direct subclass of kgclass:RiskFactor
+    rdfs:label "Social Factor"^^xsd:string ;
+    rdfs:comment "An ESG factor related to social aspects like employee relations, community impact, and human rights."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:GovernanceFactor rdf:type owl:Class ;
+    rdfs:subClassOf esg:ESGMetric ; # Could also be a direct subclass of kgclass:RiskFactor
+    rdfs:label "Governance Factor"^^xsd:string ;
+    rdfs:comment "An ESG factor related to corporate governance, such as board structure, executive compensation, and shareholder rights."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# Specific Examples of ESG Metrics/Factors
+
+esg:CarbonEmission rdf:type owl:Class ;
+    rdfs:subClassOf esg:EnvironmentalFactor ;
+    rdfs:label "Carbon Emission"^^xsd:string ;
+    rdfs:comment "Metric for carbon emissions, detailing value, unit, reporting period, and scope."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:WaterUsage rdf:type owl:Class ;
+    rdfs:subClassOf esg:EnvironmentalFactor ;
+    rdfs:label "Water Usage"^^xsd:string ;
+    rdfs:comment "Metric for water usage by an entity."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:WasteManagementPolicyAdherence rdf:type owl:Class ; # This might be more of a qualitative rating or status
+    rdfs:subClassOf esg:EnvironmentalFactor ;
+    rdfs:label "Waste Management Policy Adherence"^^xsd:string ;
+    rdfs:comment "Adherence to waste management policies, potentially a rating or status."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:EmployeeSafetyRecord rdf:type owl:Class ; # Could be a set of metrics or a rating
+    rdfs:subClassOf esg:SocialFactor ;
+    rdfs:label "Employee Safety Record"^^xsd:string ;
+    rdfs:comment "Record or rating related to employee safety."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:CommunityInvestmentLevel rdf:type owl:Class ;
+    rdfs:subClassOf esg:SocialFactor ;
+    rdfs:label "Community Investment Level"^^xsd:string ;
+    rdfs:comment "Level of investment in community initiatives."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:DiversityAndInclusionRating rdf:type owl:Class ;
+    rdfs:subClassOf esg:SocialFactor ;
+    rdfs:label "Diversity and Inclusion Rating"^^xsd:string ;
+    rdfs:comment "Rating of an entity's diversity and inclusion performance."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:BoardIndependenceRatio rdf:type owl:Class ;
+    rdfs:subClassOf esg:GovernanceFactor ;
+    rdfs:subClassOf cacm_ont:Ratio ; # It's also a ratio
+    rdfs:label "Board Independence Ratio"^^xsd:string ;
+    rdfs:comment "Ratio of independent directors on the board."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:ExecutiveCompensationPolicyTransparency rdf:type owl:Class ; # Could be a rating or status
+    rdfs:subClassOf esg:GovernanceFactor ;
+    rdfs:label "Executive Compensation Policy Transparency"^^xsd:string ;
+    rdfs:comment "Transparency of executive compensation policies."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:ShareholderRightsStrength rdf:type owl:Class ; # Could be a rating or score
+    rdfs:subClassOf esg:GovernanceFactor ;
+    rdfs:label "Shareholder Rights Strength"^^xsd:string ;
+    rdfs:comment "Strength of shareholder rights within the company."^^xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:OverallESGRating rdf:type owl:Class;
+  rdfs:subClassOf kgclass:Rating ;
+  rdfs:label "Overall ESG Rating"^^xsd:string ;
+  rdfs:comment "An overall rating assessing an entity's ESG performance, often provided by third-party agencies."^^xsd:string ;
+  rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+
+# --- ESG Data Properties (Datatype Properties) ---
+
+esg:metricValue rdf:type owl:DatatypeProperty ; # Generic value for any ESG metric
+    rdfs:label "Metric Value"^^xsd:string ;
+    rdfs:comment "The value of an ESG metric."^^xsd:string ;
+    rdfs:domain esg:ESGMetric ; # Apply to parent ESGMetric for inheritance
+    rdfs:range xsd:string ; # General, can be refined by specific metric types or instances (e.g. float for CarbonEmissionValue)
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:metricUnit rdf:type owl:DatatypeProperty ;
+    rdfs:label "Metric Unit"^^xsd:string ;
+    rdfs:comment "The unit of measurement for an ESG metric (e.g., 'tonnes CO2e', 'cubic meters', '%')."^^xsd:string ;
+    rdfs:domain esg:ESGMetric ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:reportingPeriod rdf:type owl:DatatypeProperty ;
+    rdfs:label "Reporting Period"^^xsd:string ;
+    rdfs:comment "The period to which an ESG metric applies (e.g., '2023', 'Q1 2024')."^^xsd:string ;
+    rdfs:domain esg:ESGMetric ;
+    rdfs:range xsd:string ; # Could be more specific like gYear or a custom date range type
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:emissionScope rdf:type owl:DatatypeProperty ;
+    rdfs:label "Emission Scope"^^xsd:string ;
+    rdfs:comment "Scope of carbon emissions (e.g., 'Scope 1', 'Scope 2', 'Scope 3')."^^xsd:string ;
+    rdfs:domain esg:CarbonEmission ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:ratingValue rdf:type owl:DatatypeProperty ; # For qualitative ratings that are ESG specific
+    rdfs:label "ESG Rating Value"^^xsd:string ;
+    rdfs:comment "Value of an ESG rating (e.g., 'AAA', 'B', 'High', 'Compliant')."^^xsd:string ;
+    rdfs:domain esg:WasteManagementPolicyAdherence ;
+    rdfs:domain esg:EmployeeSafetyRecord ;
+    rdfs:domain esg:DiversityAndInclusionRating ;
+    rdfs:domain esg:ExecutiveCompensationPolicyTransparency ;
+    rdfs:domain esg:ShareholderRightsStrength ;
+    rdfs:domain esg:OverallESGRating ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:dataSource rdf:type owl:DatatypeProperty ; # Could also be an object property if linking to a Data Source class
+    rdfs:label "ESG Data Source"^^xsd:string ;
+    rdfs:comment "Source of the ESG data or rating (e.g., 'Company Report', 'MSCI', 'Sustainalytics')."^^xsd:string ;
+    rdfs:domain esg:ESGMetric ;
+    rdfs:domain esg:OverallESGRating ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+# --- Object Properties for Alternative Data and ESG ---
+
+altdata:hasUtilityPaymentHistory rdf:type owl:ObjectProperty ;
+    rdfs:label "has utility payment history"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to their utility payment records."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range altdata:UtilityPaymentRecord ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasRentalPaymentHistory rdf:type owl:ObjectProperty ;
+    rdfs:label "has rental payment history"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to their rental payment records."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range altdata:RentalPaymentRecord ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasTelecomActivity rdf:type owl:ObjectProperty ;
+    rdfs:label "has telecom activity"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to their telecom activity data."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range altdata:TelecomActivity ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasBankAccountFeature rdf:type owl:ObjectProperty ;
+    rdfs:label "has bank account feature"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to derived features from their bank account transactions."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range altdata:BankAccountTransactionFeature ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasSocialMediaSentiment rdf:type owl:ObjectProperty ;
+    rdfs:label "has social media sentiment"^^xsd:string ;
+    rdfs:comment "Connects an Obligor or Asset to associated social media sentiment scores."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    rdfs:range altdata:SocialMediaSentiment ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasGeospatialRisk rdf:type owl:ObjectProperty ;
+    rdfs:label "has geospatial risk"^^xsd:string ;
+    rdfs:comment "Connects an Obligor or Asset to a geospatial risk indicator."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    rdfs:range altdata:GeospatialRiskIndicator ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasSupplyChainLink rdf:type owl:ObjectProperty ;
+    rdfs:label "has supply chain link"^^xsd:string ;
+    rdfs:comment "Connects an Obligor (company) to its supply chain links."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range altdata:SupplyChainLink ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+altdata:hasPublicWebDataInsight rdf:type owl:ObjectProperty ;
+    rdfs:label "has public web data insight"^^xsd:string ;
+    rdfs:comment "Connects an Obligor or Asset to insights derived from public web data."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    rdfs:range altdata:PublicWebDataInsight ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:reportsESGMetric rdf:type owl:ObjectProperty ;
+    rdfs:label "reports ESG metric"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to an ESG metric they report."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range esg:ESGMetric ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:hasESGRating rdf:type owl:ObjectProperty ;
+    rdfs:label "has ESG rating"^^xsd:string ;
+    rdfs:comment "Connects an Obligor to their overall ESG rating."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:range esg:OverallESGRating ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
+esg:affectedByESGFactor rdf:type owl:ObjectProperty ;
+    rdfs:label "affected by ESG factor"^^xsd:string ;
+    rdfs:comment "Indicates that an Obligor or Asset is affected by a specific ESG factor (which could be a risk or an opportunity)."^^xsd:string ;
+    rdfs:domain kgclass:Obligor ;
+    rdfs:domain kgclass:Asset ;
+    owl:equivalentProperty kgprop:exposedTo ; # An ESG Factor can be a type of RiskFactor
+    rdfs:range esg:EnvironmentalFactor ;
+    rdfs:range esg:SocialFactor ;
+    rdfs:range esg:GovernanceFactor ;
+    rdfs:isDefinedBy <http://example.com/ontology/cacm_credit_ontology/0.3#> .
+
 
 # --- ADK Architecture Object Properties ---
 

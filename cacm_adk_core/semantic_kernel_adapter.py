@@ -40,6 +40,16 @@ class KernelService:
             self.kernel.add_plugin(CustomReportingSkills(kernel=self.kernel, logger_instance=logger), plugin_name="ReportingAnalysisSkills") # Fixed: logger_instance
             logger.info("Registered CustomReportingSkills with the kernel under plugin ReportingAnalysisSkills.")
 
+            # Register KGPopulationSkill
+            from cacm_adk_core.skills.kg_population_skills import KGPopulationSkill
+            self.kernel.add_plugin(KGPopulationSkill(logger=logger), plugin_name="KGPopulation")
+            logger.info("KGPopulationSkill registered with the kernel as 'KGPopulation'.")
+
+            # Register ESGAnalysisSkill
+            from cacm_adk_core.skills.esg_analysis_skill import ESGAnalysisSkill
+            self.kernel.add_plugin(ESGAnalysisSkill(logger=logger), plugin_name="ESGAnalysis")
+            logger.info("ESGAnalysisSkill registered with the kernel as 'ESGAnalysis'.")
+
         except ImportError as e:
             logger.error(f"Failed to import native or placeholder skills: {e}. Some functions may not be available.")
         except Exception as e: # Other potential errors during plugin registration
