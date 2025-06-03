@@ -144,7 +144,7 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         ratios_data_from_output = outputs["final_analysis_output"]["value"]
         self.assertIn("calculated_ratios", ratios_data_from_output)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["current_ratio"], 3.2) 
-        self.assertEqual(ratios_data_from_output["calculated_ratios"]["debt_to_equity_ratio"], 0.47)
+        self.assertEqual(ratios_data_from_output["calculated_ratios"]["debt_to_equity_ratio"], 0.47) 
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["gross_profit_margin"], 40.0)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["net_profit_margin"], 8.33)
         self.assertEqual(ratios_data_from_output["calculated_ratios"]["return_on_assets_ROA"], 13.89)
@@ -159,7 +159,7 @@ class TestOrchestratorIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertIn("**Company Name:** AlphaTech Innovations", report_text_value)
         self.assertIn("**Ticker:** ATI", report_text_value)
         self.assertIn("- **Current Ratio:** 3.2", report_text_value) 
-        self.assertIn("- **Debt To Equity Ratio:** 0.47", report_text_value)
+        self.assertIn("- **Debt To Equity Ratio:** 0.47", report_text_value) 
         self.assertIn("- **Gross Profit Margin:** 40.0", report_text_value)
         self.assertIn("- **Net Profit Margin:** 8.33", report_text_value)
         self.assertIn("- **Return On Assets Roa:** 13.89", report_text_value)

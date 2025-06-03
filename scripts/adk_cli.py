@@ -201,10 +201,10 @@ def run_cacm_cmd(cacm_filepath, output_dir):
             click.echo(click.style("Workflow Outputs:", fg="cyan"))
             for output_name, output_data in outputs.items():
                 output_value = output_data.get('value', None)
-                # Try to find a report package to save
-                if isinstance(output_value, dict) and 'content' in output_value and 'file_path' in output_value:
-                    report_content = output_value['content']
-                    conceptual_file_path = output_value['file_path']
+                # Try to find a report package to save - keys updated to match ReportGenerationAgent
+                if isinstance(output_value, dict) and 'generated_report_text' in output_value and 'report_file_path' in output_value:
+                    report_content = output_value['generated_report_text'] # Key updated
+                    conceptual_file_path = output_value['report_file_path'] # Key updated
 
                     click.echo(f"  Found potential report package in output: '{output_name}'")
 

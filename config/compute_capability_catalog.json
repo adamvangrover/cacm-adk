@@ -220,6 +220,20 @@
           "type": "string",
           "optional": true,
           "description": "Type of the primary document if URI is provided. Currently not processed by the agent; intended for future extension."
+        },
+        {
+          "name": "text_files_to_ingest",
+          "type": "array",
+          "optional": true,
+          "description": "A list of text files to ingest. Each item in the list should be an object with 'file_path' and 'context_key'.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file_path": {"type": "string", "description": "Path to the text file."},
+              "context_key": {"type": "string", "description": "Key to use for storing content in SharedContext."}
+            },
+            "required": ["file_path", "context_key"]
+          }
         }
       ],
       "outputs": [

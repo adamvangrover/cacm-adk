@@ -10,9 +10,9 @@ class BasicCalculationSkill:
     A skill that performs basic calculations.
     """
 
-    @kernel_function(
+    @kernel_function( # Re-enabling decorator with the correct import
         description="Calculates a simple ratio given a numerator and a denominator.",
-        name="calculate_ratio"
+        name="calculate_ratio" # SK uses this name; if not provided, it defaults to method name
     )
     def calculate_ratio(
         self,
@@ -31,7 +31,7 @@ class BasicCalculationSkill:
             raise ValueError("Denominator cannot be zero.")
         return float(numerator) / float(denominator)
 
-    @kernel_function(
+    @kernel_function( 
         description="Compares a financial metric against a threshold using a specified operator.",
         name="simple_scorer"
     )

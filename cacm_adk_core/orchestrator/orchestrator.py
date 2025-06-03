@@ -307,6 +307,14 @@ class Orchestrator:
                             value_found = True
                         else:
                             log_messages.append(f"WARN: Orchestrator: CACM output binding '{binding_value_source}' not found or not in expected format in final_cacm_outputs.")
+                    elif isinstance(binding_value_source, str) and binding_value_source.startswith("shared_context."):
+                        context_key = binding_value_source.split("shared_context.")[-1]
+                        resolved_value = shared_context.get_data(context_key)
+                        if resolved_value is not None:
+                            value_found = True
+                            log_messages.append(f"INFO: Orchestrator: Resolved '{binding_value_source}' from SharedContext.")
+                        else:
+                            log_messages.append(f"WARN: Orchestrator: Value for '{binding_value_source}' not found in SharedContext.")
                     else: # Direct value
                         resolved_value = binding_value_source
                         value_found = True

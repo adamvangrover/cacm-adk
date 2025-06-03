@@ -11,7 +11,8 @@ from typing import Dict, Any, Optional, Tuple # Tuple might be removed if not di
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
 from cacm_adk_core.context.shared_context import SharedContext
-# from semantic_kernel import Kernel # No longer needed for direct type hint in __init__
+from semantic_kernel.functions.kernel_arguments import KernelArguments # Added for SK
+# from semantic_kernel import Kernel
 
 # Logging setup is handled by the orchestrator/framework
 
@@ -138,24 +139,30 @@ class SNCAnalystAgent(Agent):
 
         try:
             # _determine_rating now returns a tuple (rating, rationale)
+            # Analyze Press Releases with SK
+            sk_press_release_insights = await self._analyze_press_releases_with_sk(shared_context)
+
+            # _determine_rating now returns a tuple (rating, rationale)
             rating, rationale = await self._determine_rating(
                 company_info.get('name', company_id),
                 financial_analysis_result,
                 qualitative_analysis_result,
                 credit_risk_mitigation_info,
-                economic_data_context
+                economic_data_context,
+                sk_press_release_insights # Pass insights
             )
             logging.debug(f"SNC_ANALYSIS_RUN_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
-            # Package into the dictionary format
-            return {
-                "status": "success",
-                "data": {
-                    "rating": rating.value if rating else None, # Store enum value
-                    "rationale": rationale
-                }
+            
+            output_data = {
+                "rating": rating.value if rating else None,
+                "rationale": rationale,
+                "sk_generated_press_release_insights": sk_press_release_insights, # Add to output
+                "data_source_notes": "SNC analysis incorporates data from financial statements and SK-generated insights from available press releases."
             }
+            return {"status": "success", "data": output_data}
+
         except Exception as e:
-            error_msg = f"Error during SNC rating determination for {company_id}: {e}"
+            error_msg = f"Error during SNC rating determination or press release analysis for {company_id}: {e}"
             logging.exception(error_msg)
             return {"status": "error", "message": error_msg}
 
@@ -247,7 +254,8 @@ class SNCAnalystAgent(Agent):
                                financial_analysis: Dict[str, Any], 
                                qualitative_analysis: Dict[str, Any], 
                                credit_risk_mitigation: Dict[str, Any],
-                               economic_data_context: Dict[str, Any]
+                               economic_data_context: Dict[str, Any],
+                               sk_press_release_insights: Dict[str, str] # Added
                                ) -> Tuple[Optional[SNCRating], str]:
         """
         Determines the SNC rating and generates a rationale.
@@ -260,9 +268,17 @@ class SNCAnalystAgent(Agent):
         is applied if SK skill outputs are inconclusive or unavailable.
         The final rating and a consolidated rationale are returned.
         """
-        logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis_keys={list(financial_analysis.keys())}, qualitative_analysis_keys={list(qualitative_analysis.keys())}, credit_mitigation_keys={list(credit_risk_mitigation.keys())}, economic_context_keys={list(economic_data_context.keys())}")
+        logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis_keys={list(financial_analysis.keys())}, qualitative_analysis_keys={list(qualitative_analysis.keys())}, credit_mitigation_keys={list(credit_risk_mitigation.keys())}, economic_context_keys={list(economic_data_context.keys())}, press_release_insights_keys={list(sk_press_release_insights.keys())}")
         
         rationale_parts = []
+        
+        # Add SK-generated press release insights to rationale
+        if sk_press_release_insights:
+            rationale_parts.append("SK-Generated Press Release Insights:")
+            for period, insight in sk_press_release_insights.items():
+                rationale_parts.append(f"  - {period.replace('_', ' ').title()}: {insight}")
+            rationale_parts.append("\n") # Add a newline for separation
+
         collateral_sk_assessment_str = None
         collateral_sk_justification = ""
         repayment_sk_assessment_str = None
@@ -420,8 +436,54 @@ class SNCAnalystAgent(Agent):
         final_rationale = " ".join(filter(None, rationale_parts))
         
         logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
-        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}. Rationale: {final_rationale}")
+        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}. Rationale (first 200 chars): {final_rationale[:200]}...")
         return rating, final_rationale
+
+    async def _analyze_press_releases_with_sk(self, shared_context: SharedContext) -> Dict[str, str]:
+        """
+        Analyzes (summarizes) available press release texts from SharedContext using SK.
+        """
+        insights = {}
+        kernel = self.get_kernel()
+        if not kernel:
+            logging.warning("SNC_ANALYZE_PR: Kernel not available, cannot analyze press releases.")
+            return insights
+
+        # These keys should match the 'context_key' provided in the workflow for DataIngestionAgent
+        press_release_context_keys = {
+            "q4_2024": "press_release_q4_2024",
+            "q1_2025": "press_release_q1_2025"
+        }
+
+        for period, context_key in press_release_context_keys.items():
+            press_release_text = shared_context.get_data(context_key) # Changed .get to .get_data
+            if press_release_text and isinstance(press_release_text, str):
+                logging.info(f"SNC_ANALYZE_PR: Analyzing press release for {period} from context key '{context_key}'.")
+                try:
+                    # Using summarize_section for broad insights. Could be refined with more targeted prompts/skills later.
+                    args = KernelArguments(input=press_release_text, max_sentences="5") 
+                    summary_result = await kernel.invoke(
+                        plugin_name="SummarizationSkills", 
+                        function_name="summarize_section",
+                        arguments=args
+                    )
+                    summary_value = str(summary_result)
+                    
+                    if summary_value and "[Placeholder LLM Summary:" not in summary_value:
+                        insights[f"insights_press_release_{period}"] = summary_value
+                        logging.info(f"SNC_ANALYZE_PR: Successfully analyzed press release for {period}.")
+                        logging.debug(f"SNC_XAI:ANALYZE_PR_SK_OUTPUT_{period}: '{summary_value}'")
+                    else:
+                        logging.warning(f"SNC_ANALYZE_PR: Received placeholder or empty summary for {period} from SK. Text was: {summary_value}")
+                        insights[f"insights_press_release_{period}"] = "Insights could not be generated by SK (placeholder returned)."
+                except Exception as e:
+                    logging.error(f"SNC_ANALYZE_PR: Error analyzing press release for {period} using SK: {e}")
+                    insights[f"insights_press_release_{period}"] = f"Error during SK analysis: {e}"
+            else:
+                logging.info(f"SNC_ANALYZE_PR: No press release text found in SharedContext for key '{context_key}' ({period}).")
+                insights[f"insights_press_release_{period}"] = "Not available in SharedContext."
+        
+        return insights
 
 # The if __name__ == '__main__': block should be removed as agents are run by the orchestrator.
 # Test code would typically reside in a separate test file/suite.
