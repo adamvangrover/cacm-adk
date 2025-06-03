@@ -6,9 +6,11 @@ from typing import Dict, List, Any, Optional
 import logging
 
 # from cacm_adk_core.semantic_kernel_adapter import KernelService # Not directly used by skills if kernel passed in
-import semantic_kernel as sk 
+import semantic_kernel as sk
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel import Kernel 
+from semantic_kernel.functions.kernel_function_decorator import kernel_function # Correct decorator import
+from semantic_kernel import Kernel
 
 class SK_EntityInfoExtractorSkill:
     def extract_entity_info(self, sectioned_data: dict) -> dict:
@@ -63,8 +65,9 @@ class SK_MDNA_SummarizerSkill:
 
         if self.kernel:
             try:
-                if self.kernel.get_service(type="chat-completion"):
-                    self.use_placeholder = False 
+                # Check for the specific service type class
+                if self.kernel.get_service(OpenAIChatCompletion):
+                    self.use_placeholder = False
                     logging.info("SK_MDNA_SummarizerSkill: Chat Completion service found. Semantic function will be used if available.")
                     self.summarization_prompt = """
 Summarize the following text in approximately {{max_sentences}} sentences.
@@ -83,12 +86,12 @@ Focus on the key points and main ideas. Text to summarize: {{$input}} Summary:""
         else:
             logging.warning("SK_MDNA_SummarizerSkill: Kernel instance not available. Will use NATIVE placeholder logic.")
 
-    @sk.kernel_function(description="A simple test echo function.", name="test_echo")
+    @kernel_function(description="A simple test echo function.", name="test_echo") # Using correct decorator
     def test_echo(self, text_to_echo: str) -> str:
         logging.info(f"SK_MDNA_SummarizerSkill.test_echo called with: {text_to_echo}")
         return f"Echo from SK_MDNA_SummarizerSkill: {text_to_echo}"
 
-    @sk.kernel_function(
+    @kernel_function( # Using correct decorator
         description="Summarizes a section of text using placeholder or (if configured) LLM logic.",
         name="summarize_section"
     )
@@ -129,7 +132,8 @@ class CustomReportingSkills:
 
         if self.kernel:
             try:
-                if self.kernel.get_service(type="chat-completion"):
+                # Check for the specific service type class
+                if self.kernel.get_service(OpenAIChatCompletion):
                     self.use_placeholder = False
                     self.logger.info("CustomReportingSkills: Chat Completion service found. LLM calls will be attempted if skill logic includes them.")
                 else:
@@ -141,7 +145,7 @@ class CustomReportingSkills:
         else:
             self.logger.warning("CustomReportingSkills: Kernel not provided. Will use placeholders.")
 
-    @sk.kernel_function(description="Generates a placeholder financial performance summary.", name="generate_financial_summary")
+    @kernel_function(description="Generates a placeholder financial performance summary.", name="generate_financial_summary") # Using correct decorator
     async def generate_financial_summary(self, financial_data: Dict[str, Any]) -> str:
         self.logger.info(f"CustomReportingSkills.generate_financial_summary called. Placeholder mode: {self.use_placeholder}")
         if self.use_placeholder:
@@ -156,7 +160,7 @@ class CustomReportingSkills:
                 f"{period_y1} Net Income {ni_y1} {currency}, {period_y2} Net Income {ni_y2} {currency}. "
                 f"Actual LLM output would be here.]")
 
-    @sk.kernel_function(description="Generates a placeholder key risks summary.", name="generate_key_risks_summary")
+    @kernel_function(description="Generates a placeholder key risks summary.", name="generate_key_risks_summary") # Using correct decorator
     async def generate_key_risks_summary(self, risk_factors_text: str) -> str:
         self.logger.info(f"CustomReportingSkills.generate_key_risks_summary called. Placeholder mode: {self.use_placeholder}")
         if self.use_placeholder:
@@ -165,7 +169,7 @@ class CustomReportingSkills:
         return (f"[LLM Placeholder: Key Risks Summary. Input text started with: '{first_50_chars}...'. "
                 f"Actual LLM output would be here.]")
 
-    @sk.kernel_function(description="Generates a placeholder overall assessment.", name="generate_overall_assessment")
+    @kernel_function(description="Generates a placeholder overall assessment.", name="generate_overall_assessment") # Using correct decorator
     async def generate_overall_assessment(self, ratios_json_str: str, financial_summary_text: str, key_risks_summary_text: str) -> str:
         self.logger.info(f"CustomReportingSkills.generate_overall_assessment called. Placeholder mode: {self.use_placeholder}")
         if self.use_placeholder:

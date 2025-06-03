@@ -2,6 +2,7 @@ import os
 import logging
 import semantic_kernel as sk
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+from semantic_kernel.functions.kernel_arguments import KernelArguments # Added for completeness / if main block is used
 
 class KernelService:
     _instance = None
@@ -36,7 +37,7 @@ class KernelService:
             # Register CustomReportingSkills
             from processing_pipeline.semantic_kernel_skills import CustomReportingSkills
             # Pass the kernel and logger to CustomReportingSkills instance
-            self.kernel.add_plugin(CustomReportingSkills(kernel=self.kernel, logger=logger), plugin_name="ReportingAnalysisSkills")
+            self.kernel.add_plugin(CustomReportingSkills(kernel=self.kernel, logger_instance=logger), plugin_name="ReportingAnalysisSkills") # Fixed: logger_instance
             logger.info("Registered CustomReportingSkills with the kernel under plugin ReportingAnalysisSkills.")
 
         except ImportError as e:

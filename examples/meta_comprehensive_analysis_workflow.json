@@ -33,12 +33,31 @@
         "type": "string",
         "value": "Comprehensive Analysis for Meta Platforms, Inc. (META)",
         "description": "Specific detail for the report title for META."
-    }
-  },
+    },
+    "cli_output_directory": {
+            "type": "string",
+            "value": "output_artifacts/workflow_default_meta/", 
+            "description": "Output directory for this workflow, can be overridden by CLI's --output-dir at runtime via adk_cli.py logic."
+        },
+        "press_release_files_list": {
+            "type": "array",
+            "description": "List of press release files to ingest.",
+            "value": [
+                {
+                    "file_path": "data_ingestion/input_documents/META_press_release_2024_Q4_FY.txt",
+                    "context_key": "press_release_q4_2024"
+                },
+                {
+                    "file_path": "data_ingestion/input_documents/META_press_release_2025_Q1.txt",
+                    "context_key": "press_release_q1_2025"
+                }
+            ]
+        }
+    },
   "outputs": {
     "final_generated_report_details": {
       "type": "object",
-      "description": "Details of the generated report for META, including content and conceptual file path."
+            "description": "Details of the generated report package for META."
     },
     "raw_fundamental_analysis": {
       "type": "object",
@@ -63,7 +82,8 @@
         "companyTicker": "META",
         "riskFactorsText": "cacm.inputs.meta_risk_factors_text",
         "mockStructuredFinancialsForLLMSummary": "cacm.inputs.meta_business_overview_text",
-        "catalystParamsForContext": "cacm.inputs.catalyst_input_params"
+        "catalystParamsForContext": "cacm.inputs.catalyst_input_params",
+        "text_files_to_ingest": "cacm.inputs.press_release_files_list"
       },
       "outputBindings": {
         "ingestion_summary": "intermediate.step1_ingestion_summary"
@@ -77,7 +97,7 @@
         "company_id": "cacm.inputs.target_company_id"
       },
       "outputBindings": {
-        "analysis_result": "cacm.outputs.raw_fundamental_analysis"
+        "data": "cacm.outputs.raw_fundamental_analysis"
       }
     },
     {
@@ -88,7 +108,7 @@
         "company_id": "cacm.inputs.target_company_id"
       },
       "outputBindings": {
-        "snc_analysis_result": "cacm.outputs.raw_snc_analysis"
+        "data": "cacm.outputs.raw_snc_analysis"
       }
     },
     {
@@ -101,7 +121,7 @@
         "industry": "cacm.inputs.catalyst_input_params.value.industry"
       },
       "outputBindings": {
-        "catalyst_output": "cacm.outputs.raw_catalyst_output"
+        "data": "cacm.outputs.raw_catalyst_output"
       }
     },
     {
@@ -112,7 +132,8 @@
         "report_title_detail": "cacm.inputs.report_generation_title_detail",
         "fundamental_analysis_data_ref": "cacm.outputs.raw_fundamental_analysis",
         "snc_analysis_data_ref": "cacm.outputs.raw_snc_analysis",
-        "catalyst_data_ref": "cacm.outputs.raw_catalyst_output"
+        "catalyst_data_ref": "cacm.outputs.raw_catalyst_output",
+        "output_dir": "cacm.inputs.cli_output_directory"
       },
       "outputBindings": {
         "report_package": "cacm.outputs.final_generated_report_details"

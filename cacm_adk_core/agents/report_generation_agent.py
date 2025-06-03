@@ -65,6 +65,7 @@ class ReportGenerationAgent(Agent):
         fundamental_analysis_data = current_step_inputs.get("fundamental_analysis_data_ref")
         snc_analysis_data = current_step_inputs.get("snc_analysis_data_ref")
         catalyst_data = current_step_inputs.get("catalyst_data_ref")
+        output_dir = current_step_inputs.get("output_dir", "./output_artifacts/default_report_output") # Get output_dir
 
         # Retrieve text data from SharedContext
         # Keys used here must match those used by DataIngestionAgent
@@ -89,8 +90,8 @@ class ReportGenerationAgent(Agent):
         
         # Fundamental Analysis Section
         report_parts.append("\n## 2. Fundamental Analysis")
-        if fundamental_analysis_data and isinstance(fundamental_analysis_data, dict) and fundamental_analysis_data.get('status') == "success":
-            faa_data = fundamental_analysis_data.get('data', {})
+        if fundamental_analysis_data and isinstance(fundamental_analysis_data, dict): # Input is already the 'data' payload
+            faa_data = fundamental_analysis_data 
             report_parts.append("### Key Financial Ratios:")
             ratios = faa_data.get('financial_ratios', {})
             if ratios:
@@ -102,37 +103,62 @@ class ReportGenerationAgent(Agent):
             report_parts.append(f"\n### DCF Valuation: ${faa_data.get('dcf_valuation', 'N/A'):,.2f}" if isinstance(faa_data.get('dcf_valuation'), (int,float)) else f"\n### DCF Valuation: {faa_data.get('dcf_valuation', 'N/A')}")
             report_parts.append(f"### Enterprise Value: ${faa_data.get('enterprise_value', 'N/A'):,.2f}" if isinstance(faa_data.get('enterprise_value'), (int,float)) else f"### Enterprise Value: {faa_data.get('enterprise_value', 'N/A')}")
             report_parts.append(f"### Financial Health Assessment: {faa_data.get('financial_health', 'N/A')}")
-            report_parts.append("\n### Analysis Summary (from FundamentalAnalystAgent):")
+            report_parts.append("\n### Analysis Summary (from FundamentalAnalystAgent, incorporates SK-processed Press Release Insights):")
             report_parts.append(faa_data.get('analysis_summary', "[Summary not available]"))
+            
+            # Display SK-generated press release summaries from FAA
+            press_release_summaries_faa = faa_data.get('press_release_summaries', {})
+            if press_release_summaries_faa:
+                report_parts.append("\n#### SK-Generated Press Release Summaries (Fundamental Context):")
+                for key, summary in press_release_summaries_faa.items():
+                    # Clean up key for display, e.g., "summary_press_release_q4_2024" -> "Q4 2024"
+                    display_key = key.replace("summary_press_release_", "").replace("_", " ").upper()
+                    report_parts.append(f"- **{display_key}:** {summary}")
+            
+            # Add data_source_notes from FAA
+            data_source_notes_faa = faa_data.get('data_source_notes')
+            if data_source_notes_faa:
+                 report_parts.append(f"\n*Data Source Notes (Fundamental Analysis): {data_source_notes_faa}*")
         else:
-            report_parts.append("Fundamental analysis data not available or indicates an error.")
-            if fundamental_analysis_data and isinstance(fundamental_analysis_data, dict):
-                 report_parts.append(f"Error details: {fundamental_analysis_data.get('message', 'Unknown error')}")
+            report_parts.append("Fundamental analysis data not available or was not successfully processed by the upstream agent.")
+            # No need to print fundamental_analysis_data.get('message') as it's not the full agent output here
 
 
         # SNC Analysis Section
         report_parts.append("\n## 3. Shared National Credit (SNC) Analysis")
-        if snc_analysis_data and isinstance(snc_analysis_data, dict) and snc_analysis_data.get('status') == "success":
-            sncaa_data = snc_analysis_data.get('data', {})
+        if snc_analysis_data and isinstance(snc_analysis_data, dict): # Input is already the 'data' payload
+            sncaa_data = snc_analysis_data
             report_parts.append(f"**SNC Rating:** {sncaa_data.get('rating', '[Rating not provided]')}")
-            report_parts.append("\n**Rationale:**")
+            report_parts.append("\n**Rationale (Incorporates SK-Processed Press Release Insights):**")
             report_parts.append(sncaa_data.get('rationale', '[Rationale not provided]'))
+
+            # Display SK-generated press release insights from SNCAA
+            press_release_insights_snc = sncaa_data.get('sk_generated_press_release_insights', {})
+            if press_release_insights_snc:
+                report_parts.append("\n#### SK-Generated Press Release Insights (SNC Context):")
+                for key, insight in press_release_insights_snc.items():
+                    # Clean up key for display, e.g., "insights_press_release_q4_2024" -> "Q4 2024"
+                    display_key = key.replace("insights_press_release_", "").replace("_", " ").upper()
+                    report_parts.append(f"- **{display_key}:** {insight}")
+
+            # Add data_source_notes from SNCAA
+            data_source_notes_snc = sncaa_data.get('data_source_notes')
+            if data_source_notes_snc:
+                report_parts.append(f"\n*Data Source Notes (SNC Analysis): {data_source_notes_snc}*")
         else:
-            report_parts.append("SNC analysis data not available or indicates an error.")
-            if snc_analysis_data and isinstance(snc_analysis_data, dict):
-                 report_parts.append(f"Error details: {snc_analysis_data.get('message', 'Unknown error')}")
+            report_parts.append("SNC analysis data not available or was not successfully processed by the upstream agent.")
+            # No need to print snc_analysis_data.get('message')
 
         # Catalyst Strategic Insights Section
         report_parts.append("\n## 4. Catalyst Strategic Insights")
-        if catalyst_data and isinstance(catalyst_data, dict) and catalyst_data.get('status') == "success":
-            cat_data = catalyst_data.get('data', {})
+        if catalyst_data and isinstance(catalyst_data, dict): # Input is already the 'data' payload
+            cat_data = catalyst_data 
             report_parts.append("```json")
             report_parts.append(json.dumps(cat_data, indent=2))
             report_parts.append("```")
         else:
-            report_parts.append("Catalyst strategic insights not available or indicates an error.")
-            if catalyst_data and isinstance(catalyst_data, dict):
-                report_parts.append(f"Error details: {catalyst_data.get('message', 'Unknown error')}")
+            report_parts.append("Catalyst strategic insights not available or was not successfully processed by the upstream agent.")
+            # No need to print catalyst_data.get('message')
 
 
         # Key Risk Factors Section
@@ -162,19 +188,26 @@ class ReportGenerationAgent(Agent):
             
         self.logger.info(f"Report assembled. Length: {len(final_report_string)}")
 
-        # Conceptual File Output Logic
+        # File Output Logic
+        # Ensure output_dir exists (conceptually, as agent doesn't write files directly in this design)
+        # For actual file writing, os.makedirs(output_dir, exist_ok=True) would be used.
         report_filename = f"generated_report_{shared_context.get_session_id()}_{shared_context.get_cacm_id()}.md"
-        conceptual_file_path = f"./output_artifacts/final_machine_reports/{report_filename}"
-        self.logger.info(f"Conceptually saving report to: {conceptual_file_path}")
+        # Use os.path.join for platform-independent path construction if agent were to write files
+        report_file_path = f"{output_dir.rstrip('/')}/{report_filename}" # Use the provided output_dir
+        
+        self.logger.info(f"Report generation complete. Conceptual save path: {report_file_path}")
         self.logger.debug(f"Report Content for {report_filename}:\n{final_report_string}")
             
-        # d. Update Agent Return Value
+        # d. Update Agent Return Value to include report_package
+        report_package_output = {
+            "generated_report_text": final_report_string,
+            "report_file_path": report_file_path,
+            "message": "Report generated successfully."
+        }
         return {
             "status": "success",
             "agent": self.agent_name,
-            "message": "Report generated successfully and conceptually saved to file.",
-            "generated_report_text": final_report_string,
-            "report_file_path": conceptual_file_path 
+            "report_package": report_package_output # Ensure this key matches workflow outputBinding
         }
 
     async def receive_analysis_results(self, sending_agent_name: str, results: Dict[str, Any]):

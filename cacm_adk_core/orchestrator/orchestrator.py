@@ -33,6 +33,7 @@ class Orchestrator:
         self.capability_function_map: Dict[str, Callable] = {} # Kept for mixed workflows
         self.agents: Dict[str, Type[Agent]] = {} # Added for agent classes
         self.agent_instances: Dict[str, Agent] = {} # Added for active agent instances per run
+        self.logger = logging.getLogger("Orchestrator") # Initialize logger
         
         if load_catalog_on_init: # Conditional loading
             self.load_compute_capability_catalog(catalog_filepath)
@@ -296,6 +297,24 @@ class Orchestrator:
                             resolved_value = step_outputs.get(prev_step_id, {}).get(prev_output_name)
                             if resolved_value is not None: value_found = True
                         else: log_messages.append(f"WARN: Orchestrator: Invalid step binding format: {binding_value_source}")
+                    elif isinstance(binding_value_source, str) and binding_value_source.startswith("cacm.outputs."):
+                        output_key = binding_value_source.split("cacm.outputs.")[-1]
+                        # final_cacm_outputs stores these as {"value": ..., "description": ...}
+                        # The agent input should receive the actual "value"
+                        output_entry = final_cacm_outputs.get(output_key)
+                        if output_entry is not None and isinstance(output_entry, dict):
+                            resolved_value = output_entry.get("value")
+                            value_found = True
+                        else:
+                            log_messages.append(f"WARN: Orchestrator: CACM output binding '{binding_value_source}' not found or not in expected format in final_cacm_outputs.")
+                    elif isinstance(binding_value_source, str) and binding_value_source.startswith("shared_context."):
+                        context_key = binding_value_source.split("shared_context.")[-1]
+                        resolved_value = shared_context.get_data(context_key)
+                        if resolved_value is not None:
+                            value_found = True
+                            log_messages.append(f"INFO: Orchestrator: Resolved '{binding_value_source}' from SharedContext.")
+                        else:
+                            log_messages.append(f"WARN: Orchestrator: Value for '{binding_value_source}' not found in SharedContext.")
                     else: # Direct value
                         resolved_value = binding_value_source
                         value_found = True

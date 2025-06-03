@@ -25,33 +25,31 @@ class DataIngestionAgent(Agent):
         This method is intended to be replaced with actual file I/O in a production setting.
 
         Args:
-            file_path (Optional[str]): The conceptual path to the file.
-            default_value (Any): The value to return if file_path is not provided.
-            data_type (str): A string indicating the type of data to simulate reading
-                             (e.g., "risk_text", "mock_financials_json").
+            file_path (Optional[str]): The actual path to the file.
+            default_value (Any): The value to return if file_path is not provided or an error occurs.
+            data_type (str): A string indicating the type of data (e.g., "text", "json"). Only "text" is fully supported for actual reading now.
 
         Returns:
-            Any: The conceptual file content or the default_value.
+            Any: The file content (string for text) or the default_value.
         """
-        if file_path:
-            self.logger.info(f"Conceptually reading {data_type} data from file: {file_path}")
-            # In a real scenario, actual file reading and parsing would happen here.
-            if data_type == "risk_text":
-                return "Sample risk factors text from conceptual file. Competition remains a key challenge. Market volatility could impact performance."
-            elif data_type == "mock_financials_json":
-                return {"source": "file_conceptual", "revenue_y1": 2100000, "revenue_y2": 2600000, "net_income_y1": 110000, "net_income_y2": 160000, "currency": "USD", "period_y1_label": "FY2022-File", "period_y2_label": "FY2023-File"}
-            elif data_type == "expanded_financials_json":
-                # This structure includes all keys expected by the enhanced FinancialAnalysisSkill
-                return {
-                    "source": "file_conceptual",
-                    "current_assets": 760000.0, "current_liabilities": 310000.0, 
-                    "total_debt": 510000.0, "total_equity": 910000.0,
-                    "revenue": 2600000.0, "gross_profit": 1000000.0,
-                    "net_income": 160000.0, "total_assets": 1500000.0
-                }
-            self.logger.warning(f"Unknown data_type '{data_type}' for conceptual file read. Returning default.")
+        if not file_path:
             return default_value
-        return default_value
+        
+        try:
+            # Assuming files are UTF-8 encoded text files for now.
+            # For JSON, we'd use json.load(f) after opening.
+            # This agent part needs to align with how actual file paths are resolved (e.g., relative to project root).
+            # For now, assume file_path is directly usable.
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            self.logger.info(f"Successfully read content from file: {file_path}")
+            return content
+        except FileNotFoundError:
+            self.logger.error(f"File not found: {file_path}")
+            return default_value
+        except Exception as e:
+            self.logger.error(f"Error reading file {file_path}: {e}")
+            return default_value
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
         """
@@ -184,6 +182,29 @@ class DataIngestionAgent(Agent):
                  shared_context.set_data("financial_data_for_ratios", current_step_inputs.get("financialStatementData"))
                  self.logger.info("Stored direct financialStatementData under 'financial_data_for_ratios' for basic ratio compatibility.")
                  stored_keys_list.append("financial_data_for_ratios (compat)")
+        
+        # Process text_files_to_ingest
+        text_files_to_ingest = current_step_inputs.get("text_files_to_ingest")
+        if isinstance(text_files_to_ingest, list):
+            for file_item in text_files_to_ingest:
+                if isinstance(file_item, dict):
+                    file_path = file_item.get("file_path")
+                    context_key = file_item.get("context_key")
+                    if file_path and context_key:
+                        # Use the updated _read_file_content_or_default for actual file reading
+                        content = self._read_file_content_or_default(file_path, default_value=None, data_type="text")
+                        if content is not None:
+                            shared_context.set_data(context_key, content)
+                            self.logger.info(f"Stored content from '{file_path}' into SharedContext key '{context_key}'.")
+                            stored_keys_list.append(context_key)
+                        else:
+                            self.logger.warning(f"Failed to read or content was empty for file '{file_path}' specified in text_files_to_ingest.")
+                    else:
+                        self.logger.warning(f"Invalid item in text_files_to_ingest (missing file_path or context_key): {file_item}")
+                else:
+                    self.logger.warning(f"Invalid item type in text_files_to_ingest (expected dict): {file_item}")
+        elif text_files_to_ingest is not None: # If it exists but is not a list
+             self.logger.warning(f"text_files_to_ingest parameter was provided but is not a list: {text_files_to_ingest}")
 
 
         self.logger.info(f"'{self.agent_name}' completed data ingestion. Shared context updated.")

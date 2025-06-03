@@ -1,0 +1,25 @@
+{
+  "company_id": "META",
+  "financial_ratios": {
+    "revenue_growth": 0.10000000000000009,
+    "net_profit_margin": 0.01090909090909091,
+    "return_on_equity": 0.096,
+    "debt_to_equity": 0.68,
+    "current_ratio": 2.4705882352941178,
+    "ebitda_margin": 0.015454545454545455
+  },
+  "dcf_valuation": null,
+  "comps_valuation": null,
+  "enterprise_value": 10025000.0,
+  "financial_health": "Moderate",
+  "analysis_summary": "Fundamental Analysis for META (DataRetrievalAgent Source):\n\nKey Financial Ratios (from DataRetrievalAgent data):\n  - revenue_growth: 0.10\n  - net_profit_margin: 0.01\n  - return_on_equity: 0.10\n  - debt_to_equity: 0.68\n  - current_ratio: 2.47\n  - ebitda_margin: 0.02\nFinancial Health (based on DataRetrievalAgent data): Moderate\nDCF Valuation (DataRetrievalAgent data): Not available\nEnterprise Value (DataRetrievalAgent data): 10025000.00\n\n--- Press Release Insights (Extracted) ---\n  **Q4 2024:**\n    - Revenue: $$45.2 billion 45.2\n    - Netincome: $$15.1 billion 15.1\n    - Eps: $$5.50 5.50\n  **FY 2024:**\n    - Revenue: $$160.5 billion 160.5\n    - Netincome: $$50.3 billion 50.3\n    - Eps: $$18.00 18.00\n  **Q1 2025:**\n    - Revenue: $$48.5 billion 48.5\n    - Netincome: $$16.2 billion 16.2\n    - Eps: $$6.00 6.00\n  **Operational:**\n    - Dap Fy24: 3.25 billion\n    - Adrevenue Fy24: $$155.0 billion 155.0\n    - Dap Q125: 3.30 billion\n  **Outlook:**\n    - Q2 2025 Revenue: $49-52 billion\n\n\n(Summary generated using fallback string formatting. SK summarization skill was not available or failed.)",
+  "press_release_financial_extracts": {
+    "Q4_2024": {"Revenue": "$$45.2 billion 45.2", "NetIncome": "$$15.1 billion 15.1", "EPS": "$$5.50 5.50"},
+    "FY_2024": {"Revenue": "$$160.5 billion 160.5", "NetIncome": "$$50.3 billion 50.3", "EPS": "$$18.00 18.00"},
+    "Q1_2025": {"Revenue": "$$48.5 billion 48.5", "NetIncome": "$$16.2 billion 16.2", "EPS": "$$6.00 6.00"},
+    "Operational": {"DAP_FY24": "3.25 billion", "AdRevenue_FY24": "$$155.0 billion 155.0", "DAP_Q125": "3.30 billion"},
+    "Outlook": {"Q2_2025_Revenue": "$49-52 billion"},
+    "notes": []
+  },
+  "data_source_notes": "Financial analysis primarily based on DataRetrievalAgent. Press release data has been extracted and is available; analysis_summary may incorporate insights."
+}

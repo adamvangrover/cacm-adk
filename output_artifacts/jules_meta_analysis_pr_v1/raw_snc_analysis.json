@@ -1,0 +1,23 @@
+{
+  "rating": null,
+  "rationale": "Initial Rationale based on available data. Fallback: Key financial metrics (D/E, Profitability) missing for full assessment. | Press Release Insights: CEO Commentary Highlights: 2024 was a pivotal year for Meta, with strong growth in our Family of Apps and continued progress in our Reality Labs initiatives,; We've had a strong start to 2025, with continued growth across our Family of Apps and encouraging developments in our AI and Reality Labs efforts,. Strategic Focus Points: AI; metaverse; Family of Apps; Reality Labs; monetization; user engagement. Outlook: Meta expects second quarter 2025 total revenue to be in the range of $49-52 billion..",
+  "press_release_narrative_extracts": {
+    "ceo_quotes": [
+      "2024 was a pivotal year for Meta, with strong growth in our Family of Apps and continued progress in our Reality Labs initiatives,",
+      "We've had a strong start to 2025, with continued growth across our Family of Apps and encouraging developments in our AI and Reality Labs efforts,"
+    ],
+    "strategic_focus": [
+      "AI",
+      "metaverse",
+      "Family of Apps",
+      "Reality Labs",
+      "monetization",
+      "user engagement"
+    ],
+    "outlook_statements": [
+      "Meta expects second quarter 2025 total revenue to be in the range of $49-52 billion."
+    ],
+    "notes": []
+  },
+  "data_source_notes": "SNC Rationale incorporates insights derived from provided press releases."
+}
