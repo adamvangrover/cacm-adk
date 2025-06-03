@@ -49,6 +49,23 @@ class DataIngestionAgent(Agent):
                     "revenue": 2600000.0, "gross_profit": 1000000.0,
                     "net_income": 160000.0, "total_assets": 1500000.0
                 }
+            # New Alt Data Types
+            elif data_type == "altdata_utility_payments_json":
+                return [{"utilityProvider": "City Electric", "utilityType": "Electricity", "paymentStatus": "on-time", "paymentDate": "2023-05-15", "amount": 75.50}]
+            elif data_type == "altdata_rental_payments_json":
+                return [{"propertyAddress": "123 Main St", "paymentStatus": "on-time", "paymentDate": "2023-05-01", "amount": 1200.00}]
+            elif data_type == "altdata_social_sentiment_json":
+                return {"sentimentScore": 0.65, "sentimentSource": "TwitterScanConceptual", "sentimentDate": "2023-06-01", "keywords": ["innovation", "growth"]}
+            elif data_type == "altdata_geospatial_risk_json":
+                return {"riskType": "Flood Zone", "exposureLevel": "Medium", "locationRef": "Lat: 34.05, Lon: -118.24", "assessmentDate": "2023-04-10"}
+            # New ESG Data Types
+            elif data_type == "esg_carbon_emissions_json":
+                return {"scope1Emissions": 1200, "scope2Emissions": 3000, "scope3Emissions": 5000, "totalEmissions": 9200, "unit": "tCO2e", "reportingPeriod": "2022"}
+            elif data_type == "esg_overall_rating_json":
+                return {"ratingValue": "AA", "ratingProvider": "ESGRateCoConceptual", "assessmentDate": "2023-01-01", "reportLink": "http://example.com/esg_report_conceptual"}
+            elif data_type == "esg_employee_safety_json":
+                return {"lostTimeInjuryFrequencyRate": 0.5, "safetyIncidentsReported": 3, "year": 2022, "dataSource": "Internal HR Report"}
+            
             self.logger.warning(f"Unknown data_type '{data_type}' for conceptual file read. Returning default.")
             return default_value
         return default_value
@@ -185,6 +202,44 @@ class DataIngestionAgent(Agent):
                  self.logger.info("Stored direct financialStatementData under 'financial_data_for_ratios' for basic ratio compatibility.")
                  stored_keys_list.append("financial_data_for_ratios (compat)")
 
+        # --- Ingest New Alternative Data Types ---
+        alt_data_types_to_process = {
+            "altdata_utility_payments": ("utilityPaymentsFilePath", "utilityPaymentsData", "altdata_utility_payments_json"),
+            "altdata_rental_payments": ("rentalPaymentsFilePath", "rentalPaymentsData", "altdata_rental_payments_json"),
+            "altdata_social_sentiment": ("socialSentimentFilePath", "socialSentimentData", "altdata_social_sentiment_json"),
+            "altdata_geospatial_risk": ("geospatialRiskFilePath", "geospatialRiskData", "altdata_geospatial_risk_json"),
+        }
+        for context_key, (file_param, data_param, data_type_sim) in alt_data_types_to_process.items():
+            data_value = self._read_file_content_or_default(
+                current_step_inputs.get(file_param),
+                current_step_inputs.get(data_param),
+                data_type=data_type_sim
+            )
+            if data_value:
+                shared_context.set_data(context_key, data_value)
+                self.logger.info(f"Stored {context_key}. Source: {'file' if current_step_inputs.get(file_param) else 'direct input'}.")
+                stored_keys_list.append(context_key)
+            else:
+                self.logger.info(f"{context_key} not found in inputs or file path. Skipped.")
+        
+        # --- Ingest New ESG Data Types ---
+        esg_data_types_to_process = {
+            "esg_carbon_emissions": ("carbonEmissionsFilePath", "carbonEmissionsData", "esg_carbon_emissions_json"),
+            "esg_overall_rating": ("overallEsgRatingFilePath", "overallEsgRatingData", "esg_overall_rating_json"),
+            "esg_employee_safety": ("employeeSafetyFilePath", "employeeSafetyData", "esg_employee_safety_json"),
+        }
+        for context_key, (file_param, data_param, data_type_sim) in esg_data_types_to_process.items():
+            data_value = self._read_file_content_or_default(
+                current_step_inputs.get(file_param),
+                current_step_inputs.get(data_param),
+                data_type=data_type_sim
+            )
+            if data_value:
+                shared_context.set_data(context_key, data_value)
+                self.logger.info(f"Stored {context_key}. Source: {'file' if current_step_inputs.get(file_param) else 'direct input'}.")
+                stored_keys_list.append(context_key)
+            else:
+                self.logger.info(f"{context_key} not found in inputs or file path. Skipped.")
 
         self.logger.info(f"'{self.agent_name}' completed data ingestion. Shared context updated.")
         return {
@@ -214,26 +269,35 @@ if __name__ == '__main__':
         inputs_direct = {
             "companyName": "DirectCorp",
             "companyTicker": "DCORP",
-            "financialStatementData": {"current_assets": 100.0, "current_liabilities": 50.0}, # Old structure
+            "financialStatementData": {"current_assets": 100.0, "current_liabilities": 50.0},
             "mockStructuredFinancialsForLLMSummary": {"revenue_y1": 1000},
-            "riskFactorsText": "Direct risk text."
+            "riskFactorsText": "Direct risk text.",
+            # New direct data
+            "utilityPaymentsData": [{"utilityType": "Gas", "paymentStatus": "late", "paymentDate": "2023-04-20"}],
+            "esgOverallRatingData": {"ratingValue": "BBB", "ratingProvider": "ESGDirect Inc."}
         }
-        print("\n--- Testing with Direct Data Inputs ---")
-        result_direct = await data_agent.run("Ingest direct data.", inputs_direct, mock_shared_context)
+        print("\n--- Testing with Direct Data Inputs (including new types) ---")
+        result_direct = await data_agent.run("Ingest direct data with new types.", inputs_direct, mock_shared_context)
         logging.info(f"DataIngestionAgent (direct) result: {json.dumps(result_direct, indent=2)}")
         mock_shared_context.log_context_summary()
 
+        # Create a new context for the file path test run
+        mock_shared_context_file = SharedContext(cacm_id="test_data_ingestion_file_cacm")
         inputs_file_paths = {
             "companyName": "FileCorp",
             "companyTicker": "FCORP",
             "riskFactorsFilePath": "conceptual_risks.txt",
             "mockFinancialsFilePath": "conceptual_mock_financials.json",
-            "fullFinancialStatementFilePath": "conceptual_expanded_financials.json"
+            "fullFinancialStatementFilePath": "conceptual_expanded_financials.json",
+            # New file paths
+            "socialSentimentFilePath": "conceptual_social_sentiment.json",
+            "carbonEmissionsFilePath": "conceptual_carbon_emissions.json",
+            "rentalPaymentsFilePath": "conceptual_rental_payments.json",
+            "geospatialRiskFilePath": "conceptual_geospatial_risk.json",
+            "employeeSafetyFilePath": "conceptual_employee_safety.json"
         }
-        print("\n--- Testing with File Path Inputs (Conceptual) ---")
-        # Create a new context for the second run or clear relevant parts of the old one
-        mock_shared_context_file = SharedContext(cacm_id="test_data_ingestion_file_cacm")
-        result_file = await data_agent.run("Ingest from file paths.", inputs_file_paths, mock_shared_context_file)
+        print("\n--- Testing with File Path Inputs (Conceptual, including new types) ---")
+        result_file = await data_agent.run("Ingest from file paths with new types.", inputs_file_paths, mock_shared_context_file)
         logging.info(f"DataIngestionAgent (file) result: {json.dumps(result_file, indent=2)}")
         mock_shared_context_file.log_context_summary()
 
