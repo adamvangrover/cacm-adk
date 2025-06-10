@@ -420,7 +420,7 @@ class DataIngestionPipeline(OntologyElement):
 
                     else: # Agent specified but not found or wrong type
                         if self.logger: self.logger.log_event("PipelineError", f"Agent {step['agent_id']} for step {step_name} not found or not an OntologyAgent.", severity="ERROR"); return None
-
+                
                 # Fallback or non-agent step logic (simplified):
                 elif processor_type == "fetch":
                     current_artifact = DataArtifact(name=f"Fetched data for {self.name} from {initial_data_uri}",
@@ -662,7 +662,7 @@ class OntologyAgent(OntologyElement):
         super().__init__(name, description, version)
         self.agent_type: str = agent_type  # E.g., 'DataCollection', 'Analysis', 'Labeling', 'Orchestration'.
         self.capabilities: List[str] = capabilities if capabilities else [] # List of SkillDefinition.skill_name strings.
-
+        
         # References to actual ADK components, initialized via `initialize_actual_agent`.
         self.actual_agent_instance: Optional[ActualAgentBase] = None
         self.kernel_service_ref: Optional[ActualKernelService] = None
@@ -861,7 +861,7 @@ class FederatedLearningInfra(OntologyElement):
                 valid_participants_info.append({"id": node.id, "name": node.name, "endpoint": node.node_endpoint})
             else:
                 if self.logger: self.logger.log_event("FedLearningInfra", f"Node ID '{node_id}' skipped for round (not found or inactive).", severity="WARNING")
-
+        
         if not valid_participants_info:
             if self.logger: self.logger.log_event("FedLearningInfra", f"No valid participant nodes for model '{global_model.name}'.", severity="ERROR")
             return {"status": "error", "message": "No valid participant nodes for training round."}
@@ -888,7 +888,7 @@ class FederatedLearningInfra(OntologyElement):
         """
         if not self.current_global_model_id:
             if self.logger: self.logger.log_event("FedLearningInfra", f"Aggregation for round '{round_id}' failed: No global model ID set for current training.", severity="ERROR"); return None
-
+        
         original_model = self._ml_guidance.get_model(self.current_global_model_id)
         if not original_model:
              if self.logger: self.logger.log_event("FedLearningInfra", f"Aggregation for round '{round_id}' failed: Original model '{self.current_global_model_id}' not found.", severity="ERROR"); return None
@@ -905,7 +905,7 @@ class FederatedLearningInfra(OntologyElement):
         # Create a new version for the MLModel. Example: "1.0.0" -> "1.1.0"
         current_major, current_minor, current_patch = map(int, original_model.version.split('.'))
         new_version_str = f"{current_major}.{current_minor + 1}.0" # Simple minor version increment.
-
+        
         # Create a new MLModel instance representing the updated global model.
         updated_global_model = MLModel(
             name=original_model.name, # Name might stay the same, or indicate it's an FL version
@@ -958,12 +958,12 @@ async def main_async_example():
     logger = Logger()
     vc = VersionControl() # Conceptual version control
     ks = KnowledgeStore(logger_instance=logger) # KnowledgeStore for ontology elements and artifact metadata
-
+    
     # Initialize ADK component placeholders
     actual_kernel_service = ActualKernelService()
     actual_shared_context = ActualSharedContext(session_id="comprehensive_review_session_005")
     context_manager = ContextManager(session_id="comprehensive_review_session_005", actual_context_instance=actual_shared_context, logger=logger)
-
+    
     ml_guidance = MachineLearningGuidance(knowledge_store=ks, logger=logger)
 
     logger.log_event("FrameworkInit", "Ontology framework demo with comprehensive comments.", "INFO")
@@ -1027,7 +1027,7 @@ async def main_async_example():
     # 5. Run a task with the agent, targeting the specific skill
     sample_document_text = "This is an extensive document detailing the history of the data mesh paradigm, its core principles, and implementation challenges. It spans multiple chapters and includes various case studies from different industries applying decentralized data ownership and domain-driven design to their data architecture."
     summarization_task_inputs = {"text_content": sample_document_text}
-
+    
     logger.log_event("AgentTask", f"Agent '{doc_analysis_agent.name}' starting task 'Summarize Document' using skill '{text_summary_skill.skill_name}'.")
     agent_summary_result = await doc_analysis_agent.run_task(
         task_description="Summarize the provided extensive document.",
@@ -1098,13 +1098,13 @@ async def main_async_example():
     if training_round_details.get("status") == "initiated":
         round_id = training_round_details["round_id"]
         logger.log_event("FLDemo", f"FL Training round '{round_id}' initiated for model version {training_round_details['model_version']}.")
-
+        
         # Simulate nodes training and providing updates (these are conceptual URIs to model weight updates)
         mock_node_updates = [
             {"node_id": fl_node_hospital_A.id, "status": "success", "update_payload_uri": "secure_store:/hospitalA/update_roundX.weights", "num_samples": 1500},
             {"node_id": fl_node_hospital_B.id, "status": "success", "update_payload_uri": "secure_store:/hospitalB/update_roundX.weights", "num_samples": 1200},
         ]
-
+        
         new_global_model_version_id = health_fl_platform.aggregate_model_updates(round_id, mock_node_updates)
         if new_global_model_version_id:
             updated_fl_model = health_fl_platform.get_global_model()
@@ -1121,7 +1121,7 @@ async def main_async_example():
     # 10. Using MLGuidance to recommend models for an artifact
     clinical_notes_artifact = DataArtifact(name="ClinicalNotesBatch7", description="Batch of unstructured clinical notes.", source_uri="ehr_system:/notes/batch7", data_type="unstructured_clinical_text", status="raw")
     ks.register_artifact(clinical_notes_artifact)
-
+    
     # Task: extract medical entities (conceptual task type)
     recommended_ner_models = ml_guidance.recommend_models_for_artifact(clinical_notes_artifact, "entity_extraction")
     if recommended_ner_models:
