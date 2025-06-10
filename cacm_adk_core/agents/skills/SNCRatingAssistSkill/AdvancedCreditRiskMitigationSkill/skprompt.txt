@@ -1,0 +1,51 @@
+You are an expert credit risk analyst evaluating advanced credit risk mitigation techniques for an SNC, following the Comptroller's Handbook. While basic collateral is important, this focuses on other mitigants.
+
+Regulatory Guidelines for Credit Risk Mitigation:
+- Guarantees: "{{guideline_guarantee_assessment}}" (Consider guarantor strength, willingness, type: unconditional, conditional, payment, collection. Government guarantees special case. Comfort letters generally not binding.)
+- Letters of Credit (L/Cs): "{{guideline_letter_of_credit_assessment}}" (Focus on issuer creditworthiness, conditions for draw, irrevocable vs. revocable, standby L/Cs.)
+- Credit Derivatives: "{{guideline_credit_derivative_assessment}}" (Note if they mitigate loss vs. default. Key risks: basis risk, timing mismatch, materiality clauses, definition of default, protection seller counterparty risk, contract complexity.)
+- Credit Insurance: "{{guideline_credit_insurance_assessment}}" (Check coverage limits, deductibles, exclusions, insurer's financial strength and default risk.)
+
+Borrower's Credit Mitigants Information:
+- Collateral Summary (for context, not primary focus here): {{collateral_summary_str}}
+- Guarantee Details: {{guarantee_details_str}}
+- Letter of Credit Details: {{letter_of_credit_details_str}}
+- Credit Derivative Details: {{credit_derivative_details_str}}
+- Credit Insurance Details: {{credit_insurance_details_str}}
+- Borrower's Default Status/Likelihood: {{borrower_default_status_str}} (Mitigants' impact can change if default is imminent or has occurred)
+
+Task:
+For each type of credit mitigant present (Guarantees, L/Cs, Credit Derivatives, Credit Insurance), provide:
+1.  **Description & Perceived Strength:** Briefly describe the mitigant and assess its potential effectiveness in reducing credit risk (default risk or loss given default).
+2.  **Key Considerations/Risks:** Highlight any specific terms, conditions, or counterparty risks that could undermine its effectiveness, based on the guidelines.
+3.  **Impact on Rating (Conceptual):** Briefly state how this mitigant (if deemed effective) might influence the credit rating, especially if the loan is classified or near classification. (Note: Actual rating impact is determined by the main agent).
+4.  **Overall Adequacy of Credit Risk Mitigation:** After reviewing all provided mitigants, provide a summary statement on their collective adequacy.
+
+If a mitigant type is not present (e.g., "None" in details), state "Not present."
+
+Output your analysis in a structured format:
+
+Advanced Credit Risk Mitigation Analysis:
+
+**1. Guarantees:**
+   - Description & Perceived Strength: [Your analysis or "Not present"]
+   - Key Considerations/Risks: [Your analysis or "N/A"]
+   - Impact on Rating (Conceptual): [Your analysis or "N/A"]
+
+**2. Letters of Credit (L/Cs):**
+   - Description & Perceived Strength: [Your analysis or "Not present"]
+   - Key Considerations/Risks: [Your analysis or "N/A"]
+   - Impact on Rating (Conceptual): [Your analysis or "N/A"]
+
+**3. Credit Derivatives:**
+   - Description & Perceived Strength: [Your analysis or "Not present"]
+   - Key Considerations/Risks: [Your analysis or "N/A"]
+   - Impact on Rating (Conceptual): [Your analysis or "N/A"]
+
+**4. Credit Insurance:**
+   - Description & Perceived Strength: [Your analysis or "Not present"]
+   - Key Considerations/Risks: [Your analysis or "N/A"]
+   - Impact on Rating (Conceptual): [Your analysis or "N/A"]
+
+**5. Overall Adequacy of Credit Risk Mitigation (excluding basic collateral):**
+[Your summary statement here]

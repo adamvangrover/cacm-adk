@@ -1,22 +1,40 @@
-You are an expert credit risk analyst specializing in Shared National Credits (SNCs), focusing on non-accrual status.
-Evaluate if the borrower's loan should be placed on non-accrual status based on the provided data and regulatory guidelines.
+You are an expert credit risk analyst determining if a loan's accrual status is appropriate based on the Comptroller's Handbook.
 
-Regulatory Guideline Context:
-- Non-Accrual Status Definition: "{{guideline_nonaccrual_status}}"
-- Interest Capitalization Guideline: "{{guideline_interest_capitalization}}"
+Regulatory Guideline Context for Nonaccrual Status:
+- General Rule for Placing on Nonaccrual: "{{guideline_nonaccrual_general_rule}}"
+- Definition of "Well Secured": "{{guideline_nonaccrual_well_secured_definition}}"
+- Definition of "In Process of Collection": "{{guideline_nonaccrual_in_process_of_collection_definition}}"
+- Conditions for Return to Accrual Status: "{{guideline_nonaccrual_return_to_accrual_conditions}}"
+- Guidance on Interest Capitalization (relevant for context): "{{guideline_interest_capitalization}}"
 
-Borrower Information:
-- Payment History (e.g., Days Past Due): {{payment_history_status}}
-- Key Financial Ratios (e.g., Liquidity, Coverage, Leverage): {{relevant_ratios}}
-- Current Assessment of Repayment Capacity: {{repayment_capacity_assessment}}
-- Notes on Borrower's Financial Condition Deterioration: {{notes_financial_deterioration}}
-- Is interest currently being capitalized? {{interest_capitalization_status}}
+Loan Information:
+- Current Recorded Accrual Status: {{current_accrual_status_str}}
+- Payment History Status: {{payment_history_status_str}}
+- Days Past Due: {{days_past_due_int}} days
+- Is Asset Considered Well Secured?: {{is_well_secured_bool}}
+- Is Asset Considered In Process of Collection?: {{is_in_process_of_collection_bool}}
+- Is Full Payment of Principal & Interest Expected?: {{expects_full_payment_bool}}
+- Is Asset Maintained on Cash Basis due to Borrower Deterioration?: {{is_maintained_on_cash_basis_due_to_deterioration_bool}}
+- Repayment Capacity Assessment: {{repayment_capacity_assessment_str}}
+- Notes on Financial Deterioration: {{notes_financial_deterioration_str}}
+- Interest Capitalization Status: {{interest_capitalization_status_str}}
 
-Based on all the above:
-1. Determine if the borrower's condition aligns with the definition of non-accrual status.
-2. If interest is being capitalized, assess if it's appropriate per guidelines.
-3. Conclude on whether non-accrual status is indicated.
+Task:
+Based on the provided information and guidelines, determine the appropriate accrual status:
+1.  **Assessment for Placing on Nonaccrual (if currently on Accrual):**
+    *   Does `is_maintained_on_cash_basis_due_to_deterioration_bool` apply?
+    *   Does `expects_full_payment_bool` indicate non-payment?
+    *   Are `days_past_due_int` 90 or more?
+        *   If yes to 90+ days past due, does the exception apply (is `is_well_secured_bool` AND `is_in_process_of_collection_bool` true)?
+    *   Based on these, should the loan be placed on nonaccrual?
+2.  **Assessment for Returning to Accrual (if currently on Nonaccrual):**
+    *   Are all conditions from `guideline_nonaccrual_return_to_accrual_conditions` met? (i.e., P&I not due and unpaid AND expects repayment, OR becomes well secured AND in process of collection).
+    *   Based on these, can the loan be returned to accrual status?
+3.  **Conclusion on Accrual Status:** State whether the `current_recorded_accrual_status_str` is appropriate, or if it should be changed (and to what).
 
 Output your assessment in the following format:
-Assessment: [Non-Accrual Warranted/Monitor for Non-Accrual/Accrual Appropriate]
-Justification: [Detailed justification for your assessment, referencing specific data points, qualitative factors, and how they align or conflict with regulatory guidelines regarding non-accrual and interest capitalization.]
+Assessment: [Appropriate Status: Accrual/Nonaccrual - Justification for why the current status is correct, or why it should be changed, referencing specific guideline conditions and loan data points.]
+Justification:
+   - Evaluation against Nonaccrual Placement Rules: [Detailed check of conditions, or "N/A if currently Nonaccrual"]
+   - Evaluation against Return to Accrual Rules: [Detailed check of conditions, or "N/A if currently Accrual"]
+Recommended Action: [e.g., "Maintain current Accrual status", "Place on Nonaccrual", "Return to Accrual status", "Further review needed for X reason"]

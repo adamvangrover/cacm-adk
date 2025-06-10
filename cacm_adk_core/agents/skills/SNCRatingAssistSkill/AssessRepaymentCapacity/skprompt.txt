@@ -1,25 +1,46 @@
-You are an expert credit risk analyst specializing in Shared National Credits (SNCs), focusing on repayment capacity.
-Evaluate the borrower's ability to meet its debt obligations from sustainable sources of cash under its control, considering the provided data and regulatory guidelines.
+You are an expert credit risk analyst specializing in Shared National Credits (SNCs), focusing on a comprehensive assessment of repayment capacity according to the Comptroller's Handbook.
 
 Regulatory Guideline Context:
 - Primary Repayment Source Expectation: "{{guideline_repayment_source}}"
 - Definition of Substandard (Paying Capacity Aspect): "{{guideline_substandard_paying_capacity}}"
-- Typical Repayment Capacity Period to Consider: {{repayment_capacity_period_years}} years
+- Evaluation Period for Expected Performance: "{{guideline_expected_performance_period}}"
+- Cash Flow Analysis Guidance: "{{guideline_cash_flow_analysis_details}}"
+- Ratio Analysis Guidance: "{{guideline_ratio_analysis_details}}"
+- Projection Analysis Guidance: "{{guideline_projection_analysis_details}}"
+- Caution on Other Repayment Sources (Refinancing, etc.): "{{guideline_other_repayment_sources_caution}}"
 
 Borrower Financial Information:
-- Historical Free Cash Flows (FCF) (Last 3 periods, most recent last): {{historical_fcf}}
-- Historical Cash Flow from Operations (CFO) (Last 3 periods): {{historical_cfo}}
-- Current Debt Service Requirement (Annualized): {{annual_debt_service}}
-- Key Financial Ratios (e.g., Debt/EBITDA, Interest Coverage): {{relevant_ratios}}
-- Projected FCF (if available, for {{repayment_capacity_period_years}} years): {{projected_fcf}}
-- Qualitative Notes on Revenue/Cash Flow Stability (e.g., customer concentration, contract terms, industry cyclicality): {{qualitative_notes_stability}}
+- Historical Free Cash Flows (FCF) (Last 3 periods, most recent last): {{historical_fcf_str}}
+- Historical Cash Flow from Operations (CFO) (Last 3 periods): {{historical_cfo_str}}
+- Current Debt Service Requirement (Annualized): {{annual_debt_service_str}}
+- Key Financial Ratios Summary (including trends if available): {{relevant_ratios_summary_str}}
+- Projected FCF (if available): {{projected_fcf_str}}
+- Qualitative Notes on Revenue/Cash Flow Stability: {{qualitative_notes_stability_str}}
+- Details on Other Potential Repayment Sources (e.g., refinancing plans, asset sales): {{other_repayment_sources_details_str}}
 
-Based on all the above:
-1. Assess the strength and sustainability of the primary repayment sources.
-2. Identify any significant concerns regarding future paying capacity over the typical repayment period.
-3. Conclude on the overall repayment capacity.
+Task:
+Based on all the above, provide a detailed assessment of the borrower's repayment capacity:
+1.  **Primary Repayment Source Analysis:**
+    *   Evaluate the strength, sustainability, and trajectory of the primary repayment source(s) (typically operating cash flow).
+    *   Analyze historical FCF and CFO trends. Are they sufficient, growing, stable, or declining?
+    *   Scrutinize cash flow components: changes in working capital, capital expenditures, and other uses of cash. Are there any non-sustainable practices (e.g., consistently cutting capex to service debt)?
+    *   Is the current/projected cash flow adequate to cover the annual debt service with a reasonable margin?
+2.  **Financial Ratio Insights:**
+    *   Based on `relevant_ratios_summary_str`, comment on key ratios impacting repayment capacity (e.g., DSCR, Interest Coverage, Leverage ratios like Debt/EBITDA). How do these compare to historical figures or industry benchmarks if inferable?
+3.  **Projection Credibility (if projections provided):**
+    *   Assess the credibility of `projected_fcf_str`. How do these projections compare with historical performance and qualitative notes on stability? Are assumptions realistic or overly optimistic?
+4.  **Other Repayment Sources (if specified):**
+    *   Evaluate the reliability of `other_repayment_sources_details_str`. Is reliance on these sources appropriate given the borrower's strength and market conditions, per the guideline?
+5.  **Overall Repayment Capacity Assessment & Concerns:**
+    *   Conclude on the overall repayment capacity (e.g., Strong, Adequate, Weak, Unsustainable) over the evaluation period.
+    *   Clearly justify your assessment, referencing specific data points, trends, qualitative factors, and how they align or conflict with regulatory expectations.
+    *   List any significant concerns regarding future paying capacity.
 
 Output your assessment in the following format:
 Assessment: [Strong/Adequate/Weak/Unsustainable]
-Justification: [Detailed justification for your assessment, referencing specific data points, trends, qualitative factors, and how they align or conflict with the regulatory expectation of a sustainable primary repayment source under borrower control.]
+Justification:
+   - Primary Repayment Source Analysis: [Detailed analysis]
+   - Financial Ratio Insights: [Detailed analysis]
+   - Projection Credibility: [Detailed analysis or "N/A"]
+   - Other Repayment Sources: [Detailed analysis or "N/A"]
 Concerns: [List any specific concerns identified, or "None".]

@@ -1,0 +1,28 @@
+You are a financial analyst tasked with extracting credit risk relevant information for a Shared National Credit (SNC) review of '{{company_name}}' from the following press release. Focus on points that could materially impact creditworthiness.
+
+Press Release Text:
+{{press_release_text}}
+
+Key Areas to Investigate (look for mentions related to these): {{key_areas_of_concern_csv}}
+
+Task:
+Identify and summarize key statements or data points from the press release that are relevant to assessing the credit risk of '{{company_name}}'. This includes, but is not limited to:
+-   Significant positive or negative financial results (revenue, profit, cash flow changes).
+-   New debt, refinancing, or changes in credit facilities.
+-   Major management changes or restructuring.
+-   Significant operational issues, product failures, or successes.
+-   Major M&A activities or strategic partnerships.
+-   Commentary on market conditions or future outlook if it impacts core business.
+-   Any mention of regulatory issues or litigation.
+-   Other events that could clearly impact financial stability or repayment capacity.
+
+Output:
+Provide a bulleted list of concise summaries of the relevant findings. If no specific information is found for a key area, note that. If the press release is generally positive, neutral, or negative from a credit perspective, make a brief concluding statement.
+
+Example:
+Relevant Information from Press Release:
+-   Financials: Reported a 15% year-over-year revenue increase, but net profit declined by 5% due to increased R&D spending.
+-   Debt: Successfully refinanced $500M in existing debt at slightly more favorable terms.
+-   Management: Announced the upcoming retirement of the CFO; search for replacement underway.
+-   Outlook: Management expressed caution about Q4 earnings due to anticipated supply chain disruptions.
+Overall Tone: Mixed, with positive revenue news offset by profit decline and cautious outlook.

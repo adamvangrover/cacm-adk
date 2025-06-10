@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "type": "completion",
-  "description": "Assesses a borrower's repayment capacity for SNC based on financial data, qualitative notes, and regulatory guidelines.",
+  "description": "Assesses a borrower's repayment capacity for SNC based on financial data, qualitative notes, and detailed regulatory guidelines from the Comptroller's Handbook.",
   "completion": {
-    "max_tokens": 400,
-    "temperature": 0.4,
+    "max_tokens": 500,
+    "temperature": 0.3,
     "top_p": 1.0,
     "presence_penalty": 0.0,
     "frequency_penalty": 0.0
@@ -13,13 +13,18 @@
     "parameters": [
       { "name": "guideline_repayment_source", "description": "Guideline on primary repayment source.", "defaultValue": "Must be sustainable and under borrower control." },
       { "name": "guideline_substandard_paying_capacity", "description": "Guideline on paying capacity for substandard.", "defaultValue": "Paying capacity is inadequate." },
-      { "name": "repayment_capacity_period_years", "description": "Typical period to consider for repayment capacity.", "defaultValue": "7" },
-      { "name": "historical_fcf", "description": "String representation of historical FCF, e.g., '[100, 110, 120]'.", "defaultValue": "Not available" },
-      { "name": "historical_cfo", "description": "String representation of historical CFO.", "defaultValue": "Not available" },
-      { "name": "annual_debt_service", "description": "Annual debt service requirement.", "defaultValue": "Not available" },
-      { "name": "relevant_ratios", "description": "String representation of key financial ratios, e.g., 'Debt/EBITDA: 3.5, Interest Coverage: 2.1'.", "defaultValue": "Not available" },
-      { "name": "projected_fcf", "description": "String representation of projected FCF.", "defaultValue": "Not available" },
-      { "name": "qualitative_notes_stability", "description": "Qualitative notes on revenue and cash flow stability.", "defaultValue": "None provided." }
+      { "name": "guideline_expected_performance_period", "description": "Guideline on the evaluation period for expected performance.", "defaultValue": "Foreseeable future - not less than one year." },
+      { "name": "guideline_cash_flow_analysis_details", "description": "Detailed guidelines on analyzing cash flow components and sustainability.", "defaultValue": "Analyze operating revenue less costs, noncash expenses, changes in working capital, uses of cash (debt repayment, capex). Shortfalls are obvious problem indicators." },
+      { "name": "guideline_ratio_analysis_details", "description": "Detailed guidelines for conducting financial ratio analysis.", "defaultValue": "Compare ratios with prior periods and industry/peer norms. Significant deviations require further analysis to identify root cause." },
+      { "name": "guideline_projection_analysis_details", "description": "Detailed guidelines for analyzing financial projections.", "defaultValue": "Analyze variance from historical performance, assess achievement likelihood. Analyze under multiple scenarios. Quickly/repeatedly missed projections lack credibility." },
+      { "name": "guideline_other_repayment_sources_caution", "description": "Guideline regarding reliance on refinancing or recapitalization.", "defaultValue": "Weaker borrowers need reliable sources as access to markets diminishes in downturns. Continual reliance on refinancing is speculative." },
+      { "name": "historical_fcf_str", "description": "String representation of historical FCF, e.g., '[100, 110, 120]'.", "defaultValue": "Not available" },
+      { "name": "historical_cfo_str", "description": "String representation of historical CFO.", "defaultValue": "Not available" },
+      { "name": "annual_debt_service_str", "description": "Annual debt service requirement.", "defaultValue": "Not available" },
+      { "name": "relevant_ratios_summary_str", "description": "String representation of key financial ratios and their trends.", "defaultValue": "Not available" },
+      { "name": "projected_fcf_str", "description": "String representation of projected FCF.", "defaultValue": "Not available" },
+      { "name": "qualitative_notes_stability_str", "description": "Qualitative notes on revenue and cash flow stability.", "defaultValue": "None provided." },
+      { "name": "other_repayment_sources_details_str", "description": "Details on other repayment sources like planned refinancing or asset sales.", "defaultValue": "None specified." }
     ]
   }
 }

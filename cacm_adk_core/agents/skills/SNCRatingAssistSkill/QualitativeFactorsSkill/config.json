@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Assesses qualitative factors such as management, industry conditions, economic outlook, and underwriting standards for SNC evaluation, based on Comptroller's Handbook and SNC Program Review insights.",
+  "completion": {
+    "max_tokens": 600,
+    "temperature": 0.4,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_underwriting_standards", "description": "Guideline on sound underwriting practices.", "defaultValue": "Sound underwriting provides protections. Weakened underwriting increases credit risk." },
+      { "name": "guideline_management_competency", "description": "Guideline on assessing management competency.", "defaultValue": "Assess ability to guide entity, exploit opportunities, execute plans, react to market changes." },
+      { "name": "guideline_industry_analysis", "description": "Guideline for industry analysis.", "defaultValue": "Understand operating conditions, cyclical/competitive/technological changes." },
+      { "name": "borrower_management_assessment_str", "description": "Assessment of the borrower's management team, their experience, track record, and strategic planning capabilities.", "defaultValue": "Not available" },
+      { "name": "borrower_industry_str", "description": "The primary industry in which the borrower operates.", "defaultValue": "Not specified" },
+      { "name": "industry_outlook_str", "description": "Specific outlook for the borrower's industry, including competitive landscape and cyclicality.", "defaultValue": "Neutral" },
+      { "name": "snc_review_focus_industries_str", "description": "JSON string listing current SNC focus industries and their specific concerns (from SNC Program Review).", "defaultValue": "{}" },
+      { "name": "economic_conditions_str", "description": "Current overall economic conditions and outlook relevant to the borrower.", "defaultValue": "Stable" },
+      { "name": "underwriting_elements_summary_str", "description": "Summary of key underwriting elements of the loan (e.g., covenants, amortization, reporting requirements).", "defaultValue": "Standard terms" },
+      { "name": "company_business_model_strength_str", "description": "Assessment of the company's business model strength and sustainability.", "defaultValue": "Not assessed" },
+      { "name": "company_competitive_advantages_str", "description": "Description of the company's competitive advantages.", "defaultValue": "Not specified" }
+    ]
+  }
+}

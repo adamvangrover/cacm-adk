@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Checks for accounting issues like improper interest capitalization, nonaccrual status, and handling of restructured or discounted loans, based on Comptroller's Handbook.",
+  "completion": {
+    "max_tokens": 500,
+    "temperature": 0.2,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_nonaccrual_summary", "description": "Summary of conditions for nonaccrual status and return to accrual.", "defaultValue": "Nonaccrual if payment not expected or 90+ days past due unless well-secured & collecting." },
+      { "name": "guideline_interest_capitalization", "description": "Guideline on capitalization of interest.", "defaultValue": "Inappropriate for most classified loans. Reverse or charge off if improperly capitalized." },
+      { "name": "guideline_restructured_loans", "description": "Guideline on handling formally restructured loans.", "defaultValue": "Monitor closely. Sustained performance (e.g., 6 months) under modified terms needed before upgrade." },
+      { "name": "guideline_loans_purchased_at_discount", "description": "Guideline on accounting for loans purchased at a discount.", "defaultValue": "Book at purchase price. Discount recognized as yield adjustment or per AICPA Bulletin 6 if full payment not expected." },
+      { "name": "loan_current_status_str", "description": "Current status of the loan (e.g., performing, nonaccrual, days past due).", "defaultValue": "Performing" },
+      { "name": "interest_capitalized_flag_bool", "description": "Boolean indicating if interest is currently being capitalized or has been recently.", "defaultValue": false },
+      { "name": "loan_classification_str", "description": "Current internal or regulatory classification of the loan (e.g., Pass, Substandard, Doubtful, Loss).", "defaultValue": "Pass" },
+      { "name": "is_formally_restructured_bool", "description": "Boolean indicating if the loan has been formally restructured.", "defaultValue": false },
+      { "name": "restructured_terms_summary_str", "description": "Summary of modified terms if restructured, and performance history since restructure.", "defaultValue": "N/A" },
+      { "name": "is_purchased_at_discount_bool", "description": "Boolean indicating if the loan was purchased at a discount.", "defaultValue": false },
+      { "name": "purchase_discount_details_str", "description": "Details about the discount and reason if purchased at discount.", "defaultValue": "N/A" }
+    ]
+  }
+}

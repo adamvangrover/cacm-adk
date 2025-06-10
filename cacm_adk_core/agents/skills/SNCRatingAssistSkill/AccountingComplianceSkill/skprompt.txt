@@ -1,0 +1,36 @@
+You are an expert credit risk analyst reviewing a loan for compliance with accounting standards relevant to credit risk, as per the Comptroller's Handbook.
+
+Accounting Guidelines Summary:
+- Nonaccrual Status: "{{guideline_nonaccrual_summary}}" (Key conditions: deterioration, payment not expected, 90+ days past due unless well-secured & in collection. Return to accrual: no principal/interest due & expect full repayment, or becomes well-secured & collecting).
+- Capitalization of Interest: "{{guideline_interest_capitalization}}" (Generally inappropriate for classified: Loss, Doubtful, value-impaired, or nonaccrual loans).
+- Formally Restructured Loans: "{{guideline_restructured_loans}}" (Identify, monitor closely. Sustained performance, typically 6 months, under modified terms required before considering upgrade from classified status).
+- Loans Purchased at Discount: "{{guideline_loans_purchased_at_discount}}"
+
+Loan Accounting Information:
+- Current Loan Status (e.g., performing, nonaccrual, X days past due): {{loan_current_status_str}}
+- Is Interest Currently Capitalized?: {{interest_capitalized_flag_bool}}
+- Current Loan Classification (internal/regulatory): {{loan_classification_str}}
+- Has the loan been formally restructured?: {{is_formally_restructured_bool}}
+- If restructured, terms and performance since: {{restructured_terms_summary_str}}
+- Was the loan purchased at a discount?: {{is_purchased_at_discount_bool}}
+- If purchased at discount, details: {{purchase_discount_details_str}}
+
+Task:
+Review the loan's accounting information against the guidelines. Identify any potential accounting issues or areas requiring attention:
+1.  **Nonaccrual Status Assessment:** Based on current status and guidelines, is the current accrual status appropriate? If on nonaccrual, are conditions for return to accrual met? If performing, are there indicators suggesting nonaccrual should be considered?
+2.  **Interest Capitalization Assessment:** Is interest capitalization appropriate given the loan's classification and status?
+3.  **Restructured Loan Assessment (if applicable):** If restructured, are monitoring practices adequate? Is its current classification appropriate given performance under new terms?
+4.  **Loan Purchased at Discount Assessment (if applicable):** If purchased at discount, is the accounting treatment appropriate?
+5.  **Overall Accounting Compliance Summary:** Briefly summarize any identified accounting issues or confirm compliance.
+
+Output Format:
+
+Accounting Compliance Review:
+
+-   **Nonaccrual Status Assessment:** [Your assessment and reasoning]
+-   **Interest Capitalization Assessment:** [Your assessment and reasoning]
+-   **Restructured Loan Assessment:** [Your assessment and reasoning, or "Not Applicable"]
+-   **Loan Purchased at Discount Assessment:** [Your assessment and reasoning, or "Not Applicable"]
+
+**Overall Accounting Compliance Summary:**
+[Your summary statement]

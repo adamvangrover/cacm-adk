@@ -1,23 +1,31 @@
 {
   "schema": 1,
   "type": "completion",
-  "description": "Assesses if a loan should be on non-accrual status based on financial data, payment history, and regulatory guidelines.",
+  "description": "Assesses if a loan should be on nonaccrual status, or can be returned to accrual, based on detailed Comptroller's Handbook guidelines.",
   "completion": {
-    "max_tokens": 350,
-    "temperature": 0.3,
+    "max_tokens": 450,
+    "temperature": 0.2,
     "top_p": 1.0,
     "presence_penalty": 0.0,
     "frequency_penalty": 0.0
   },
   "input": {
     "parameters": [
-      { "name": "guideline_nonaccrual_status", "description": "Guideline defining non-accrual status.", "defaultValue": "Asset is maintained on a cash basis because of deterioration in the financial condition of the borrower." },
-      { "name": "guideline_interest_capitalization", "description": "Guideline on interest capitalization.", "defaultValue": "Interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business." },
-      { "name": "payment_history_status", "description": "Status of loan payments, e.g., 'Current', '30 days past due', '90+ days past due'.", "defaultValue": "Current" },
-      { "name": "relevant_ratios", "description": "String representation of key financial ratios.", "defaultValue": "Not available" },
-      { "name": "repayment_capacity_assessment", "description": "Current assessment of repayment capacity (e.g., 'Strong', 'Weak').", "defaultValue": "Adequate" },
-      { "name": "notes_financial_deterioration", "description": "Qualitative notes on any observed financial deterioration.", "defaultValue": "None noted." },
-      { "name": "interest_capitalization_status", "description": "Is interest currently being capitalized? (e.g., 'Yes', 'No').", "defaultValue": "No" }
+      { "name": "guideline_nonaccrual_general_rule", "description": "The general rule for placing an asset on nonaccrual status.", "defaultValue": "Do not accrue if: maintained on cash basis due to deterioration, OR payment in full of P&I not expected, OR P&I default for 90+ days UNLESS well secured AND in process of collection." },
+      { "name": "guideline_nonaccrual_well_secured_definition", "description": "Definition of 'well secured' for nonaccrual exception.", "defaultValue": "Secured by collateral with realizable value sufficient to discharge debt (incl. accrued interest) in full, OR by guarantee of a financially responsible party." },
+      { "name": "guideline_nonaccrual_in_process_of_collection_definition", "description": "Definition of 'in process of collection' for nonaccrual exception.", "defaultValue": "Collection proceeding in due course via legal action OR other collection efforts reasonably expected to result in repayment or restoration to current status soon." },
+      { "name": "guideline_nonaccrual_return_to_accrual_conditions", "description": "Conditions for returning a nonaccrual loan to accrual status.", "defaultValue": "None of its P&I is due and unpaid AND bank expects repayment of remaining contractual P&I, OR it otherwise becomes well secured AND is in process of collection." },
+      { "name": "guideline_interest_capitalization", "description": "Guideline on capitalization of interest.", "defaultValue": "Inappropriate for most classified loans (Loss, Doubtful, value-impaired, or nonaccrual)." },
+      { "name": "payment_history_status_str", "description": "Overall payment history status (e.g. 'Current', 'Delinquent').", "defaultValue": "Current" },
+      { "name": "days_past_due_int", "description": "Number of days principal or interest is continuously past due.", "defaultValue": 0 },
+      { "name": "is_well_secured_bool", "description": "Is the asset considered well secured per guidelines?", "defaultValue": false },
+      { "name": "is_in_process_of_collection_bool", "description": "Is the asset considered in the process of collection per guidelines?", "defaultValue": false },
+      { "name": "expects_full_payment_bool", "description": "Does the bank expect payment in full of principal and interest?", "defaultValue": true },
+      { "name": "is_maintained_on_cash_basis_due_to_deterioration_bool", "description": "Is the asset maintained on a cash basis due to borrower's financial deterioration?", "defaultValue": false },
+      { "name": "repayment_capacity_assessment_str", "description": "Overall assessment of repayment capacity (e.g. Strong, Adequate, Weak).", "defaultValue": "Adequate" },
+      { "name": "notes_financial_deterioration_str", "description": "Notes on any financial deterioration of the borrower.", "defaultValue": "None noted." },
+      { "name": "interest_capitalization_status_str", "description": "Current status of interest capitalization (e.g., 'No', 'Yes - Appropriate', 'Yes - Inappropriate').", "defaultValue": "No" },
+      { "name": "current_accrual_status_str", "description": "The loan's current recorded accrual status (e.g. 'Accrual', 'Nonaccrual').", "defaultValue": "Accrual"}
     ]
   }
 }

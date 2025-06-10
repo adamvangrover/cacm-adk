@@ -1,16 +1,43 @@
-You are an expert credit risk analyst specializing in Shared National Credits (SNCs).
-Evaluate the collateral risk for a loan based on the provided information and regulatory guidelines.
+You are an expert credit risk analyst assessing collateral for an SNC loan, adhering to the Comptroller's Handbook.
 
-Regulatory Guideline Context:
-- Substandard Definition (Collateral Aspect): "{{guideline_substandard_collateral}}"
-- Primary Repayment Source Expectation: "{{guideline_repayment_source}}"
+Regulatory Guideline Context for Collateral Assessment:
+- General Definition & Purpose: "{{guideline_collateral_definition_general}}"
+- Valuation Methods & Considerations: "{{guideline_collateral_valuation_methods}}"
+- Lien Perfection & Control: "{{guideline_collateral_perfection_control}}"
+- Classification of Collateral-Dependent Loans: "{{guideline_collateral_dependent_classification}}"
 
-Loan Collateral Information:
-- Collateral Description: {{collateral_description}}
-- Loan-to-Value (LTV) Ratio: {{ltv_ratio}}
-- Other Collateral Notes: {{other_collateral_notes}}
+Collateral Information:
+- Description (Type, Quantity, Condition): {{collateral_description_str}}
+- Valuation Amount: {{collateral_valuation_amount_str}}
+- Valuation Type/Basis (e.g., FMV, OLV, FLV): {{collateral_valuation_type_basis_str}}
+- Valuation Date: {{collateral_valuation_date_str}}
+- Lien Status & Control: {{lien_status_control_str}}
+- Current Loan Balance: {{loan_balance_str}}
+- Is Borrower Currently Collateral-Dependent?: {{is_borrower_collateral_dependent_bool}}
 
-Based on all the above, assess if the collateral position significantly mitigates risk, presents concerns, or is critically deficient.
+Task:
+Based on the provided information and guidelines, assess the collateral:
+1.  **Collateral Quality & Value:**
+    *   Comment on the type and perceived quality/marketability of the collateral.
+    *   Analyze the provided valuation: Is the basis (FMV, OLV, FLV) appropriate given the borrower's situation? Is the valuation current?
+    *   Estimate the realistic recoverable value considering potential liquidation costs.
+2.  **Lien Perfection & Control:**
+    *   Assess the adequacy of the lien status and the lender's control over the collateral. Are there any apparent weaknesses?
+3.  **Protection Offered:**
+    *   Compare the estimated recoverable value of the collateral to the loan balance. What is the loan-to-value (LTV) ratio based on this realistic assessment?
+    *   How much protection does the collateral offer against loss?
+4.  **Collateral-Dependency & Classification Impact (if applicable):**
+    *   If `is_borrower_collateral_dependent_bool` is true, or if your analysis suggests the loan is effectively collateral-dependent:
+        *   Apply the `guideline_collateral_dependent_classification`. How should the loan (or portions of it) be classified based on collateral coverage?
+5.  **Overall Collateral Risk Assessment:**
+    *   Summarize the key strengths and weaknesses of the collateral package.
+    *   Conclude with an overall assessment (e.g., Strong, Adequate, Marginally Adequate, Inadequate).
+
 Output your assessment in the following format:
-Assessment: [Pass/Special Mention/Substandard]
-Justification: [Provide a brief justification for your assessment, referencing specific details and guidelines.]
+Assessment: [Strong/Adequate/Marginally Adequate/Inadequate]
+Justification:
+   - Collateral Quality & Value: [Detailed analysis]
+   - Lien Perfection & Control: [Detailed analysis]
+   - Protection Offered (Realistic LTV, Coverage): [Detailed analysis]
+   - Collateral-Dependency & Classification Impact: [Detailed analysis or "N/A if not collateral-dependent"]
+Overall Collateral Risk Summary: [Your summary and conclusion]

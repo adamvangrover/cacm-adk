@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Assesses advanced credit risk mitigation factors including guarantees, letters of credit, credit derivatives, and credit insurance, based on Comptroller's Handbook guidelines.",
+  "completion": {
+    "max_tokens": 700,
+    "temperature": 0.3,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_guarantee_assessment", "description": "Guideline on assessing loan guarantees.", "defaultValue": "Guarantor must display capacity and willingness. Agreement should be precise. Analyze guarantor's financials." },
+      { "name": "guideline_letter_of_credit_assessment", "description": "Guideline on assessing L/Cs.", "defaultValue": "L/C from high-quality institution may prevent default. Evaluate conditions to draw. Irrevocable L/Cs are stronger." },
+      { "name": "guideline_credit_derivative_assessment", "description": "Guideline on assessing credit derivatives.", "defaultValue": "Most mitigate loss, not default. Check for basis risk, timing mismatch, materiality clause, counterparty risk." },
+      { "name": "guideline_credit_insurance_assessment", "description": "Guideline on assessing credit insurance.", "defaultValue": "Check coverage limits, deductibles, exclusions, insurer's financial strength." },
+      { "name": "collateral_summary_str", "description": "Stringified summary of pledged collateral (type, valuation, LTV).", "defaultValue": "Not available" },
+      { "name": "guarantee_details_str", "description": "Stringified details of any guarantees (guarantor, type, amount, conditions).", "defaultValue": "None" },
+      { "name": "letter_of_credit_details_str", "description": "Stringified details of any L/Cs (issuer, amount, type - standby/irrevocable, conditions).", "defaultValue": "None" },
+      { "name": "credit_derivative_details_str", "description": "Stringified details of any credit derivatives (type, protection seller, reference asset, potential risks).", "defaultValue": "None" },
+      { "name": "credit_insurance_details_str", "description": "Stringified details of any credit insurance (insurer, coverage, terms).", "defaultValue": "None" },
+      { "name": "borrower_default_status_str", "description": "Current default status or likelihood for the borrower.", "defaultValue": "Not in default" }
+    ]
+  }
+}

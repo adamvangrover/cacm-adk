@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Analyzes borrower's financial statements (balance sheet, income statement, cash flow) based on Comptroller's Handbook guidelines to identify trends, anomalies, and repayment capacity indicators.",
+  "completion": {
+    "max_tokens": 700,
+    "temperature": 0.3,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_financial_statement_analysis_focus", "description": "Guideline on focus areas for financial statement analysis.", "defaultValue": "Focus on balance sheet (asset degradation, asset/liability levels), income statement, sources/uses of funds, projections." },
+      { "name": "guideline_cash_flow_definition", "description": "Guideline defining business cash flow.", "defaultValue": "Operating revenue less operating costs paid, plus noncash expenses." },
+      { "name": "guideline_cash_flow_scrutiny", "description": "Guideline on cash flow points of scrutiny.", "defaultValue": "Changes in working capital, uses of cash flow (debt repayment, capex)." },
+      { "name": "guideline_ratio_analysis", "description": "Guideline for ratio analysis.", "defaultValue": "Compare with prior periods and industry/peer norms. Investigate deviations." },
+      { "name": "guideline_projection_analysis", "description": "Guideline for analyzing projections.", "defaultValue": "Assess variance from historical, likelihood of achievement, multi-scenario analysis." },
+      { "name": "balance_sheet_summary_str", "description": "Stringified summary of key balance sheet items and trends.", "defaultValue": "Not available" },
+      { "name": "income_statement_summary_str", "description": "Stringified summary of key income statement items and trends (revenues, profit margins).", "defaultValue": "Not available" },
+      { "name": "cash_flow_statement_summary_str", "description": "Stringified summary of key cash flow items (operating, investing, financing, FCF).", "defaultValue": "Not available" },
+      { "name": "financial_projections_summary_str", "description": "Stringified summary of financial projections if available.", "defaultValue": "Not available" },
+      { "name": "key_financial_ratios_str", "description": "Stringified key financial ratios (e.g., liquidity, leverage, profitability, debt service coverage).", "defaultValue": "Not available" }
+    ]
+  }
+}

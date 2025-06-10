@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Identifies potential structural weaknesses in a loan agreement based on Appendix F of the Comptroller's Handbook.",
+  "completion": {
+    "max_tokens": 600,
+    "temperature": 0.3,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_appendix_f_summary", "description": "Summary of key structural weaknesses from Appendix F.", "defaultValue": "Indefinite purpose, liberal repayment, weak covenants, inadequate debt service coverage, high leverage, etc." },
+      { "name": "loan_purpose_str", "description": "The stated purpose of the loan.", "defaultValue": "Not specified" },
+      { "name": "repayment_terms_str", "description": "Details of the loan's repayment program (source, timing, maturity).", "defaultValue": "Not specified" },
+      { "name": "covenants_summary_str", "description": "Summary of key financial and operational covenants.", "defaultValue": "None" },
+      { "name": "debt_service_coverage_ratio_str", "description": "Reported or calculated DSCR.", "defaultValue": "Not available" },
+      { "name": "leverage_ratio_str", "description": "Reported or calculated leverage ratio (e.g., Debt/Equity or Debt/EBITDA).", "defaultValue": "Not available" },
+      { "name": "tangible_net_worth_str", "description": "Borrower's tangible net worth.", "defaultValue": "Not available" },
+      { "name": "collateral_ltv_advance_rates_str", "description": "Loan-to-value or advance rates against collateral.", "defaultValue": "Not available" },
+      { "name": "guarantor_support_details_str", "description": "Details on guarantor support if critical to credit decision.", "defaultValue": "N/A" },
+      { "name": "reliance_on_projections_str", "description": "Notes on whether repayment relies heavily on uncommitted future events like refinancing or optimistic projections.", "defaultValue": "No unusual reliance" }
+    ]
+  }
+}

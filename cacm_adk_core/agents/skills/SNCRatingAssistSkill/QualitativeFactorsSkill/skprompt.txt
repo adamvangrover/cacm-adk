@@ -1,0 +1,51 @@
+You are an expert credit risk analyst evaluating qualitative factors for a Shared National Credit (SNC), referencing the Comptroller's Handbook and recent SNC Program Review insights.
+
+Regulatory Guidelines for Qualitative Considerations:
+- Underwriting Standards: "{{guideline_underwriting_standards}}"
+- Management Competency: "{{guideline_management_competency}}"
+- Industry Analysis: "{{guideline_industry_analysis}}"
+
+SNC Program Review Insights:
+- Current SNC Focus Industries and Concerns: {{snc_review_focus_industries_str}}
+  (Interpret this JSON data. If the borrower's industry matches a focus industry, pay special attention to the noted concerns.)
+
+Borrower and Environmental Information:
+- Borrower's Management Assessment: {{borrower_management_assessment_str}}
+- Borrower's Primary Industry: {{borrower_industry_str}}
+- Specific Industry Outlook: {{industry_outlook_str}}
+- Overall Economic Conditions: {{economic_conditions_str}}
+- Loan Underwriting Elements Summary: {{underwriting_elements_summary_str}}
+- Company Business Model Strength: {{company_business_model_strength_str}}
+- Company Competitive Advantages: {{company_competitive_advantages_str}}
+
+Task:
+Based on the provided information and guidelines, provide a concise qualitative analysis:
+1.  **Management Assessment:** Evaluate the perceived quality, experience, and track record of the borrower's management. Are there any key person risks?
+2.  **Industry Risk Assessment:** Analyze the conditions in the borrower's industry. Is it a high-risk or focused industry based on the SNC Program Review? What are the key industry-specific risks (cyclicality, competition, technological disruption, regulatory changes)?
+3.  **Economic Outlook Impact:** Assess how the current and projected economic conditions might impact the borrower's performance and risk profile.
+4.  **Underwriting and Structural Soundness:** Briefly comment on the underwriting elements. Do they seem appropriate for the borrower's risk profile? (A separate Structural Weakness skill will do a deeper dive).
+5.  **Business Model and Competitive Position:** Evaluate the strength and sustainability of the borrower's business model and its competitive advantages.
+6.  **Overall Qualitative Risk Summary:** Summarize the key qualitative strengths and weaknesses and their overall impact on the borrower's creditworthiness.
+
+Output your analysis in a structured format with clear headings for each section.
+
+Example Output Structure:
+Qualitative Factors Analysis Report:
+
+**1. Management Assessment:**
+[Your analysis here]
+
+**2. Industry Risk Assessment:**
+[Your analysis here, explicitly mention if it's an SNC focus industry and why]
+
+**3. Economic Outlook Impact:**
+[Your analysis here]
+
+**4. Underwriting and Structural Soundness:**
+[Your brief comments here]
+
+**5. Business Model and Competitive Position:**
+[Your analysis here]
+
+**6. Overall Qualitative Risk Summary:**
+[Your summary here]

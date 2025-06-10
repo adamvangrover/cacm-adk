@@ -1,41 +1,27 @@
 {
   "schema": 1,
   "type": "completion",
-  "description": "Assesses collateral risk for SNC based on provided details and regulatory guidelines.",
+  "description": "Assesses collateral risk, focusing on valuation, lien status, control, and its impact on loan classification, based on Comptroller's Handbook guidelines.",
   "completion": {
-    "max_tokens": 200,
-    "temperature": 0.3, 
+    "max_tokens": 500,
+    "temperature": 0.3,
     "top_p": 1.0,
     "presence_penalty": 0.0,
     "frequency_penalty": 0.0
   },
   "input": {
     "parameters": [
-      {
-        "name": "guideline_substandard_collateral",
-        "description": "Relevant part of the substandard definition related to collateral.",
-        "defaultValue": "Collateral is inadequately protective."
-      },
-      {
-        "name": "guideline_repayment_source",
-        "description": "Guideline regarding primary repayment source.",
-        "defaultValue": "Primary repayment should come from a sustainable source of cash under borrower control."
-      },
-      {
-        "name": "collateral_description",
-        "description": "Description of the collateral.",
-        "defaultValue": "Not specified."
-      },
-      {
-        "name": "ltv_ratio",
-        "description": "Loan-to-Value ratio (e.g., 0.75 for 75%).",
-        "defaultValue": "Not specified."
-      },
-      {
-        "name": "other_collateral_notes",
-        "description": "Any other relevant notes about the collateral.",
-        "defaultValue": "None."
-      }
+      { "name": "guideline_collateral_definition_general", "description": "General definition and purpose of collateral.", "defaultValue": "Asset pledged to lender, lender has right to take possession on default. Perfection via legal documents (security interest, mortgage)." },
+      { "name": "guideline_collateral_valuation_methods", "description": "Guideline on methods for collateral valuation.", "defaultValue": "Valuation under duress (fair market, orderly liquidation, forced liquidation). Costs of repossession/holding/selling diminish proceeds." },
+      { "name": "guideline_collateral_perfection_control", "description": "Guideline on lien perfection and control over collateral.", "defaultValue": "Lender's rights must be perfected. Control over collateral is key." },
+      { "name": "guideline_collateral_dependent_classification", "description": "Guideline for classifying collateral-dependent loans.", "defaultValue": "If borrower can't repay as structured, loan is collateral-dependent. Portion covered by conservatively valued collateral: Substandard. Remainder: Doubtful or Loss." },
+      { "name": "collateral_description_str", "description": "Description of the pledged collateral (type, quantity, condition).", "defaultValue": "Not specified" },
+      { "name": "collateral_valuation_amount_str", "description": "Stated value of the collateral.", "defaultValue": "Not available" },
+      { "name": "collateral_valuation_type_basis_str", "description": "Basis of valuation (e.g., 'Appraisal - Fair Market Value', 'Forced Liquidation Estimate').", "defaultValue": "Not specified" },
+      { "name": "collateral_valuation_date_str", "description": "Date of the latest collateral valuation.", "defaultValue": "Not specified" },
+      { "name": "lien_status_control_str", "description": "Description of lien status (e.g., 'Perfected first lien') and lender's control.", "defaultValue": "Not specified" },
+      { "name": "loan_balance_str", "description": "Current outstanding loan balance.", "defaultValue": "Not available" },
+      { "name": "is_borrower_collateral_dependent_bool", "description": "Boolean indicating if the borrower is currently considered collateral-dependent.", "defaultValue": false }
     ]
   }
 }
