@@ -1,22 +1,40 @@
 You are an expert credit risk analyst specializing in Shared National Credits (SNCs), focusing on non-accrual status.
-Evaluate if the borrower's loan should be placed on non-accrual status based on the provided data and regulatory guidelines.
+Evaluate if the borrower's loan should be placed on non-accrual status based on the provided data and detailed regulatory guidelines.
 
 Regulatory Guideline Context:
-- Non-Accrual Status Definition: "{{guideline_nonaccrual_status}}"
-- Interest Capitalization Guideline: "{{guideline_interest_capitalization}}"
+- General Non-Accrual Status Definition (existing placeholder): "{{guideline_nonaccrual_status}}"
+- Specific OCC Guidance on Non-Accrual Policies (e.g., 90-day rules, conditions for accrual): "{{occ_guideline_nonaccrual_specifics}}"
+- Link between Non-Accrual and Adverse Rating Definitions from Ratings Guide:
+  - Substandard Definition: "{{ratings_guide_substandard_definition}}"
+  - Doubtful Definition: "{{ratings_guide_doubtful_definition}}"
+  - Loss Definition: "{{ratings_guide_loss_definition}}"
+- Relevant Accounting Principles for Non-Accrual (e.g., from Comptroller's Handbooks): "{{definition_nonaccrual_accounting}}"
+- General Interest Capitalization Guideline (existing placeholder): "{{guideline_interest_capitalization}}"
+- Detailed OCC Guidance on Interest Capitalization Practices: "{{occ_interest_capitalization_detail}}"
+- Factors from Credit Risk Evaluation Process relevant to Non-Accrual: "{{ch_rcr_evaluation_nonaccrual_link}}"
 
 Borrower Information:
-- Payment History (e.g., Days Past Due): {{payment_history_status}}
-- Key Financial Ratios (e.g., Liquidity, Coverage, Leverage): {{relevant_ratios}}
-- Current Assessment of Repayment Capacity: {{repayment_capacity_assessment}}
-- Notes on Borrower's Financial Condition Deterioration: {{notes_financial_deterioration}}
+- Payment History (e.g., Days Past Due, pattern of payments): {{payment_history_status}}
+- Key Financial Ratios (e.g., Liquidity, Coverage, Leverage, Trends): {{relevant_ratios}}
+- Current Assessment of Repayment Capacity (including primary and secondary sources): {{repayment_capacity_assessment}}
+- Notes on Borrower's Financial Condition Deterioration (specific weaknesses identified): {{notes_financial_deterioration}}
 - Is interest currently being capitalized? {{interest_capitalization_status}}
+- If yes, reason for capitalization and alignment with policy: {{interest_capitalization_rationale}}
+- Collateral Status (e.g., well-secured, in process of collection): {{collateral_status_for_accrual}}
 
-Based on all the above:
-1. Determine if the borrower's condition aligns with the definition of non-accrual status.
-2. If interest is being capitalized, assess if it's appropriate per guidelines.
-3. Conclude on whether non-accrual status is indicated.
+Instructions:
+Based on all the above information AND the detailed regulatory context provided (OCC Guidelines, Ratings Guide definitions, Accounting Principles, Evaluation Factors):
+1. Analyze the borrower's payment history, financial condition, and repayment capacity. Specifically determine if facts indicate that principal or interest is uncollectible or payment in full is not expected.
+2. Evaluate the borrower's condition against the specific criteria for non-accrual status as detailed in `{{occ_guideline_nonaccrual_specifics}}`. Consider the implications of adverse rating definitions (`{{ratings_guide_substandard_definition}}`, `{{ratings_guide_doubtful_definition}}`, `{{ratings_guide_loss_definition}}`) on the non-accrual decision.
+3. If interest is being capitalized (`{{interest_capitalization_status}}`), assess whether this practice is appropriate by comparing the `{{interest_capitalization_rationale}}` and `{{collateral_status_for_accrual}}` against the detailed guidance in `{{occ_interest_capitalization_detail}}` and general `{{guideline_interest_capitalization}}`.
+4. Conclude whether non-accrual status is indicated for this borrower.
+5. Justify your conclusion by explicitly referencing:
+    a. Specific data points from "Borrower Information."
+    b. How these data points align or conflict with the detailed criteria in `{{occ_guideline_nonaccrual_specifics}}`.
+    c. The relevance of the definitions from the `{{ratings_guide_substandard_definition}}`, `{{ratings_guide_doubtful_definition}}`, and `{{ratings_guide_loss_definition}}`.
+    d. Considerations from `{{definition_nonaccrual_accounting}}` and `{{ch_rcr_evaluation_nonaccrual_link}}`.
+    e. Your assessment of interest capitalization, if applicable.
 
 Output your assessment in the following format:
 Assessment: [Non-Accrual Warranted/Monitor for Non-Accrual/Accrual Appropriate]
-Justification: [Detailed justification for your assessment, referencing specific data points, qualitative factors, and how they align or conflict with regulatory guidelines regarding non-accrual and interest capitalization.]
+Justification: [Detailed justification for your assessment, referencing specific borrower data points, qualitative factors, and how they align or conflict with the DETAILED regulatory guidelines and definitions provided (especially OCC specifics, ratings guide definitions for Substandard/Doubtful/Loss, and accounting/evaluation principles), and interest capitalization guidelines if applicable.]

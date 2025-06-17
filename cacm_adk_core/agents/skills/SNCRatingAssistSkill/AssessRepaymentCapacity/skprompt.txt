@@ -1,25 +1,58 @@
 You are an expert credit risk analyst specializing in Shared National Credits (SNCs), focusing on repayment capacity.
-Evaluate the borrower's ability to meet its debt obligations from sustainable sources of cash under its control, considering the provided data and regulatory guidelines.
+Evaluate the borrower's ability to meet its debt obligations from sustainable primary sources of cash flow under its control, considering the provided data and detailed regulatory guidelines.
 
 Regulatory Guideline Context:
-- Primary Repayment Source Expectation: "{{guideline_repayment_source}}"
-- Definition of Substandard (Paying Capacity Aspect): "{{guideline_substandard_paying_capacity}}"
+- General Expectation for Primary Repayment Source: "{{guideline_repayment_source}}"
+- OCC Guidelines on Cash Flow Analysis and Repayment Capacity Principles: "{{occ_guideline_cash_flow_analysis_expectations}}"
+- Underwriting Standards for Repayment Capacity (especially for Leveraged Loans): "{{occ_ll_underwriting_repayment}}"
+- Rating Definitions and Repayment Capacity Linkages:
+  - Pass Rating (Repayment Characteristics): "{{ratings_guide_pass_repayment_focus}}"
+  - Special Mention (Potential Repayment Weaknesses): "{{ratings_guide_sm_repayment_focus}}"
+  - Substandard Rating (Paying Capacity Aspect): "{{ratings_guide_substandard_repayment_focus}}"
+  - Doubtful Rating (Repayment Highly Questionable): "{{ratings_guide_doubtful_repayment_focus}}"
+- Key Definitions for Repayment Analysis:
+  - EBITDA (and relevance of adjustments): "{{definition_ebitda_for_repayment}}"
+  - Free Cash Flow (FCF) (and its components): "{{definition_fcf_for_repayment}}"
+  - Debt Service Coverage Ratio (DSCR) (calculation and interpretation): "{{definition_dscr_calculation_and_interpretation}}"
+- Comptroller's Handbook Guidance:
+  - Credit Risk Evaluation Process (Repayment Focus): "{{ch_rcr_repayment_evaluation_guidance}}"
+  - Risk Management for Leveraged Lending (Repayment Focus, Stress Testing): "{{ch_ll_risk_mgmt_repayment_focus}}"
+  - Evaluating Borrower in Leveraged Lending (Cash Flow Sustainability): "{{ch_ll_eval_borrower_repayment_focus}}"
+- Leveraged Lending Guidance Insights:
+  - EBITDA Adjustments Impact on Repayment Analysis: "{{llg_ebitda_adjustments_for_repayment}}"
+  - Financial Covenants as Indicators of Repayment Capacity: "{{llg_financial_covenants_repayment_link}}"
 - Typical Repayment Capacity Period to Consider: {{repayment_capacity_period_years}} years
 
 Borrower Financial Information:
-- Historical Free Cash Flows (FCF) (Last 3 periods, most recent last): {{historical_fcf}}
+- Historical Free Cash Flows (FCF) (Last 3 periods, most recent last, specify if adjusted): {{historical_fcf}}
 - Historical Cash Flow from Operations (CFO) (Last 3 periods): {{historical_cfo}}
-- Current Debt Service Requirement (Annualized): {{annual_debt_service}}
-- Key Financial Ratios (e.g., Debt/EBITDA, Interest Coverage): {{relevant_ratios}}
-- Projected FCF (if available, for {{repayment_capacity_period_years}} years): {{projected_fcf}}
-- Qualitative Notes on Revenue/Cash Flow Stability (e.g., customer concentration, contract terms, industry cyclicality): {{qualitative_notes_stability}}
+- Historical EBITDA (Last 3 periods, specify if adjusted and how): {{historical_ebitda}}
+- Current Debt Service Requirement (Annualized Principal & Interest): {{annual_debt_service}}
+- Key Financial Ratios (e.g., Debt/EBITDA, Interest Coverage, DSCR, Fixed Charge Coverage): {{relevant_ratios}}
+- Projected FCF (if available, for {{repayment_capacity_period_years}} years, specify assumptions): {{projected_fcf}}
+- Projected EBITDA (if available, for {{repayment_capacity_period_years}} years, specify assumptions): {{projected_ebitda}}
+- Qualitative Notes on Revenue/Cash Flow Stability (e.g., customer concentration, contract terms, industry cyclicality, competitive pressures, management assessment): {{qualitative_notes_stability}}
+- Details on Secondary Repayment Sources (e.g., collateral liquidation value, guarantor support - nature and reliability): {{secondary_repayment_sources_detail}}
+- Sensitivity Analysis or Stress Test Results (if available, impact on cash flows/ratios): {{stress_test_results}}
 
-Based on all the above:
-1. Assess the strength and sustainability of the primary repayment sources.
-2. Identify any significant concerns regarding future paying capacity over the typical repayment period.
-3. Conclude on the overall repayment capacity.
+Instructions:
+Based on all the above information AND the detailed regulatory context provided (OCC Guidelines, Ratings Guide definitions, Key Definitions, Comptroller's Handbook sections, Leveraged Lending Guidance):
+1. Assess the strength, sustainability, and reliability of the borrower's primary source(s) of repayment (typically operating cash flows). Consider historical performance, projections, and qualitative factors.
+2. Analyze the impact of any EBITDA adjustments (`{{llg_ebitda_adjustments_for_repayment}}`) on the assessment of true operating cash flow available for debt service.
+3. Evaluate key financial ratios (DSCR, coverage ratios, leverage) against industry norms and regulatory expectations outlined in `{{ch_rcr_repayment_evaluation_guidance}}` and `{{ch_ll_eval_borrower_repayment_focus}}`.
+4. Consider the reliability and availability of secondary repayment sources, but base your primary assessment on operating cash flow.
+5. Incorporate findings from sensitivity analysis or stress tests (`{{stress_test_results}}` and `{{ch_ll_risk_mgmt_repayment_focus}}`) to gauge resilience.
+6. Identify any significant concerns regarding future paying capacity over the typical repayment period of {{repayment_capacity_period_years}} years, explicitly linking them to the provided guidelines (e.g., characteristics of Special Mention or Substandard if weaknesses are evident).
+7. Conclude on the overall repayment capacity (e.g., Strong, Adequate, Weak, Unsustainable).
 
 Output your assessment in the following format:
 Assessment: [Strong/Adequate/Weak/Unsustainable]
-Justification: [Detailed justification for your assessment, referencing specific data points, trends, qualitative factors, and how they align or conflict with the regulatory expectation of a sustainable primary repayment source under borrower control.]
-Concerns: [List any specific concerns identified, or "None".]
+Justification: [Detailed justification for your assessment. Explicitly reference:
+    a. Specific borrower data (historical and projected cash flows/EBITDA, key ratios, qualitative notes).
+    b. How these data align or conflict with regulatory expectations from `{{occ_guideline_cash_flow_analysis_expectations}}`, `{{occ_ll_underwriting_repayment}}`, `{{ch_rcr_repayment_evaluation_guidance}}`, and `{{ch_ll_eval_borrower_repayment_focus}}`.
+    c. The definitions of cash flow metrics (`{{definition_fcf_for_repayment}}`, `{{definition_dscr_calculation_and_interpretation}}`).
+    d. The characteristics of relevant rating definitions (e.g., `{{ratings_guide_pass_repayment_focus}}` if strong, or `{{ratings_guide_substandard_repayment_focus}}` if weak).
+    e. Insights from leveraged lending guidance on EBITDA adjustments and covenants (`{{llg_ebitda_adjustments_for_repayment}}`, `{{llg_financial_covenants_repayment_link}}`).
+    f. Impact of stress tests, if available.
+    Your justification MUST clearly distinguish between primary and secondary sources of repayment and focus on the sustainability of the primary source.]
+Concerns: [List any specific concerns identified (e.g., reliance on asset sales, unrealistic projections, covenant breaches indicating stress), or "None". Explicitly link concerns to specific guideline definitions where appropriate.]

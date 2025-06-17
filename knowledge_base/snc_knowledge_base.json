@@ -1,0 +1,1037 @@
+{
+  "occ_guidelines": [
+    {
+      "id": "occ_rcr_principle_001",
+      "topic": "Establishment of Risk Rating System",
+      "guideline_text": "Banks should establish and maintain a credit risk rating system appropriate for their size, complexity, and risk profile. The system should identify and quantify the level of credit risk in individual credits, transactions, and portfolios.",
+      "source_document": "Comptroller's Handbook: Rating Credit Risk, Introduction"
+    },
+    {
+      "id": "occ_rcr_principle_002",
+      "topic": "Risk Rating System Objectives",
+      "guideline_text": "An effective risk rating system supports prudent credit risk management by accurately differentiating risk, identifying problem credits in a timely manner, and providing essential information for credit decisions, portfolio management, and capital adequacy.",
+      "source_document": "Comptroller's Handbook: Rating Credit Risk, Functions of a Credit Risk Rating System"
+    },
+    {
+      "id": "occ_ll_underwriting_001",
+      "topic": "Underwriting Standards for Leveraged Loans",
+      "guideline_text": "Lending institutions should establish well-defined underwriting standards for leveraged loans that address repayment capacity, leverage levels, collateral, covenants, and enterprise value. These standards should be regularly reviewed and updated.",
+      "source_document": "Comptroller's Handbook: Leveraged Lending, Risk Management Guidelines and Controls"
+    },
+    {
+      "id": "occ_ll_collateral_001",
+      "topic": "Collateral in Leveraged Lending",
+      "guideline_text": "For leveraged loans, collateral evaluations should be thorough, considering marketability, and control. Lien perfection and ongoing monitoring of collateral value are critical.",
+      "source_document": "Comptroller's Handbook: Leveraged Lending, Evaluating Collateral"
+    }
+  ],
+  "shared_national_credit_criteria": [
+    {
+      "id": "snc_program_objective_001",
+      "criterion_name": "SNC Program Objective",
+      "description": "The Shared National Credit (SNC) Program is designed to provide a consistent regulatory approach to the review and risk assessment of large syndicated loans. Its objectives include efficient review, consistent application of credit risk ratings, and generation of data for trend analysis.",
+      "source_reference": "Shared National Credit Program - General Description"
+    },
+    {
+      "id": "snc_program_scope_001",
+      "criterion_name": "SNC Program Scope",
+      "description": "The SNC Program generally covers any syndicated loan or loan commitment of $100 million or more that is shared by three or more supervised institutions.",
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Program Scope"
+    },
+    {
+      "id": "snc_review_process_001",
+      "criterion_name": "SNC Review Process",
+      "description": "SNC reviews are conducted by teams of examiners from the OCC, Federal Reserve, and FDIC. Reviews focus on credit quality, underwriting standards, risk management practices, and trends in the syndicated loan market.",
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Review Process"
+    },
+    {
+      "id": "snc_focus_areas_2024_001",
+      "criterion_name": "SNC Focus Areas 2024",
+      "description": "Focus areas for the 2024 SNC reviews include the impact of economic conditions on borrower performance, underwriting discipline for new originations, and risk layering in leveraged loans.",
+      "factors_to_consider": ["Inflationary pressures", "Interest rate environment", "Supply chain disruptions", "Geopolitical risks"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Focus of Reviews"
+    }
+  ],
+  "ratings_guide": [
+    {
+      "id": "rating_pass_001",
+      "rating_category": "Pass",
+      "definition": "Pass-rated credits are of satisfactory to excellent quality. They exhibit minimal risk and are expected to be repaid in accordance with contractual terms. These credits do not warrant more than normal attention from bank management.",
+      "characteristics": ["Strong financial condition", "Adequate repayment capacity", "Appropriate collateral (if applicable)", "Well-structured loan terms"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions; Comptroller's Handbook: Rating Credit Risk, Appendix C"
+    },
+    {
+      "id": "rating_sm_001",
+      "rating_category": "Special Mention (SM)",
+      "definition": "A Special Mention asset has potential weaknesses that deserve management’s close attention. If left uncorrected, these potential weaknesses may result in deterioration of the repayment prospects for the asset or in the bank’s credit position at some future date. Special Mention assets are not adversely classified and do not expose an institution to sufficient risk to warrant adverse classification.",
+      "characteristics": ["Potential for future weakness", "Currently protected but trends are concerning", "Requires more than normal monitoring"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions; Comptroller's Handbook: Rating Credit Risk, Appendix C"
+    },
+    {
+      "id": "rating_substandard_001",
+      "rating_category": "Substandard",
+      "definition": "A Substandard asset is inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged, if any. Assets so classified must have a well-defined weakness or weaknesses that jeopardize the liquidation of the debt. They are characterized by the distinct possibility that the bank will sustain some loss if the deficiencies are not corrected.",
+      "characteristics": ["Well-defined weakness(es)", "Inadequate protection from primary repayment source", "Distinct possibility of loss if deficiencies not corrected"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions; Comptroller's Handbook: Rating Credit Risk, Appendix C"
+    },
+    {
+      "id": "rating_doubtful_001",
+      "rating_category": "Doubtful",
+      "definition": "An asset classified Doubtful has all the weaknesses inherent in one classified Substandard, with the added characteristic that the weaknesses make collection or liquidation in full, on the basis of currently existing facts, conditions, and values, highly questionable and improbable.",
+      "characteristics": ["Weaknesses make collection in full highly questionable/improbable", "Possibility of loss is high, but specific amount not yet determinable"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions; Comptroller's Handbook: Rating Credit Risk, Appendix C"
+    },
+    {
+      "id": "rating_loss_001",
+      "rating_category": "Loss",
+      "definition": "Assets classified Loss are considered uncollectible and of such little value that their continuance as bankable assets is not warranted. This classification does not mean that the asset has absolutely no recovery or salvage value, but rather that it is not practical or desirable to defer writing off this basically worthless asset even though partial recovery may be effected in the future.",
+      "characteristics": ["Considered uncollectible", "Of such little value that continuance as bankable asset is not warranted"],
+      "source_reference": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions; Comptroller's Handbook: Rating Credit Risk, Appendix C"
+    }
+  ],
+  "definitions": [
+    {
+      "id": "def_snc_commitment_001",
+      "term": "Commitment (SNC)",
+      "definition_text": "A commitment is any legal obligation to extend credit, purchase an asset, or assume a financial obligation. For SNC purposes, this includes term loans, revolving credit facilities, and other extensions of credit.",
+      "source": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions"
+    },
+    {
+      "id": "def_rcr_credit_risk_001",
+      "term": "Credit Risk (Rating Credit Risk Handbook)",
+      "definition_text": "The risk to earnings or capital arising from an obligor’s failure to meet the terms of any contract with the bank or otherwise to perform as agreed.",
+      "source": "Comptroller's Handbook: Rating Credit Risk, Appendix C: Rating Terminology"
+    },
+    {
+      "id": "def_rcr_guarantor_001",
+      "term": "Guarantor (Rating Credit Risk Handbook)",
+      "definition_text": "A person or entity that has committed to repay a credit obligation in the event the primary obligor defaults. The assessment of a guarantor's strength is a key component of credit risk evaluation.",
+      "source": "Comptroller's Handbook: Rating Credit Risk, Appendix D: Guarantees"
+    },
+    {
+      "id": "def_ll_leveraged_lending_001",
+      "term": "Leveraged Lending (Leveraged Lending Handbook)",
+      "definition_text": "Loans to companies with debt-to-equity or debt-to-EBITDA ratios significantly above industry norms, or loans to finance buyouts, acquisitions, or capital distributions. Often characterized by higher risk and pricing.",
+      "source": "Comptroller's Handbook: Leveraged Lending, Appendix B: Glossary"
+    },
+    {
+      "id": "def_ll_ebitda_001",
+      "term": "EBITDA (Leveraged Lending Handbook)",
+      "definition_text": "Earnings Before Interest, Taxes, Depreciation, and Amortization. A measure of a company's operating performance, commonly used in financial covenants and valuation in leveraged lending. Definitions and adjustments can vary significantly.",
+      "source": "Comptroller's Handbook: Leveraged Lending, Appendix B: Glossary"
+    },
+    {
+      "id": "def_rcr_writeup_standard_001",
+      "term": "Write-Up Standard (Rating Credit Risk Handbook)",
+      "definition_text": "A document that provides a comprehensive analysis of a credit relationship, including the purpose of the credit, sources of repayment, risk assessment, and assigned risk rating. Standards ensure consistency and thoroughness.",
+      "source": "Comptroller's Handbook: Rating Credit Risk, Appendix B: Write-Up Standards"
+    },
+    {
+      "id": "def_snc_loss_given_default_001",
+      "term": "Loss Given Default (LGD - SNC)",
+      "definition_text": "An estimate of the expected loss, expressed as a percentage of exposure at default (EAD), that a bank would incur if a borrower defaults.",
+      "source": "Shared National Credit Program 1st and 3rd Quarter 2024 Reviews, Appendix A: Definitions"
+    }
+  ],
+  "comptrollers_handbook_rating_credit_risk": {
+    "id": "ch_rcr_main_001",
+    "title": "Comptroller's Handbook: Rating Credit Risk - Key Sections",
+    "source_document": "Comptroller's Handbook: Rating Credit Risk",
+    "sections": [
+      {
+        "id": "ch_rcr_functions_001",
+        "section_title": "Functions of a Credit Risk Rating System",
+        "points": [
+          {"id": "ch_rcr_func_p1", "text": "Accurately differentiate risk levels across individual credits and portfolios."},
+          {"id": "ch_rcr_func_p2", "text": "Identify problem credits in a timely manner."},
+          {"id": "ch_rcr_func_p3", "text": "Provide essential input for credit approval, loan pricing, and portfolio management."},
+          {"id": "ch_rcr_func_p4", "text": "Support determination of allowance for loan and lease losses (ALLL)."},
+          {"id": "ch_rcr_func_p5", "text": "Facilitate capital adequacy assessment and regulatory reporting."}
+        ],
+        "source_reference": "Comptroller's Handbook: Rating Credit Risk, Functions of a Credit Risk Rating System"
+      },
+      {
+        "id": "ch_rcr_expectations_001",
+        "section_title": "Expectations of Bank Credit Risk Rating Systems",
+        "points": [
+          {"id": "ch_rcr_exp_p1", "text": "System should be comprehensive, clearly documented, and consistently applied."},
+          {"id": "ch_rcr_exp_p2", "text": "Risk rating definitions should be precise and distinct."},
+          {"id": "ch_rcr_exp_p3", "text": "System should incorporate both quantitative and qualitative factors."},
+          {"id": "ch_rcr_exp_p4", "text": "Independent review and validation of the risk rating process are expected."},
+          {"id": "ch_rcr_exp_p5", "text": "Ratings should be updated promptly based on new information."}
+        ],
+        "source_reference": "Comptroller's Handbook: Rating Credit Risk, OCC Expectations"
+      },
+      {
+        "id": "ch_rcr_process_controls_001",
+        "section_title": "Risk Rating Process Controls",
+        "points": [
+          {"id": "ch_rcr_proc_p1", "text": "Clear roles and responsibilities for rating assignment and approval."},
+          {"id": "ch_rcr_proc_p2", "text": "Regular training for personnel involved in the risk rating process."},
+          {"id": "ch_rcr_proc_p3", "text": "Robust data systems to support the risk rating process."},
+          {"id": "ch_rcr_proc_p4", "text": "Independent validation of risk rating accuracy and system effectiveness."}
+        ],
+        "source_reference": "Comptroller's Handbook: Rating Credit Risk, Risk Rating Process Controls"
+      },
+      {
+        "id": "ch_rcr_evaluation_process_001",
+        "section_title": "The Credit Risk Evaluation Process",
+        "points": [
+          {"id": "ch_rcr_eval_p1", "text": "Analysis of borrower's financial condition, repayment capacity, and management quality."},
+          {"id": "ch_rcr_eval_p2", "text": "Assessment of industry trends and economic conditions affecting the borrower."},
+          {"id": "ch_rcr_eval_p3", "text": "Evaluation of collateral value and lien perfection (if applicable)."},
+          {"id": "ch_rcr_eval_p4", "text": "Consideration of loan structure, covenants, and other terms."},
+          {"id": "ch_rcr_eval_p5", "text": "Assessment of guarantor support and other credit enhancements."}
+        ],
+        "source_reference": "Comptroller's Handbook: Rating Credit Risk, The Credit Risk Evaluation Process"
+      },
+      {
+        "id": "ch_rcr_writeup_standards_001",
+        "section_title": "Write-Up Standards (Credit Analysis Report)",
+        "guidelines": [
+          {"id": "ch_rcr_wu_g1", "text": "Write-ups should be current, accurate, and provide a comprehensive analysis of the credit."},
+          {"id": "ch_rcr_wu_g2", "text": "Clearly state the purpose of the credit and sources of repayment."},
+          {"id": "ch_rcr_wu_g3", "text": "Summarize the borrower's history, nature of business, and management expertise."},
+          {"id": "ch_rcr_wu_g4", "text": "Include a thorough financial analysis, including ratio analysis and cash flow projections."},
+          {"id": "ch_rcr_wu_g5", "text": "Detail collateral evaluations and lien status."},
+          {"id": "ch_rcr_wu_g6", "text": "Provide a clear rationale for the assigned risk rating, referencing specific rating criteria."},
+          {"id": "ch_rcr_wu_g7", "text": "Identify key risks and mitigants."}
+        ],
+        "source_reference": "Comptroller's Handbook: Rating Credit Risk, Appendix B: Write-Up Standards, Guidelines, and Examples"
+      }
+    ]
+  },
+  "comptrollers_handbook_leveraged_lending": {
+    "id": "ch_ll_main_001",
+    "title": "Comptroller's Handbook: Leveraged Lending - Key Sections",
+    "source_document": "Comptroller's Handbook: Leveraged Lending",
+    "sections": [
+      {
+        "id": "ch_ll_risks_001",
+        "section_title": "Risks Associated with Leveraged Lending",
+        "points": [
+          {"id": "ch_ll_risk_p1", "text": "Increased credit risk due to high leverage, aggressive repayment assumptions, and sensitivity to economic downturns."},
+          {"id": "ch_ll_risk_p2", "text": "Market risk if loans are intended for syndication or sale."},
+          {"id": "ch_ll_risk_p3", "text": "Liquidity risk if unable to sell or syndicate loans as planned."},
+          {"id": "ch_ll_risk_p4", "text": "Operational risk from complex deal structures and monitoring requirements."},
+          {"id": "ch_ll_risk_p5", "text": "Reputation risk if underwriting practices are perceived as overly aggressive."},
+          {"id": "ch_ll_risk_p6", "text": "Legal risk from inadequate documentation or challenges to lender rights."}
+        ],
+        "source_reference": "Comptroller's Handbook: Leveraged Lending, Risks Associated with Leveraged Lending"
+      },
+      {
+        "id": "ch_ll_risk_mgmt_001",
+        "section_title": "Risk Management Guidelines and Controls",
+        "points": [
+          {"id": "ch_ll_rm_p1", "text": "Board-approved policies specific to leveraged lending activities."},
+          {"id": "ch_ll_rm_p2", "text": "Well-defined underwriting standards and exception approval processes."},
+          {"id": "ch_ll_rm_p3", "text": "Robust credit analysis, including stress testing of repayment capacity."},
+          {"id": "ch_ll_rm_p4", "text": "Independent credit review function with expertise in leveraged lending."},
+          {"id": "ch_ll_rm_p5", "text": "Accurate and timely risk rating of leveraged loans."},
+          {"id": "ch_ll_rm_p6", "text": "Limits on concentrations by borrower, industry, and deal type."},
+          {"id": "ch_ll_rm_p7", "text": "Effective monitoring of covenant compliance, borrower performance, and collateral."}
+        ],
+        "source_reference": "Comptroller's Handbook: Leveraged Lending, Risk Management Guidelines and Controls"
+      },
+      {
+        "id": "ch_ll_eval_borrower_001",
+        "section_title": "Evaluating the Borrower in a Leveraged Loan Transaction",
+        "points": [
+          {"id": "ch_ll_eb_p1", "text": "Assess management's experience, track record, and credibility of projections."},
+          {"id": "ch_ll_eb_p2", "text": "Analyze the borrower's business model, competitive position, and industry risks."},
+          {"id": "ch_ll_eb_p3", "text": "Scrutinize financial statements, particularly the quality of earnings and sustainability of cash flows."},
+          {"id": "ch_ll_eb_p4", "text": "Evaluate enterprise value and its implications for debt recovery."},
+          {"id": "ch_ll_eb_p5", "text": "Understand the sponsor's (if applicable) objectives, track record, and support for the borrower."}
+        ],
+        "source_reference": "Comptroller's Handbook: Leveraged Lending, Evaluating the Borrower"
+      },
+      {
+        "id": "ch_ll_accounting_001",
+        "section_title": "Accounting for Leveraged Lending",
+        "points": [
+          {"id": "ch_ll_acc_p1", "text": "Proper accounting for loan origination fees and costs in accordance with ASC 310-20."},
+          {"id": "ch_ll_acc_p2", "text": "Accurate classification of loans (held-for-investment vs. held-for-sale)."},
+          {"id": "ch_ll_acc_p3", "text": "Timely recognition of impairment and charge-offs when necessary."},
+          {"id": "ch_ll_acc_p4", "text": "Consideration of ASC 450-20 (formerly FAS 5) and ASC 310-10-35 (formerly FAS 114) for ALLL estimation."}
+        ],
+        "source_reference": "Comptroller's Handbook: Leveraged Lending, Appendix C: Accounting for Leveraged Lending"
+      }
+    ]
+  },
+  "leveraged_lending_guidance": [
+  {
+    "id": "covenant_overview",
+    "term_name": "Covenants - General Overview",
+    "category": "Credit Agreement Provisions",
+    "description": "Contractual promises by the borrower (and guarantors) to conduct its business in a certain manner or refrain from specific actions. They are a primary tool for lenders to mitigate credit risk, monitor performance, and protect interests post-closing. Breach typically constitutes a technical default, potentially leading to an Event of Default.",
+    "source_reference": "Section II.D"
+  },
+  {
+    "id": "affirmative_covenants",
+    "term_name": "Affirmative (Positive) Covenants",
+    "category": "Types of Covenants",
+    "description": "Stipulate actions the borrower must perform or conditions it must maintain. Purpose is to ensure prudent operation, maintenance of legal status/assets, and provision of ongoing information to lenders.",
+    "examples": [
+      {
+        "example_name": "Maintenance of Legal Existence & Corporate Status",
+        "details": "Ensure borrower remains a valid legal entity.",
+        "source_reference": "Section II.D.1, Table 2"
+      },
+      {
+        "example_name": "Payment of Taxes",
+        "details": "Ensure timely payment of taxes and other obligations.",
+        "source_reference": "Section II.D.1, Table 2"
+      },
+      {
+        "example_name": "Compliance with Laws",
+        "details": "Comply with applicable laws (environmental, anti-corruption, sanctions). Negotiation on materiality thresholds.",
+        "source_reference": "Section II.D.1, Table 2"
+      },
+      {
+        "example_name": "Maintenance of Properties and Insurance",
+        "details": "Keep properties in good repair, maintain appropriate insurance. Negotiation on materiality and scope.",
+        "source_reference": "Section II.D.1, Table 2"
+      },
+      {
+        "example_name": "Financial Reporting",
+        "details": "Provision of regular financial statements (annual audited, quarterly unaudited), compliance certificates, budgets, notices of default. Negotiation on timing, scope.",
+        "source_reference": "Section II.D.1, Table 2"
+      },
+      {
+        "example_name": "Lender Inspections/Audits",
+        "details": "Permitting lenders/representatives to conduct inspections (subject to limitations).",
+        "source_reference": "Section II.D.1"
+      }
+    ],
+    "source_reference": "Section II.D.1"
+  },
+  {
+    "id": "negative_covenants_overview",
+    "term_name": "Negative Covenants - Overview",
+    "category": "Types of Covenants",
+    "description": "Restrict the borrower from undertaking certain actions without prior lender consent. Aim to prevent actions that could increase lender risk, diminish collateral value, or leak value from the restricted group. 'Permitted baskets' (fixed, grower, builder) are heavily negotiated allowances providing flexibility.",
+    "source_reference": "Section II.D.1, II.D.2"
+  },
+  {
+    "id": "limitation_on_indebtedness",
+    "term_name": "Limitation on Indebtedness",
+    "category": "Key Negative Covenants",
+    "description": "Restricts the incurrence of additional financial debt. Core restriction supplemented by permitted debt baskets (e.g., refinancing, capital leases, intercompany, acquisition debt, general basket) and often a 'ratio debt' permission (allowing debt if a financial ratio is met pro forma).",
+    "source_reference": "Section II.D.2, Table 2"
+  },
+  {
+    "id": "limitation_on_liens",
+    "term_name": "Limitation on Liens (Negative Pledge)",
+    "category": "Key Negative Covenants",
+    "description": "Prohibits creating security interests over assets for other creditors, unless existing lenders are equally/ratably secured. Subject to permitted lien baskets (e.g., for purchase money debt, statutory liens, general basket, liens for other permitted debt).",
+    "source_reference": "Section II.D.2, Table 2"
+  },
+  {
+    "id": "limitation_on_asset_sales",
+    "term_name": "Limitation on Asset Sales (Disposals)",
+    "category": "Key Negative Covenants",
+    "description": "Restricts sale, lease, transfer of assets outside ordinary course. Exceptions for value thresholds, obsolete assets, or if proceeds are reinvested or used for loan prepayment. Requirements for fair market value and cash consideration are common. Reinvestment rights (e.g., 12-18 months) are often broad.",
+    "source_reference": "Section II.D.2, Table 2"
+  },
+  {
+    "id": "limitation_on_investments_loans_acquisitions",
+    "term_name": "Limitation on Investments, Loans, and Acquisitions",
+    "category": "Key Negative Covenants",
+    "description": "Restricts making investments in, or loans to, third parties or other group companies (especially outside guarantors), and making acquisitions, subject to permitted baskets and ratio tests.",
+    "source_reference": "Section II.D.2"
+  },
+  {
+    "id": "limitation_on_restricted_payments",
+    "term_name": "Limitation on Restricted Payments (RP Covenant)",
+    "category": "Key Negative Covenants",
+    "description": "Controls outflow of cash/assets from borrower/restricted subsidiaries to equity holders (dividends, share repurchases) or to repay subordinated debt. Includes complex 'builder baskets' (e.g., % of CNI plus equity proceeds) and fixed/grower baskets. Access often conditioned on no default and/or meeting a financial ratio test.",
+    "typical_restricted_payments": [
+      "Dividends and other equity distributions",
+      "Purchases, redemptions, or retirements of equity interests",
+      "Payments on subordinated indebtedness before scheduled maturity",
+      "Investments in entities/assets that are not restricted subsidiaries (including unrestricted subsidiaries)"
+    ],
+    "source_reference": "Section II.D.2, Table 2"
+  },
+  {
+    "id": "limitation_on_mergers_consolidations",
+    "term_name": "Limitation on Mergers and Consolidations",
+    "category": "Key Negative Covenants",
+    "description": "Prohibits mergers/consolidations unless the surviving entity assumes all obligations and certain financial tests are met.",
+    "source_reference": "Section II.D.2"
+  },
+  {
+    "id": "limitation_on_changes_to_business",
+    "term_name": "Limitation on Changes to Business",
+    "category": "Key Negative Covenants",
+    "description": "Restricting fundamental changes to the nature of the borrower's business.",
+    "source_reference": "Section II.D.2"
+  },
+  {
+    "id": "limitation_on_transactions_with_affiliates",
+    "term_name": "Limitation on Transactions with Affiliates",
+    "category": "Key Negative Covenants",
+    "description": "Requires affiliate transactions to be on arm's length terms or approved by disinterested directors to prevent value extraction. Exceptions for intercompany transactions within restricted group, compensation, disclosed sponsor fees.",
+    "source_reference": "Section II.D.2, Table 2"
+  },
+  {
+    "id": "financial_covenants_overview",
+    "term_name": "Financial Covenants - Overview",
+    "category": "Types of Covenants",
+    "description": "Require the borrower to maintain its financial condition/performance within pre-agreed numerical parameters. Serve as key early warning indicators. Common examples: Leverage Ratio, Interest Coverage Ratio, Fixed Charge Coverage Ratio, Capex Limitation.",
+    "source_reference": "Section II.D.1, II.D.3, Table 2"
+  },
+  {
+    "id": "maintenance_vs_incurrence_covenants",
+    "term_name": "Maintenance vs. Incurrence Financial Covenants",
+    "category": "Financial Covenants",
+    "maintenance_covenants": {
+      "name": "Maintenance Covenants",
+      "definition": "Require borrower to meet specified financial ratio tests at regular intervals (e.g., quarterly), regardless of borrower actions.",
+      "breach_implication": "Allows lenders to act even if no payment default. Traditional in LMA TLA / bank-led deals.",
+      "source_reference": "Section II.D.3"
+    },
+    "incurrence_covenants": {
+      "name": "Incurrence Covenants",
+      "definition": "Tested only when borrower proposes a specific restricted action (e.g., incurring debt, making acquisition/dividend). Action permitted if pro forma compliance, else prohibited (unless basket capacity exists).",
+      "characteristics": "Provide greater operational flexibility. Hallmark of high-yield bonds and 'covenant-lite' TLBs.",
+      "source_reference": "Section II.D.3"
+    },
+    "covenant_lite_loose": {
+      "name": "Covenant-Lite / Covenant-Loose Structures",
+      "covenant_lite_definition": "Typically no financial maintenance covenants for term loan lenders.",
+      "covenant_loose_definition": "Might include one maintenance covenant (often leverage ratio) with generous headroom or springing for RCF lenders if RCF drawn significantly (e.g., >30-40%).",
+      "implications": "Reduces lender intervention points, delays detection of financial distress, but accepted by institutional investors for higher yields/capital deployment.",
+      "source_reference": "Section II.D.3"
+    }
+  },
+  {
+    "id": "ebitda_adjustments_calculations",
+    "term_name": "EBITDA Definition and Adjustments (Add-backs)",
+    "category": "Financial Covenants",
+    "description": "EBITDA definition is critical for financial ratios. Subject to intense negotiation. Borrowers (especially PE-backed) seek wide array of 'add-backs' that increase reported EBITDA.",
+    "common_add_backs": [
+      "Synergies and cost savings (often permitted even if unrealized, with limited timeframes/verification)",
+      "Restructuring charges and non-recurring expenses",
+      "Transaction costs (acquisitions, debt/equity offerings)",
+      "Stock-based compensation and other non-cash charges"
+    ],
+    "lender_considerations": "Permissiveness of add-backs (especially prospective ones) can disconnect reported compliance from actual economic performance. Robust due diligence on quality of earnings and reasonableness of add-backs is critical. Lenders may seek caps on certain add-backs.",
+    "source_reference": "Section II.D.3"
+  },
+  {
+    "id": "equity_cures",
+    "term_name": "Equity Cures",
+    "category": "Financial Covenants",
+    "description": "Allow PE sponsor/equity holders to cure a financial maintenance covenant breach by making an equity contribution. Proceeds typically treated as addition to EBITDA for recalculating the breached covenant or (less commonly) as debt reduction.",
+    "limitations": "Usually limited (e.g., number of times in total, not in consecutive quarters, max two in four quarters).",
+    "negotiation_points": "Whether cure amount is deemed EBITDA vs. actual debt paydown; limitations on use.",
+    "lender_considerations": "Provides lifeline for borrowers/sponsors but can delay necessary operational restructurings or inevitable default if underlying issues persist.",
+    "source_reference": "Section II.D.3"
+  },
+  {
+    "id": "restricted_unrestricted_subsidiaries",
+    "term_name": "Role of Restricted and Unrestricted Subsidiaries in Covenants",
+    "category": "Covenant Application",
+    "restricted_subsidiaries": {
+      "name": "Restricted Subsidiaries",
+      "definition": "Subsidiaries bound by the full covenant package. Form the core 'credit group'. Usually provide guarantees and grant security. Their financials are consolidated for covenant calculations and basket capacity.",
+      "source_reference": "Section II.D.4"
+    },
+    "unrestricted_subsidiaries": {
+      "name": "Unrestricted Subsidiaries",
+      "definition": "Subsidiaries designated by borrower (if permitted) to be outside the scope of most covenants/obligations. Do not provide guarantees/security for main facilities. Their financials typically excluded from consolidated calculations (though dividends to restricted group may be included in CNI/EBITDA). Transactions between restricted/unrestricted groups treated as third-party transactions subject to covenant limitations (e.g., RPs, affiliate rules).",
+      "strategic_use_and_risks": "Intended for operational flexibility (JVs, non-core assets, special projects) but has become central to aggressive LMEs (e.g., asset drop-downs like J.Crew, PetSmart, Neiman Marcus, Envision) to shield assets or raise structurally senior debt, leading to development of 'blocker' provisions.",
+      "source_reference": "Section II.D.4"
+    }
+  },
+  {
+    "id": "introduction_leveraged_lending_framework",
+    "term_name": "Introduction to Leveraged Lending: A Legal Framework",
+    "category": "Foundational Concepts",
+    "description": "Leveraged lending involves extending credit to companies/individuals already with significant debt or sub-investment grade credit ratings. It's characterized by inherent risk, influencing legal architecture, terms, documentation, and borrower-lender relationships. The US market surpassed $1 trillion, highlighting its economic significance and need for robust legal/regulatory oversight.",
+    "source_reference": "Section I"
+  },
+  {
+    "id": "defining_leveraged_lending",
+    "term_name": "Defining Leveraged Lending: Key Characteristics and Market Overview",
+    "category": "Foundational Concepts",
+    "key_characteristics": [
+      {
+        "characteristic": "High Borrower Leverage/Impaired Creditworthiness",
+        "details": "Core characteristic. Lenders demand higher compensation (e.g., higher interest rates) for increased default risk.",
+        "source_reference": "Section I.A"
+      },
+      {
+        "characteristic": "Arrangement and Syndication",
+        "details": "Frequently structured, arranged, and administered by 'arrangers' (commercial/investment banks), then syndicated to a broader group of banks and institutional investors to distribute risk.",
+        "source_reference": "Section I.A"
+      },
+      {
+        "characteristic": "Security Package",
+        "details": "Usually involves a pledge of borrower's assets to collateralize the debt, providing lenders priority claim in insolvency.",
+        "source_reference": "Section I.A"
+      },
+      {
+        "characteristic": "Floating Interest Rate",
+        "details": "Commonly based on a floating rate (historically LIBOR, now SOFR) plus a credit spread/margin. Transition from LIBOR to SOFR added legal/operational complexity.",
+        "source_reference": "Section I.A"
+      }
+    ],
+    "definitional_ambiguity": {
+      "issue": "No universally accepted legal definition. Market participants and rating agencies (Moody's: Ba3 or lower; S&P: BB- or lower) use varying criteria (credit ratings, spread over benchmark).",
+      "implications": "Inconsistencies in regulatory treatment, risk assessment, potential for regulatory arbitrage, supervisory gaps, complicates cross-border comparisons and uniform application of international standards.",
+      "source_reference": "Section I.A"
+    },
+    "common_uses": [
+      "Leveraged Buyouts (LBOs)",
+      "Mergers and Acquisitions (M&A)",
+      "Corporate Recapitalizations (including dividend recapitalizations)",
+      "Refinancing of existing indebtedness"
+    ],
+    "purpose_influence_on_structure": "Specific purpose significantly influences legal structuring and term negotiation. Purposes often entail substantial increase in borrower's risk profile post-transaction, necessitating forward-looking legal analysis on pro forma leverage and strategic plans.",
+    "systemic_risk_concerns": "Scale and characteristics (high risk, opacity) led to concerns about potential contribution to systemic financial risk and exacerbating economic downturns. Prompted increased regulatory monitoring but limited policy responses.",
+    "lender_base_evolution": {
+      "shift": "Shift from traditional banks to institutional investors (CLOs, mutual funds, pension funds, insurance companies, hedge funds).",
+      "implications": "Non-bank entities often have different investment horizons, risk appetites, regulatory frameworks. Altered negotiation dynamics, often leading to more borrower-friendly terms (e.g., 'covenant-lite'). May increase systemic risk if non-bank lenders are less stringently regulated.",
+      "source_reference": "Section I.A"
+    },
+    "source_reference": "Section I.A"
+  },
+  {
+    "id": "parties_involved_legal_roles",
+    "term_name": "Parties Involved and Their Legal Roles",
+    "category": "Foundational Concepts",
+    "parties": [
+      {
+        "party_name": "Borrowers",
+        "description": "Typically corporations (often LBO/acquisition targets) or entities refinancing/recapitalizing. Characterized by substantial existing debt or sub-investment grade ratings. Primary legal obligations: service debt, comply with credit agreement terms.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Lenders/Creditors",
+        "description": "Diverse: traditional banks, insurance companies, pension funds, mutual funds, hedge funds, specialized private investment funds (including direct lenders). Fundamental legal right: timely principal/interest payment, exercise remedies on default.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Arrangers (Mandated Lead Arrangers - MLAs)",
+        "description": "Commercial/investment banks leading structuring, underwriting, and syndicating the loan. Significant legal responsibilities for accuracy of information memorandum and conduct of syndication.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Syndicate Lenders",
+        "description": "Financial institutions/funds acquiring loan portions from MLAs. Rights/obligations governed by credit agreement and assignment/participation agreements.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Facility Agent/Administrative Agent",
+        "description": "Usually a lender, responsible for day-to-day loan administration (communications, fund flows, covenant monitoring, waivers/amendments). Operates under legally defined duties; potential liabilities if breached.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Security Agent/Trustee",
+        "description": "Holds security interests on behalf of lender syndicate. Primary role: enforce security upon instruction post-default. Operates under trust/agency framework with duties to secured lenders. Potential conflicts of interest if an institution holds multiple roles (Arranger, Agent, Lender), especially in distress (e.g., Stabilus case).",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Private Equity Sponsors",
+        "description": "Driving force in LBOs. Contribute equity, exert significant influence on loan term negotiation (often resulting in borrower-favorable terms). Relationship with borrower (portfolio company) and lenders is crucial.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Legal Advisors",
+        "description": "Indispensable for structuring, drafting/negotiating documentation, due diligence, navigating legal/regulatory landscape for all parties.",
+        "source_reference": "Section I.B"
+      },
+      {
+        "party_name": "Rating Agencies (Moody's, S&P)",
+        "description": "Assess creditworthiness of borrower/loan. Not direct parties, but ratings significantly impact pricing, marketability, investor appetite.",
+        "source_reference": "Section I.B"
+      }
+    ],
+    "direct_lender_dynamic": "Increasing prominence. Often single lender or small club. Can lead to streamlined decisions, bespoke documentation, but less diverse creditor constituencies in stress, and more concentrated risk.",
+    "source_reference": "Section I.B"
+  },
+  {
+    "id": "legal_significance_high_leverage_credit_risk",
+    "term_name": "The Legal Significance of High Leverage and Credit Risk",
+    "category": "Foundational Concepts",
+    "core_principle": "High leverage and elevated credit risk are the cornerstone upon which the entire legal framework of these transactions is built, necessitating departures from investment-grade lending terms.",
+    "lender_protections_due_to_risk": [
+      {
+        "protection_type": "Comprehensive Loan Documentation",
+        "details": "Meticulously drafted, with emphasis on covenants, events of default, and security package.",
+        "source_reference": "Section I.C"
+      },
+      {
+        "protection_type": "Covenants",
+        "details": "Generally more restrictive and detailed than in investment-grade facilities. Provide mechanisms to monitor performance/condition and intervene if credit deteriorates.",
+        "source_reference": "Section I.C"
+      },
+      {
+        "protection_type": "Events of Default",
+        "details": "Broad range of triggers, often more sensitive to provide early warning signals.",
+        "source_reference": "Section I.C"
+      },
+      {
+        "protection_type": "Security Package",
+        "details": "Typically secured. Negotiation/perfection of comprehensive security is paramount to protect lenders and enhance recovery.",
+        "source_reference": "Section I.C"
+      }
+    ],
+    "due_diligence_requirements": "Extensive due diligence by lenders/counsel on borrower's financials, business, assets (collateral valuation), legal/capital structure. For acquisition/LBO financing, extends to viability of post-transaction business model and sponsor projections, focusing on cash flow generation.",
+    "impact_of_reduced_financial_cushion": "Higher likelihood of financial distress, making workouts, restructurings, insolvency more common. Legal definitions (e.g., EBITDA, aggressive 'add-backs') become critical battlegrounds in covenant negotiations, as they can obscure true financial performance and delay covenant tripping.",
+    "source_reference": "Section I.C"
+  },
+  {
+    "id": "lma_precedents_overview",
+    "term_name": "Overview of LMA Precedents and their Market Influence",
+    "category": "Credit Agreement Framework (LMA Focus)",
+    "description": "The Loan Market Association (LMA) plays a significant role in shaping leveraged loan agreements in Europe and increasingly globally by publishing recommended, non-binding forms for various transaction types, including leveraged facilities. These serve as a starting point for negotiation and require adaptation.",
+    "lma_leveraged_facilities_agreement": {
+      "development_context": "Developed without formal consultation of the Association of Corporate Treasurers (ACT), making it generally more lender-friendly in its initial form. The ACT publishes its own borrower's guide to highlight key negotiation issues.",
+      "market_adoption_and_influence": "Widespread adoption has cultivated familiarity in the European investor community. However, a notable trend, especially in PE-sponsored deals, is the increasing incorporation of New York law-governed, high-yield bond-style covenant packages and definitions alongside traditional LMA boilerplate. This convergence reflects globalization and sponsor preference for flexible, incurrence-based covenants.",
+      "dynamic_nature": "LMA documentation evolves to reflect market developments (e.g., LIBOR transition to alternative rates), regulatory changes, and shifts in negotiating leverage (e.g., rise of covenant-lite)."
+    },
+    "source_reference": "Section II.A"
+  },
+  {
+    "id": "core_economic_facility_terms_overview",
+    "term_name": "Core Economic and Facility Terms - Overview",
+    "category": "Credit Agreement Provisions (LMA Focus)",
+    "description": "Leveraged loan agreements typically comprise one or more distinct credit facilities, each with specific legal and economic characteristics. LMA provides templates for multicurrency term and revolving facilities.",
+    "source_reference": "Section II.B"
+  },
+  {
+    "id": "loan_facility_types",
+    "term_name": "Loan Facility Types: A Comparative Legal Analysis",
+    "category": "Core Economic and Facility Terms",
+    "facility_types": [
+      {
+        "name": "Term Loan A (TLA)",
+        "description": "Traditionally syndicated to commercial banks. Characterized by scheduled amortization of principal over a typically shorter loan life than TLB. Often features more stringent, maintenance-type financial covenants. Common in less aggressively leveraged deals or where relationship banking is key.",
+        "source_reference": "Section II.B.1, Table 1"
+      },
+      {
+        "name": "Term Loan B (TLB)",
+        "description": "Predominantly held by institutional investors (CLOs, hedge funds, credit funds). Typically features minimal or no amortization (e.g., 1% p.a.) with bulk/bullet repayment at maturity (commonly 5-7 years). Defining feature is prevalence of 'covenant-lite' or 'covenant-loose' structures (lacking traditional financial maintenance covenants or only springing). Dominant in LBOs and large leveraged financings. Shift towards cov-lite TLBs grants borrowers operational freedom but may delay distress detection and impact lender recoveries.",
+        "source_reference": "Section II.B.1, Table 1"
+      },
+      {
+        "name": "Revolving Credit Facility (RCF)",
+        "description": "Provides flexible access to funding up to a pre-set limit (draw, repay, re-draw) for working capital/general corporate purposes. Often secured alongside term loans. May include 'springing' financial covenants tested only when drawings exceed a certain percentage (e.g., 30-40%). Can create a 'dual-track' covenant regime if term loans are cov-lite, potentially leading to inter-lender conflicts.",
+        "variations": "Can be cash flow-based or asset-based loans (ABLs).",
+        "source_reference": "Section II.B.1, Table 1"
+      },
+      {
+        "name": "Delayed Draw Term Loans (DDTLs)",
+        "description": "Committed term loan facilities not funded at initial closing but can be drawn later during a specified period for identified acquisitions, capex, or specific projects. Typically rank pari passu with other existing term loans.",
+        "source_reference": "Section II.B.1"
+      }
+    ],
+    "choice_driver": "Driven by borrower's financing needs, transaction nature (LBO, M&A, refinancing), and prevailing debt market conditions/risk appetite.",
+    "source_reference": "Section II.B.1"
+  },
+  {
+    "id": "loan_amount_pricing_yield",
+    "term_name": "Loan Amount, Pricing, and Yield (including OID)",
+    "category": "Core Economic and Facility Terms",
+    "components": [
+      {
+        "name": "Loan Amount",
+        "details": "Aggregate principal determined by borrower's funding needs, debt service capacity, and lender appetite.",
+        "source_reference": "Section II.B.2"
+      },
+      {
+        "name": "Pricing (Interest Rate)",
+        "details": "Almost invariably a floating rate (benchmark like SOFR/Euribor + credit spread adjustment/margin). Margin compensates for credit risk. 'Margin ratchets' common (margin adjusts based on performance, typically leverage ratio). 'LIBOR/Euribor floors' ensure minimum benchmark rate.",
+        "source_reference": "Section II.B.2"
+      },
+      {
+        "name": "Fees",
+        "types": [
+          "Arrangement Fees (Upfront Fees): Paid to arrangers for structuring/underwriting.",
+          "Commitment Fees: Paid on undrawn RCF portion.",
+          "Agency Fees: Paid to facility/security agent."
+        ],
+        "source_reference": "Section II.B.2"
+      },
+      {
+        "name": "Original Issue Discount (OID)",
+        "definition": "Occurs when a loan/bond is issued below par/face value. Difference is OID, effectively increasing lender's yield.",
+        "purpose": "Enhances offering attractiveness for higher-risk credits or in challenging markets. Can be a 'deal sweetener'. Used to manage overall funding costs or improve marketability.",
+        "calculation": "Redemption Price (par) - Issuance Price.",
+        "accounting_tax_implications": "Generally amortized over loan term. Taxable income for lender; amortizable expense for borrower. Can lead to 'phantom income' for bondholders.",
+        "legal_documentation": "Credit agreement must clearly document OID impact on yield-to-maturity, tax reporting, and prepayment calculations.",
+        "source_reference": "Section II.B.2"
+      }
+    ],
+    "all_in_yield_cost": "Combination of floating rates, margins, OID, and fees creates complex 'all-in yield' for lenders and 'all-in cost' for borrowers.",
+    "source_reference": "Section II.B.2"
+  },
+  {
+    "id": "market_flex_provisions",
+    "term_name": "Market Flex Provisions: Legal Mechanics and Implications",
+    "category": "Core Economic and Facility Terms",
+    "definition": "Standard feature in mandate/arrangement fee letters for syndicated leveraged loans. Grant arrangers/underwriters contractual right to unilaterally alter certain financing terms (pricing, structure, other terms) after mandate but before closing/syndication, if necessary to ensure successful debt sale. Shifts syndication risk from arranging banks to borrower.",
+    "location_confidentiality": "Typically in confidential mandate/fee letters, not main credit agreement circulated to syndicate. Confidentiality is crucial but can reduce market transparency.",
+    "scope_of_flex": {
+      "general": "LMA standard wording: changes to 'pricing, terms and/or structure', often with facility amount unchanged. Precise scope heavily negotiated.",
+      "pricing_flex": "Most common. Adjustments to interest margin, upfront fees, OID. Often capped on overall increase in borrower's weighted average cost of capital. May necessitate financial covenant reset to maintain headroom.",
+      "structural_flex": "Allows reallocating amounts between tranches (e.g., senior/junior, term loan/bond) to align with investor demand, typically without altering total debt quantum.",
+      "terms_flex": "Other non-economic terms (e.g., prepayment penalties, margin ratchet application, basket sizes, covenant definitions) can be flexed."
+    },
+    "legal_negotiation_dynamics": [
+      "Exercise must be legally binding, obligors execute amended documents.",
+      "Borrowers seek to limit scope (consultation rights, pricing caps, termination rights if flexed terms unacceptable).",
+      "'End date'/'sunset clause' for flex rights is critical borrower protection."
+    ],
+    "reverse_flex": "In borrower-friendly markets, allows adjustments favorable to borrower (e.g., reduced margin/fees) if syndication is oversubscribed.",
+    "market_indicator": "Presence and nature of flex provisions serve as a barometer of prevailing market sentiment and negotiating power balance (e.g., increased 'lender flex' signals lender-friendly market).",
+    "source_reference": "Section II.B.3"
+  },
+  {
+    "id": "maturity_amortization_prepayment",
+    "term_name": "Maturity, Amortization, and Prepayment Rights (Mandatory and Voluntary, Call Protection)",
+    "category": "Core Economic and Facility Terms",
+    "components": [
+      {
+        "name": "Maturity",
+        "details": "Leveraged loans generally have shorter maturities than bonds. TLBs commonly 5-7 years.",
+        "source_reference": "Section II.B.4"
+      },
+      {
+        "name": "Amortization (Scheduled Principal Repayment)",
+        "tla_profile": "Typically features full amortization schedule.",
+        "tlb_profile": "Characterized by nominal (e.g., 1% p.a.) or no amortization, with entire principal as 'bullet' repayment at maturity.",
+        "amortization_schedules_note": "Detailed schedules outline principal/interest allocation. Mismatch between loan term and amortization period can result in balloon payment.",
+        "source_reference": "Section II.B.4"
+      },
+      {
+        "name": "Voluntary Prepayment",
+        "general_right": "Borrowers generally have the right to prepay whole/part at their option, often without significant penalty.",
+        "soft_call_protection": "Increasingly common in TLB market. Imposes prepayment premium (e.g., 1-2%) if loan voluntarily prepaid/refinanced (especially with lower-yielding debt) within a short period post-closing (typically 6-12 months). Weaker than high-yield bond call protection (hard call, make-whole).",
+        "source_reference": "Section II.B.4"
+      },
+      {
+        "name": "Mandatory Prepayment (Cash Sweeps)",
+        "purpose": "Traditionally included in LMA precedents to accelerate deleveraging from certain cash inflows or events.",
+        "common_triggers": [
+          {
+            "trigger": "Excess Cash Flow (ECF)",
+            "details": "Percentage of ECF (defined term: cash flow after opex, capex, taxes, scheduled debt service) used to prepay loan. Percentage often varies with leverage ratio. Subject to de minimis thresholds, permitted deductions, carry-forward amounts."
+          },
+          {
+            "trigger": "Asset Disposals and Insurance/Condemnation Proceeds",
+            "details": "Net proceeds above thresholds typically required for prepayment. Often subject to significant 'reinvestment rights' (use proceeds for replacement assets, capex, reinvest in business within specified time, e.g., 12-18 months). Reinvestment rights have broadened (acquisitions, dividends)."
+          },
+          {
+            "trigger": "Debt or Equity Issuances (including IPOs)",
+            "details": "Proceeds from new debt (other than permitted) or equity may trigger prepayment. Often subject to leverage-based step-downs or allow proceeds for other permitted uses."
+          },
+          {
+            "trigger": "Change of Control (CoC)",
+            "traditional_approach": "EoD and/or immediate mandatory prepayment.",
+            "market_shift": "More flexible CoC provisions: 'lender put rights' (lender option to demand prepayment, sometimes at premium) or 'portability' (CoC prepayment waived if conditions like leverage ratios/credit ratings post-acquisition are met). Portability is a significant departure, can compel lenders to remain under new ownership."
+          }
+        ],
+        "prepayment_waterfalls": "In multi-tranche debt structures, credit/intercreditor agreement specifies how mandatory prepayment proceeds are allocated (pro rata among pari passu, sequentially to priority tranches).",
+        "negotiation_focus": "Scope of exceptions, thresholds, reinvestment rights, CoC definition are critical negotiation areas, balancing borrower flexibility with lender risk mitigation.",
+        "source_reference": "Section II.B.4"
+      }
+    ],
+    "source_reference": "Section II.B.4"
+  },
+  {
+    "id": "lme_overview_main",
+    "term_name": "Liability Management Exercises (LMEs) and Lender Protections: Navigating Contentious Terrain",
+    "category": "Advanced Leveraged Finance Topics",
+    "description": "LMEs are transactions by companies, often PE-backed, to restructure liabilities outside formal bankruptcy, frequently exploiting flexibilities/loopholes in credit agreements to alter capital structure. This can benefit the company and certain creditors but be detrimental to others, leading to reactive evolution in credit documentation (e.g., 'blockers').",
+    "source_reference": "Section III - Overview"
+  },
+  {
+    "id": "common_lme_strategies",
+    "term_name": "Overview of Common LME Strategies",
+    "category": "LME Techniques",
+    "intro": "LMEs address balance sheet liabilities due to impending maturities, liquidity shortfalls, desire to capture debt discounts, or avoid formal insolvency. Prevalence partly due to borrower-friendly terms and loose covenants from high liquidity periods.",
+    "strategies": [
+      {
+        "name": "Drop-down / Unrestricted Subsidiary Financings",
+        "description": "Transferring valuable assets (IP, profitable units, 'crown jewels') from borrower/restricted subsidiaries to an 'unrestricted subsidiary' (outside covenant/collateral perimeter). These assets then secure new debt at the unrestricted subsidiary, often structurally senior to existing lenders regarding those assets. Proceeds can provide liquidity or refinance other debt.",
+        "source_reference": "Section III.A"
+      },
+      {
+        "name": "Uptiering Exchanges (Priming Transactions)",
+        "description": "Company, with majority (not all) lender consent, amends credit agreement to permit new debt ranking senior (priming) to existing debt. Participating majority lenders exchange existing debt for new super-priority debt (often providing new money). Non-participating minority lenders are subordinated. Often exploits 'open market purchase' exceptions or amendment clause loopholes.",
+        "source_reference": "Section III.A"
+      },
+      {
+        "name": "Debt Buybacks, Tender Offers, and Exchange Offers",
+        "description": "Traditional LMEs where company offers to repurchase existing debt (typically at discount) or exchange existing debt for new instruments with different terms (maturity, interest, security). Can be structured coercively or disadvantage certain creditors.",
+        "source_reference": "Section III.A"
+      }
+    ],
+    "disputes_and_outcomes": {
+      "lender_on_lender_violence": "Execution of drop-downs/uptiering frequently leads to significant disputes/litigation by non-participating/disadvantaged creditors.",
+      "temporary_fix_potential": "If underlying operational issues aren't resolved, LMEs may only be temporary, with formal restructuring (e.g., Chapter 11) often following. LME can significantly alter negotiating leverage and value distribution in subsequent insolvency.",
+      "source_reference": "Section III.A"
+    }
+  },
+  {
+    "id": "lme_case_studies_blockers_overview",
+    "term_name": "Case Studies in Liability Management and Resulting 'Blocker' Provisions",
+    "category": "LME Techniques",
+    "intro": "Proliferation of aggressive LMEs led to evolution in credit agreement drafting with specific 'blocker' provisions, often named after the company whose LME highlighted the loophole.",
+    "source_reference": "Section III.B"
+  },
+  {
+    "id": "j_crew_lme",
+    "term_name": "J.Crew (2016-2017): IP Transfer and 'J.Crew Blockers'",
+    "case_study": {
+      "transaction_summary": "J.Crew used investment/RP covenant basket capacity to transfer a significant portion of its valuable IP assets to a new unrestricted subsidiary (J. Crew Cayman). This unrestricted sub then issued new notes secured by the IP, effectively priming existing term lenders regarding those assets. J.Crew valued IP to align with basket capacity.",
+      "legal_issues_litigation": "Term lenders challenged, alleging fraudulent conveyance and breach of credit agreement (arguing IP transfer was 'substantially all' collateral requiring unanimous consent). J.Crew sought declaratory judgment. Litigation was complex.",
+      "outcome": "Settlement with majority lenders who consented for concessions. Minority lenders continued objections; most claims dismissed due to majority consent, but 'substantially all' collateral claim survived initial motions. Resolved in J.Crew's 2020 Chapter 11, reportedly no incremental recovery for objectors on this specific issue.",
+      "blocker_development_name": "J.Crew Blockers",
+      "blocker_aims": [
+        "Restricting/prohibiting transfer of material IP or 'crown jewel' assets to unrestricted subsidiaries or non-loan parties.",
+        "Imposing tighter caps on investments in, or other transfers of value to, unrestricted subsidiaries.",
+        "Requiring any subsidiary holding material IP to remain a restricted subsidiary and a guarantor."
+      ]
+    },
+    "source_reference": "Section III.B.1"
+  },
+  {
+    "id": "serta_simmons_lme",
+    "term_name": "Serta Simmons (2020): Uptiering and 'Serta Blockers'",
+    "case_study": {
+      "transaction_summary": "Serta, with majority lender consent, amended its credit agreement for new super-priority 'first out'/'second out' term loans. Participating lenders exchanged existing first/second lien loans for these new senior loans (plus new money), subordinating non-participating minority lenders. Relied on 'open market purchase' exception.",
+      "legal_issues_litigation": "Non-participating lenders sued, arguing violation of pro rata treatment and 'sacred rights' (requiring unanimous/all-affected consent for core economic term changes). Key issue: could privately negotiated exchange be 'open market purchase' (undefined term)? Bankruptcy Court initially ruled for Serta.",
+      "outcome_fifth_circuit_ruling": "Dec 2024, U.S. Court of Appeals for Fifth Circuit reversed, holding 'open market purchase' ambiguous and should refer to genuine market open to multiple participants, not private negotiation. Serta exchange violated sacred right to pro rata payments. Fifth Circuit denied reconsideration/certification. Case remanded, trial tentatively Feb 2026.",
+      "blocker_development_name": "Serta Blockers",
+      "blocker_aims": [
+        "Requiring unanimous or all-affected lender consent for any amendment subordinating claims/liens of existing lenders to new debt.",
+        "Clarifying 'open market purchases' exclude privately negotiated exchanges with a subset of lenders or require truly open market mechanisms.",
+        "Broadening sacred rights to explicitly cover actions effectively subordinating existing debt/liens."
+      ]
+    },
+    "source_reference": "Section III.B.2"
+  },
+  {
+    "id": "chewy_petsmart_lme",
+    "term_name": "Chewy (PetSmart) (2018): Stock Transfers and 'Chewy Blockers'",
+    "case_study": {
+      "transaction_summary": "PetSmart transferred 20% of Chewy.com stock to its parent (non-guarantor) using RP baskets, and 16.5% to a new unrestricted subsidiary using Investment baskets. Argued Chewy no longer wholly-owned, triggering automatic release of guarantees/security from Chewy under credit agreement terms.",
+      "legal_issues_collateral_impact": "Secured lenders faced loss of direct collateral value of transferred Chewy shares and potentially entire security over Chewy's assets. Lenders challenged interpretation of baskets and automatic lien release.",
+      "outcome": "Specifics not detailed, but highlighted risks in broadly defined baskets and automatic release provisions. Chewy later IPO'd.",
+      "blocker_development_name": "Chewy Blockers (or PetSmart Blockers)",
+      "blocker_aims": [
+        "Providing subsidiary guarantees/collateral not automatically released if guarantor becomes non-wholly-owned via transfer to affiliate.",
+        "Requiring releases only for bona fide third-party sale or other specific 'excluded subsidiary' reasons, not internal reorganization/share transfer to release guarantees/collateral.",
+        "Limiting non-cash distributions or investments, particularly of equity in material subsidiaries."
+      ]
+    },
+    "source_reference": "Section III.B.3"
+  },
+  {
+    "id": "envision_healthcare_lme",
+    "term_name": "Envision Healthcare (2022): AmSurg Unrestricted Sub Designation and 'Envision Blockers'",
+    "case_study": {
+      "transaction_summary": "Envision designated a large portion (83%) of its profitable AmSurg business as an unrestricted subsidiary. Unrestricted AmSurg then incurred $1.1B new first-lien debt, using proceeds to repurchase Envision's existing debt at discount. Further $2.6B new secured financing incurred via these maneuvers, priming non-participating lenders.",
+      "legal_issues_disadvantage": "Removal of high-performing AmSurg assets from existing lenders' collateral/credit support, while new debt incurred at AmSurg level. Exploited flaws in credit agreement with material capacity for unrestricted sub investments and majority consent for subordination.",
+      "outcome": "Envision filed Chapter 11 (May 2023). Restructuring plan confirmed (Oct 2023), significant debt reduction, AmSurg/Envision Physician Services became separately owned by certain lenders. KKR equity likely wiped out.",
+      "blocker_development_name": "Envision Blockers",
+      "blocker_aims": [
+        "Providing only a specific, clearly identified investment basket (if any) can be used for investments in, or designation of, unrestricted subsidiaries.",
+        "Prohibiting combination/'stacking' of other general investment baskets or RP capacity to fund transfers to unrestricted subsidiaries.",
+        "Often seen as tripartite protection: J.Crew (material assets), Serta (consent for subordination), plus specific limits on unrestricted sub investment capacity sources. Increasingly present in private credit."
+      ]
+    },
+    "source_reference": "Section III.B.4"
+  },
+  {
+    "id": "pluralsight_lme",
+    "term_name": "Pluralsight (2024): Sponsor-Funded IP Drop-Down and 'Pluralsight Blockers'",
+    "case_study": {
+      "transaction_summary": "Pluralsight (Vista Equity backed) transferred certain IP to a restricted sub. Vista provided $50M new financing (loan/preferred equity) to this sub, giving Vista priority on repayment for new capital via this IP-holding sub. Funds used for interest payment to existing lenders. One of first sponsor-funded LMEs in private credit-backed company.",
+      "legal_issues_outcome": "Despite LME, financial situation didn't improve. Vista ceded control to private credit lenders in out-of-court distressed exchange. Lenders acquired 100% ownership, significant debt reduction, lenders invested new capital.",
+      "blocker_development_name": "Pluralsight Blockers",
+      "blocker_aims": "Often related to J.Crew blockers. Guard against transfer of material IP/valuable assets from loan parties to non-loan parties, including restricted subsidiaries that are non-guarantors (e.g., foreign/non-wholly owned subs). Prevents valuable assets moving to entities within restricted group that don't provide credit support, diluting collateral. Now a structural feature in many private corporate credit loan documents."
+    },
+    "source_reference": "Section III.B.5"
+  },
+  {
+    "id": "mytheresa_neiman_marcus_lme",
+    "term_name": "MyTheresa (Neiman Marcus) (2014-2018): Multi-Step Unrestricted Sub Designation and Asset Stripping",
+    "case_study": {
+      "transaction_summary": "NMG acquired MyTheresa. Using investment covenant baskets, NMG systematically designated MyTheresa entities as unrestricted. MyTheresa subs then conveyed via dividend to NMG Inc. (Parent, sponsor-owned holding co, not obligor/guarantor), effectively transferring 100% ownership of this valuable asset away from NMG's creditors without direct compensation to NMG/creditors. Facilitated by provision allowing distribution of unrestricted sub capital stock.",
+      "legal_issues_impact": "Designation as unrestricted removed MyTheresa from covenant protections. Distribution to parent moved valuable asset beyond creditors' reach. Sparked creditor outrage/litigation (e.g., Marble Ridge Capital alleged fraudulent transfer).",
+      "outcome_subsequent_bankruptcy": "NMG filed Chapter 11 (May 2020). MyTheresa drop-down central issue. Global settlement: NMG parent contributed MyTheresa preferred equity to NMG estate for unsecured creditors. MyTheresa IPO'd Jan 2021.",
+      "lesson_relevance_to_blockers": "Reinforced need for lenders to scrutinize investment/RP baskets, unrestricted sub provisions, and negotiate tighter controls on asset transfers and designation/treatment of unrestricted subs holding significant value or growth potential. Underscores importance of J.Crew-style blockers."
+    },
+    "source_reference": "Section III.B.6"
+  },
+  {
+    "id": "lme_cat_mouse_dynamic",
+    "term_name": "Cat and Mouse Dynamic",
+    "category": "LME Context",
+    "description": "The development and deployment of LMEs and responsive evolution of 'blocker' provisions underscore a continuous 'cat and mouse' dynamic in the leveraged finance market. As borrowers/sponsors find new ways to exploit contractual flexibilities, lenders/advisors work to close loopholes. This shapes credit agreement terms and risk allocation.",
+    "source_reference": "End of Section III.B"
+  },
+  {
+    "id": "workouts_restructuring_overview",
+    "term_name": "Workouts and Restructuring in Leveraged Lending: Legal Pathways and Precedents",
+    "category": "Distressed Scenarios",
+    "description": "Given high leverage, borrowers in leveraged loan market are more susceptible to financial distress, making workouts/restructurings common. Processes can be out-of-court (consensual/semi-consensual) or formal in-court insolvency proceedings.",
+    "source_reference": "Section IV - Overview"
+  },
+  {
+    "id": "out_of_court_workouts",
+    "term_name": "Out-of-Court Workouts: Process and Legal Documentation",
+    "category": "Distressed Scenarios",
+    "preference": "Often preferred first step as can be quicker, less expensive, less disruptive than formal insolvency. Success typically requires cooperation of key creditors.",
+    "stages_and_documents": [
+      {
+        "name": "Standstill Agreements (Forbearance Agreements)",
+        "purpose": "When borrower defaults/anticipates default, may request lenders temporarily refrain from exercising remedies. Formalizes a 'breathing spell' for borrower to stabilize, develop plan, negotiate.",
+        "key_provisions": [
+          "Acknowledgement of existing defaults by borrower.",
+          "Lender agreement to forbear specified remedies for defined 'Standstill Period' (weeks to months, extendable).",
+          "Conditions for standstill effectiveness (e.g., no new defaults, adherence to budget/milestones).",
+          "Borrower undertakings during standstill (e.g., enhanced financial info, engage advisors, restrictions on payments/actions).",
+          "Reservation of lenders' rights (not waiving defaults/remedies, merely postponing exercise)."
+        ],
+        "documentation": "Formal written agreement signed by borrower, guarantors, participating lenders (often 'Required Lenders'). Pre-negotiation letter agreements often precede substantive discussions.",
+        "typical_duration_note": "Varies. Simpler amend-and-extend (weeks), complex restructurings (many months). INSOL Principles suggest initial period of weeks/months, extendable.",
+        "source_reference": "Section IV.A"
+      },
+      {
+        "name": "Role of Steering Committees (Co-ordination Committees)",
+        "formation": "In syndicated loans with multiple/diverse lenders, ad hoc committee of representative lenders often formed to facilitate negotiations.",
+        "responsibilities": "Primary contact for borrower, coordinates lender group, engages common legal/financial advisors, analyzes borrower's situation/proposals, negotiates restructuring terms on behalf of broader lender group (individual lenders usually retain ultimate approval).",
+        "advisors": "Steering committees invariably appoint own legal/financial advisors; fees typically paid by borrower.",
+        "source_reference": "Section IV.A"
+      },
+      {
+        "name": "Information Sharing and Due Diligence",
+        "description": "Borrower provides comprehensive/reliable info (financials, operations, assets, liabilities, prospects). Lenders/advisors conduct own due diligence. Confidentiality agreements essential for MNPI.",
+        "source_reference": "Section IV.A"
+      },
+      {
+        "name": "Negotiation of Restructuring Terms",
+        "process": "Borrower (often with advisors) proposes plan to steering committee/key creditors.",
+        "possible_terms": [
+          "'Amend and Extend': Modify existing terms (extend maturities, adjust rates, amend covenants) for additional collateral, fees, or equity enhancements (warrants).",
+          "Debt-for-Equity Swaps: Convert portion of debt into equity.",
+          "Debt-for-Debt Swaps: Exchange existing debt for new instruments (longer tenor, PIK interest, different security).",
+          "New Money Injections: Fresh capital (often super-priority/well-secured) to fund operations/bridge to recovery.",
+          "Asset Sales: Orderly disposal of non-core assets for debt reduction."
+        ],
+        "goal": "Achieve consensual agreement acceptable to requisite majority of creditors, providing borrower sustainable capital structure.",
+        "source_reference": "Section IV.A"
+      },
+      {
+        "name": "Documentation of Amendments / Lock-Up Agreements",
+        "implementation": "If consensual plan agreed, implemented via amendments to existing credit agreement/finance documents, or new agreements (exchange offer memo, new security docs).",
+        "lock_up_agreements": "To ensure support before formal implementation (especially if subsequent court process like scheme/pre-pack needed). Consenting creditors commit to support/vote for agreed terms and not take inconsistent actions, subject to conditions/termination events (e.g., 'long-stop date').",
+        "source_reference": "Section IV.A"
+      }
+    ],
+    "challenge": "Success hinges on consensus. If key creditors 'hold out' or debt structure too complex, company may need formal in-court proceedings.",
+    "source_reference": "Section IV.A"
+  },
+  {
+    "id": "formal_insolvency_proceedings",
+    "term_name": "Formal Insolvency Proceedings: Chapter 11 (US) and UK Restructuring Plan",
+    "category": "Distressed Scenarios",
+    "intro": "Used when out-of-court workouts not feasible/fail.",
+    "proceedings": [
+      {
+        "name": "U.S. Chapter 11 Bankruptcy",
+        "description": "Framework for company reorganization, allowing debtor to continue operating while negotiating plan to repay creditors.",
+        "key_features": [
+          {
+            "feature_name": "Debtor-in-Possession (DIP)",
+            "details": "Existing management typically remains in control, with powers/duties of a trustee; can operate business in ordinary course."
+          },
+          {
+            "feature_name": "Automatic Stay",
+            "details": "Effective immediately on filing. Halts virtually all collection efforts, litigation, foreclosure by pre-petition creditors. Provides 'breathing spell'. Secured creditors may seek relief if collateral not adequately protected or not needed for reorganization."
+          },
+          {
+            "feature_name": "DIP Financing (New Money)",
+            "details": "Debtors often require new financing. Bankruptcy Code allows DIP to obtain credit with court approval. DIP lenders can be granted 'superpriority' administrative expense claims or priming liens (subject to 'adequate protection' for existing secured creditors whose liens may be affected)."
+          },
+          {
+            "feature_name": "Plan of Reorganization",
+            "details": "Debtor (initially, during exclusivity) proposes plan outlining creditor claim treatment and business restructuring."
+          },
+          {
+            "feature_name": "Classification of Claims",
+            "details": "Claims classified into groups of substantially similar claims."
+          },
+          {
+            "feature_name": "Disclosure Statement",
+            "details": "Court-approved statement with adequate info about debtor/plan provided to creditors before voting."
+          },
+          {
+            "feature_name": "Voting and Confirmation",
+            "details": "Each impaired class votes. Acceptance: >= 2/3 in dollar amount and > 1/2 in number of allowed claims in class that vote. At least one impaired class must accept for cramdown."
+          },
+          {
+            "feature_name": "Cramdown",
+            "details": "Plan can be confirmed over rejection by impaired classes if it doesn't discriminate unfairly and is fair/equitable to dissenting impaired classes (e.g., absolute priority rule - senior classes paid full before junior, unless senior consents)."
+          },
+          {
+            "feature_name": "Executory Contracts and Unexpired Leases",
+            "details": "DIP can assume (continue) or reject (terminate) most pre-petition executory contracts/unexpired leases (subject to court approval)."
+          },
+          {
+            "feature_name": "Sale of Assets (Section 363 Sales)",
+            "details": "Allows sale of assets free/clear of liens/claims/encumbrances, with interests attaching to proceeds. Can maximize estate value."
+          }
+        ],
+        "summary_note": "Powerful, often lengthy/expensive, toolkit for restructuring complex leveraged capital structures.",
+        "source_reference": "Section IV.B.1"
+      },
+      {
+        "name": "UK Restructuring Plan (Part 26A Companies Act 2006)",
+        "description": "Significant development in UK restructuring law. Court-supervised process similar to Scheme of Arrangement but with powerful cross-class cramdown mechanism.",
+        "key_features": [
+          {
+            "feature_name": "Eligibility",
+            "details": "Company that 'has encountered, or is likely to encounter, financial difficulties that are affecting, or will or may affect, its ability to carry on business as a going concern'."
+          },
+          {
+            "feature_name": "Process (similar to Scheme of Arrangement)",
+            "stages": [
+              "Convening Hearing: Court considers class composition, jurisdiction, disclosure.",
+              "Sanction Hearing: If requisite creditor approvals obtained, court decides whether to sanction plan (fairness, statutory requirements)."
+            ]
+          },
+          {
+            "feature_name": "Voting Thresholds",
+            "details": "For each class, approval requires 75% in value of those voting. No majority in number requirement (unlike Scheme)."
+          },
+          {
+            "feature_name": "Cross-Class Cramdown (Key Innovation)",
+            "conditions_for_sanction_over_dissenting_class": [
+              "Condition A (Approval by 'In-the-Money' Class): At least one class of creditors/members who would receive payment or have genuine economic interest in 'relevant alternative' must have voted in favor by 75% value threshold.",
+              "Condition B ('No Worse Off' Test): Court must be satisfied no member of dissenting class(es) would be any worse off under Restructuring Plan than in 'relevant alternative'."
+            ]
+          },
+          {
+            "feature_name": "'Relevant Alternative'",
+            "details": "Whatever court considers most likely outcome if Restructuring Plan not sanctioned (often formal insolvency like administration/liquidation). Valuation evidence critical."
+          },
+          {
+            "feature_name": "Exclusion of 'Out-of-the-Money' Stakeholders",
+            "details": "Plan can exclude from voting those stakeholders who have no genuine economic interest in the company in the 'relevant alternative'."
+          }
+        ],
+        "summary_note": "Potent tool for restructuring companies with complex capital structures.",
+        "source_reference": "Section IV.B.2"
+      }
+    ]
+  }
+]
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Generates a formal credit rating write-up including rationale, key factors, and outlook.",
+  "completion": {
+    "max_tokens": 2000,
+    "temperature": 0.5,
+    "top_p": 0.5,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      {
+        "name": "assigned_rating",
+        "description": "The final credit rating assigned (e.g., Pass, Special Mention, Substandard).",
+        "defaultValue": ""
+      },
+      {
+        "name": "rating_outlook",
+        "description": "The outlook for the rating (e.g., Stable, Positive, Negative).",
+        "defaultValue": "Stable"
+      },
+      {
+        "name": "overall_snc_assessment_summary",
+        "description": "A summary of the overall SNC assessment including key findings from non-accrual, repayment, and collateral analysis.",
+        "defaultValue": ""
+      },
+      {
+        "name": "detailed_justification_non_accrual",
+        "description": "Detailed justification from the non-accrual assessment.",
+        "defaultValue": ""
+      },
+      {
+        "name": "detailed_justification_repayment_capacity",
+        "description": "Detailed justification from the repayment capacity assessment.",
+        "defaultValue": ""
+      },
+      {
+        "name": "detailed_justification_collateral_risk",
+        "description": "Detailed justification from the collateral risk assessment.",
+        "defaultValue": ""
+      },
+      {
+        "name": "key_financial_metrics_summary",
+        "description": "Summary of key financial metrics used in the analysis.",
+        "defaultValue": ""
+      },
+      {
+        "name": "key_qualitative_factors_summary",
+        "description": "Summary of key qualitative factors considered.",
+        "defaultValue": ""
+      },
+      {
+        "name": "relevant_occ_guidelines_summary",
+        "description": "Summary of the most pertinent OCC guidelines that influenced the decision.",
+        "defaultValue": ""
+      },
+      {
+        "name": "relevant_snc_criteria_summary",
+        "description": "Summary of the most pertinent SNC criteria that influenced the decision.",
+        "defaultValue": ""
+      },
+      {
+        "name": "company_id",
+        "description": "Identifier for the company being analyzed.",
+        "defaultValue": ""
+      }
+    ]
+  }
+}

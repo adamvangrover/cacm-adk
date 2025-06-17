@@ -1,12 +1,12 @@
 # cacm_adk_core/agents/SNC_analyst_agent.py
 import logging
 import json
-# import os # No longer needed for path manipulation or os.remove in agent logic
+import os # Added for knowledge base loading
 import asyncio
 from enum import Enum
-from typing import Dict, Any, Optional, Tuple # Tuple might be removed if not directly returned
+from typing import Dict, Any, Optional, Tuple
 
-# from unittest.mock import patch # Should be removed, part of old test block
+# from unittest.mock import patch
 
 from cacm_adk_core.agents.base_agent import Agent
 from cacm_adk_core.semantic_kernel_adapter import KernelService
@@ -48,6 +48,52 @@ class SNCAnalystAgent(Agent):
         self.occ_guidelines_snc = self.config.get('occ_guidelines_SNC', {})
         if not self.occ_guidelines_snc:
             logging.warning("OCC Guidelines SNC not found in agent configuration.")
+
+        # Load SNC Knowledge Base
+        try:
+            kb_path = os.path.join(os.path.dirname(__file__), "..", "..", "knowledge_base", "snc_knowledge_base.json")
+            with open(kb_path, 'r') as f:
+                self.snc_kb = json.load(f)
+            logging.info("Successfully loaded snc_knowledge_base.json.")
+        except Exception as e:
+            logging.error(f"Failed to load snc_knowledge_base.json: {e}")
+            self.snc_kb = {} # Initialize to empty if loading fails
+
+
+    # Illustrative helper method (implementation detail can be refined later)
+    def _get_relevant_kb_entries(self, kb_section_name: str, keywords_or_ids: list) -> str:
+        """
+        Retrieves relevant entries from the loaded knowledge base.
+        For this subtask, it's a simplified placeholder. A real implementation
+        would involve more sophisticated searching/filtering.
+        """
+        if not self.snc_kb:
+            return "Knowledge base not loaded."
+
+        section = self.snc_kb.get(kb_section_name, [])
+        if not section:
+            return f"Knowledge base section '{kb_section_name}' not found or empty."
+
+        # Simple keyword matching for demonstration
+        relevant_texts = []
+        if isinstance(section, list): # for lists of items like guidelines, definitions
+            for item in section:
+                item_text = json.dumps(item) # Convert item to string to search
+                if any(keyword.lower() in item_text.lower() for keyword in keywords_or_ids):
+                    relevant_texts.append(item_text)
+        elif isinstance(section, dict): # for structured objects like handbooks
+             # For handbooks, we might just return a summary or specific sub-sections based on keywords
+            section_text = json.dumps(section)
+            if any(keyword.lower() in section_text.lower() for keyword in keywords_or_ids):
+                # Return a summary or a specific part, simplified for now
+                relevant_texts.append(f"Content from {kb_section_name} matching {keywords_or_ids}")
+
+
+        if not relevant_texts:
+            return f"No entries found in '{kb_section_name}' for keywords/IDs: {keywords_or_ids}."
+
+        return "; ".join(relevant_texts)
+
 
     async def run(self, task_description: str, current_step_inputs: Dict[str, Any], shared_context: SharedContext) -> Dict[str, Any]:
         """
@@ -138,12 +184,11 @@ class SNCAnalystAgent(Agent):
         credit_risk_mitigation_info = self._evaluate_credit_risk_mitigation(collateral_and_debt_details)
 
         try:
-            # _determine_rating now returns a tuple (rating, rationale)
             # Analyze Press Releases with SK
             sk_press_release_insights = await self._analyze_press_releases_with_sk(shared_context)
 
-            # _determine_rating now returns a tuple (rating, rationale)
-            rating, rationale = await self._determine_rating(
+            # _determine_rating now returns (rating, rationale, formal_write_up_content)
+            rating, rationale, formal_write_up_content = await self._determine_rating(
                 company_info.get('name', company_id),
                 financial_analysis_result,
                 qualitative_analysis_result,
@@ -151,18 +196,31 @@ class SNCAnalystAgent(Agent):
                 economic_data_context,
                 sk_press_release_insights # Pass insights
             )
-            logging.debug(f"SNC_ANALYSIS_RUN_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
+            logging.debug(f"SNC_ANALYSIS_RUN_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale (excerpt)='{rationale[:200]}...'")
+
+            # The rationale might be the main narrative from formal_write_up_content or a precursor
+            # For now, let's assume 'rationale' is a good summary, and formal_write_up has the full JSON
             
             output_data = {
                 "rating": rating.value if rating else None,
                 "rationale": rationale,
-                "sk_generated_press_release_insights": sk_press_release_insights, # Add to output
-                "data_source_notes": "SNC analysis incorporates data from financial statements and SK-generated insights from available press releases."
+                "formal_write_up": formal_write_up_content, # The parsed JSON object
+                "sk_generated_press_release_insights": sk_press_release_insights,
+                "key_credit_metrics_assessed": {
+                    "financial_analysis": financial_analysis_result,
+                    "qualitative_analysis": qualitative_analysis_result,
+                    "credit_risk_mitigation": credit_risk_mitigation_info
+                },
+                "information_sources_referenced": [
+                    "snc_knowledge_base.json (including OCC Guidelines, SNC Program Criteria, Regulatory Definitions, Comptroller's Handbooks excerpts)",
+                    "Company-specific financial and qualitative data retrieved via DataRetrievalAgent"
+                ],
+                "data_source_notes": "SNC analysis incorporates data from financial statements, SK-generated insights, and regulatory knowledge base."
             }
             return {"status": "success", "data": output_data}
 
         except Exception as e:
-            error_msg = f"Error during SNC rating determination or press release analysis for {company_id}: {e}"
+            error_msg = f"Error during SNC rating determination, formal write-up, or press release analysis for {company_id}: {e}"
             logging.exception(error_msg)
             return {"status": "error", "message": error_msg}
 
@@ -255,29 +313,23 @@ class SNCAnalystAgent(Agent):
                                qualitative_analysis: Dict[str, Any], 
                                credit_risk_mitigation: Dict[str, Any],
                                economic_data_context: Dict[str, Any],
-                               sk_press_release_insights: Dict[str, str] # Added
-                               ) -> Tuple[Optional[SNCRating], str]:
+                                sk_press_release_insights: Dict[str, str]
+                               ) -> Tuple[Optional[SNCRating], str, Dict[str, Any]]: # Added Dict for formal_write_up
         """
-        Determines the SNC rating and generates a rationale.
+        Determines the SNC rating, generates a rationale, and produces a formal write-up.
         
-        This method integrates financial analysis results, qualitative assessments, 
-        credit risk mitigation information, and economic context. It uses Semantic 
-        Kernel skills (CollateralRiskAssessment, AssessRepaymentCapacity, 
-        AssessNonAccrualStatusIndication) with guidelines from agent configuration
-        to assess various risk aspects. Fallback logic based on key financial ratios
-        is applied if SK skill outputs are inconclusive or unavailable.
-        The final rating and a consolidated rationale are returned.
+        Integrates analyses, uses SK skills with expanded knowledge base context,
+        and invokes FormalWriteUpSkill for a structured output.
         """
         logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis_keys={list(financial_analysis.keys())}, qualitative_analysis_keys={list(qualitative_analysis.keys())}, credit_mitigation_keys={list(credit_risk_mitigation.keys())}, economic_context_keys={list(economic_data_context.keys())}, press_release_insights_keys={list(sk_press_release_insights.keys())}")
         
         rationale_parts = []
         
-        # Add SK-generated press release insights to rationale
         if sk_press_release_insights:
             rationale_parts.append("SK-Generated Press Release Insights:")
             for period, insight in sk_press_release_insights.items():
                 rationale_parts.append(f"  - {period.replace('_', ' ').title()}: {insight}")
-            rationale_parts.append("\n") # Add a newline for separation
+            rationale_parts.append("\n")
 
         collateral_sk_assessment_str = None
         collateral_sk_justification = ""
@@ -297,11 +349,18 @@ class SNCAnalystAgent(Agent):
                     "guideline_repayment_source": self.comptrollers_handbook_snc.get('primary_repayment_source', "Primary repayment should come from a sustainable source of cash under borrower control."),
                     "collateral_description": credit_risk_mitigation.get('collateral_summary_for_sk', "Not specified."),
                     "ltv_ratio": credit_risk_mitigation.get('loan_to_value_ratio', "Not specified."),
-                    "other_collateral_notes": credit_risk_mitigation.get('collateral_notes_for_sk', "None.")
+                    "other_collateral_notes": credit_risk_mitigation.get('collateral_notes_for_sk', "None."),
+                    # New placeholders for CollateralRiskAssessment
+                    "occ_rcr_collateral_valuation_perfection_monitoring": self._get_relevant_kb_entries("occ_guidelines", ["collateral", "valuation", "perfection", "monitoring"]),
+                    "occ_ll_collateral_specifics": self._get_relevant_kb_entries("occ_guidelines", ["Leveraged Lending", "Collateral"]),
+                    "ratings_guide_substandard_collateral_dependency": self._get_relevant_kb_entries("ratings_guide", ["Substandard", "collateral"]),
+                    "ratings_guide_doubtful_collateral_shortfall": self._get_relevant_kb_entries("ratings_guide", ["Doubtful", "collateral"]),
+                    "definition_nlv_olv_concepts": self._get_relevant_kb_entries("definitions", ["NLV", "OLV", "Net Liquidation Value", "Orderly Liquidation Value"]),
+                    "ch_rcr_collateral_evaluation_factors": self._get_relevant_kb_entries("comptrollers_handbook_rating_credit_risk", ["collateral evaluation"]),
                 }
                 logging.debug(f"SNC_XAI:SK_INPUT:{skill_name_collateral}: {sk_input_vars_collateral}")
                 
-                sk_function_collateral = kernel.plugins[self.skills_plugin_name][skill_name_collateral]
+                sk_function_collateral = kernel.plugins[self.skills_plugin_name][skill_name_collateral] # SNCRatingAssistSkill
                 result_collateral = await kernel.invoke(sk_function_collateral, **sk_input_vars_collateral)
                 sk_response_collateral_str = str(result_collateral)
                 
@@ -325,11 +384,18 @@ class SNCAnalystAgent(Agent):
                     "annual_debt_service": financial_analysis.get('annual_debt_service_str', "Not available"),
                     "relevant_ratios": financial_analysis.get('ratios_summary_str', "Not available"),
                     "projected_fcf": financial_analysis.get('projected_fcf_str', "Not available"),
-                    "qualitative_notes_stability": qualitative_analysis.get('qualitative_notes_stability_str', "None provided.")
+                    "qualitative_notes_stability": qualitative_analysis.get('qualitative_notes_stability_str', "None provided."),
+                    # New placeholders for AssessRepaymentCapacity
+                    "occ_guideline_cash_flow_analysis_expectations": self._get_relevant_kb_entries("occ_guidelines", ["cash flow", "repayment capacity"]),
+                    "occ_ll_underwriting_repayment": self._get_relevant_kb_entries("occ_guidelines", ["Leveraged Lending", "underwriting", "repayment"]),
+                    "ratings_guide_pass_repayment_focus": self._get_relevant_kb_entries("ratings_guide", ["Pass", "repayment"]),
+                    "definition_ebitda_for_repayment": self._get_relevant_kb_entries("definitions", ["EBITDA"]),
+                    "ch_rcr_repayment_evaluation_guidance": self._get_relevant_kb_entries("comptrollers_handbook_rating_credit_risk", ["repayment evaluation"]),
+                    "llg_ebitda_adjustments_for_repayment": self._get_relevant_kb_entries("leveraged_lending_guidance", ["EBITDA adjustments"]),
                 }
                 logging.debug(f"SNC_XAI:SK_INPUT:{skill_name_repayment}: {sk_input_vars_repayment}")
 
-                sk_function_repayment = kernel.plugins[self.skills_plugin_name][skill_name_repayment]
+                sk_function_repayment = kernel.plugins[self.skills_plugin_name][skill_name_repayment] # SNCRatingAssistSkill
                 result_repayment = await kernel.invoke(sk_function_repayment, **sk_input_vars_repayment)
                 sk_response_repayment_str = str(result_repayment)
 
@@ -352,11 +418,16 @@ class SNCAnalystAgent(Agent):
                     "relevant_ratios": financial_analysis.get('ratios_summary_str', "Not available"),
                     "repayment_capacity_assessment": repayment_sk_assessment_str if repayment_sk_assessment_str else "Adequate", 
                     "notes_financial_deterioration": qualitative_analysis.get('notes_financial_deterioration_str', "None noted."),
-                    "interest_capitalization_status": financial_analysis.get('interest_capitalization_status_str', "No")
+                    "interest_capitalization_status": financial_analysis.get('interest_capitalization_status_str', "No"),
+                    # New placeholders for AssessNonAccrualStatusIndication
+                    "occ_guideline_nonaccrual_specifics": self._get_relevant_kb_entries("occ_guidelines", ["nonaccrual", "90 day"]),
+                    "ratings_guide_substandard_definition": self._get_relevant_kb_entries("ratings_guide", ["Substandard"]),
+                    "definition_nonaccrual_accounting": self._get_relevant_kb_entries("definitions", ["Nonaccrual accounting", "ASC 310-10-35"]),
+                    "occ_interest_capitalization_detail": self._get_relevant_kb_entries("occ_guidelines", ["interest capitalization"]),
                 }
                 logging.debug(f"SNC_XAI:SK_INPUT:{skill_name_nonaccrual}: {sk_input_vars_nonaccrual}")
 
-                sk_function_nonaccrual = kernel.plugins[self.skills_plugin_name][skill_name_nonaccrual]
+                sk_function_nonaccrual = kernel.plugins[self.skills_plugin_name][skill_name_nonaccrual] # SNCRatingAssistSkill
                 result_nonaccrual = await kernel.invoke(sk_function_nonaccrual, **sk_input_vars_nonaccrual)
                 sk_response_nonaccrual_str = str(result_nonaccrual)
                 
@@ -433,11 +504,63 @@ class SNCAnalystAgent(Agent):
                 rationale_parts.append("Fallback: Cannot determine rating due to missing key financial metrics (debt-to-equity or profitability).")
 
         rationale_parts.append(f"Regulatory guidance: Comptroller's Handbook SNC v{self.comptrollers_handbook_snc.get('version', 'N/A')}, OCC Guidelines v{self.occ_guidelines_snc.get('version', 'N/A')}.")
-        final_rationale = " ".join(filter(None, rationale_parts))
-        
-        logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
-        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}. Rationale (first 200 chars): {final_rationale[:200]}...")
-        return rating, final_rationale
+        # Consolidate rationale parts before formal write-up, this can serve as a base or summary
+        preliminary_rationale = " ".join(filter(None, rationale_parts))
+
+        # Invoke FormalWriteUpSkill
+        formal_write_up_json_str = "{}" # Default empty JSON
+        parsed_formal_write_up = {"error": "FormalWriteUpSkill not invoked or failed."}
+
+        if kernel:
+            try:
+                overall_assessment_summary = (
+                    f"Collateral Assessment: {collateral_sk_assessment_str if collateral_sk_assessment_str else 'N/A'}. "
+                    f"Repayment Capacity: {repayment_sk_assessment_str if repayment_sk_assessment_str else 'N/A'} (Concerns: {repayment_sk_concerns if repayment_sk_concerns else 'None'}). "
+                    f"Non-Accrual Status: {nonaccrual_sk_assessment_str if nonaccrual_sk_assessment_str else 'N/A'}. "
+                    f"Preliminary Rationale: {preliminary_rationale}"
+                )
+
+                formal_write_up_inputs = {
+                    "assigned_rating": rating.value if rating else "Undetermined",
+                    "rating_outlook": "Stable", # Placeholder, can be enhanced later
+                    "overall_snc_assessment_summary": overall_assessment_summary,
+                    "detailed_justification_non_accrual": nonaccrual_sk_justification if nonaccrual_sk_justification else "Not assessed by SK.",
+                    "detailed_justification_repayment_capacity": repayment_sk_justification if repayment_sk_justification else "Not assessed by SK.",
+                    "detailed_justification_collateral_risk": collateral_sk_justification if collateral_sk_justification else "Not assessed by SK.",
+                    "key_financial_metrics_summary": json.dumps(financial_analysis), # Pass the whole dict
+                    "key_qualitative_factors_summary": json.dumps(qualitative_analysis), # Pass the whole dict
+                    "relevant_occ_guidelines_summary": self._get_relevant_kb_entries("occ_guidelines", ["risk rating", "leveraged lending", "nonaccrual", "collateral", "repayment"]), # Example broad fetch
+                    "relevant_snc_criteria_summary": self._get_relevant_kb_entries("shared_national_credit_criteria", ["SNC Program", "risk assessment"]), # Example broad fetch
+                    "company_id": company_name
+                }
+                logging.debug(f"SNC_XAI:SK_INPUT:FormalWriteUpSkill: {formal_write_up_inputs}")
+
+                # Assuming FormalWriteUpSkill is registered under its own plugin name
+                # If it was added to SNCRatingAssistSkill, the plugin_name would be self.skills_plugin_name
+                sk_function_formal_write_up = kernel.plugins["FormalWriteUpSkill"]["FormalWriteUpSkill"]
+                formal_write_up_result = await kernel.invoke(sk_function_formal_write_up, **formal_write_up_inputs)
+                formal_write_up_json_str = str(formal_write_up_result)
+                logging.debug(f"SNC_XAI:SK_OUTPUT:FormalWriteUpSkill: {formal_write_up_json_str}")
+
+                try:
+                    parsed_formal_write_up = json.loads(formal_write_up_json_str)
+                    # Use the narrative from the formal write-up as the primary rationale if available
+                    final_rationale = parsed_formal_write_up.get("ratingJustificationNarrative", preliminary_rationale)
+                except json.JSONDecodeError as e:
+                    logging.error(f"Failed to parse formal_write_up_json_str: {e}. String was: {formal_write_up_json_str}")
+                    parsed_formal_write_up = {"error": "Failed to parse formal write-up JSON.", "raw_output": formal_write_up_json_str}
+                    final_rationale = preliminary_rationale # Fallback to preliminary rationale
+
+            except Exception as e:
+                logging.error(f"Error invoking FormalWriteUpSkill for {company_name}: {e}")
+                # parsed_formal_write_up will retain its default error state
+                final_rationale = preliminary_rationale # Fallback
+        else:
+            final_rationale = preliminary_rationale # Fallback if no kernel
+
+        logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Final Rationale='{final_rationale[:200]}...'")
+        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}.")
+        return rating, final_rationale, parsed_formal_write_up
 
     async def _analyze_press_releases_with_sk(self, shared_context: SharedContext) -> Dict[str, str]:
         """

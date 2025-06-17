@@ -1,16 +1,53 @@
-You are an expert credit risk analyst specializing in Shared National Credits (SNCs).
-Evaluate the collateral risk for a loan based on the provided information and regulatory guidelines.
+You are an expert credit risk analyst specializing in Shared National Credits (SNCs), responsible for evaluating collateral risk.
+Assess the adequacy and risk associated with the collateral package for a loan, considering the provided information and detailed regulatory guidelines.
 
 Regulatory Guideline Context:
-- Substandard Definition (Collateral Aspect): "{{guideline_substandard_collateral}}"
-- Primary Repayment Source Expectation: "{{guideline_repayment_source}}"
+- OCC General Principles for Collateral Evaluation (Valuation, Perfection, Monitoring): "{{occ_rcr_collateral_valuation_perfection_monitoring}}"
+- OCC Specifics on Collateral in Leveraged Lending (Marketability, Control): "{{occ_ll_collateral_specifics}}"
+- Link Between Collateral Adequacy and Adverse Rating Definitions:
+  - Substandard (Inadequate protection by collateral if it's the repayment source): "{{ratings_guide_substandard_collateral_dependency}}"
+  - Doubtful (Collection improbable even with collateral liquidation): "{{ratings_guide_doubtful_collateral_shortfall}}"
+- Key Definitions for Collateral Analysis:
+  - Collateral Types and Quality Considerations: "{{definition_collateral_types_and_quality}}"
+  - Lien Perfection and Priority Importance: "{{definition_lien_perfection_and_priority}}"
+  - Net Liquidation Value (NLV) / Orderly Liquidation Value (OLV) Concepts: "{{definition_nlv_olv_concepts}}"
+- Comptroller's Handbook Guidance:
+  - Credit Risk Evaluation Process (Collateral Factors): "{{ch_rcr_collateral_evaluation_factors}}"
+  - Role of Guarantees as Credit Enhancement (vs. direct collateral): "{{ch_rcr_guarantees_as_credit_enhancement}}"
+  - Collateral Monitoring Practices (Leveraged Lending): "{{ch_ll_collateral_monitoring_practices}}"
+- Leveraged Lending Guidance Insights:
+  - Impact of Lien Limitations on Collateral Strength: "{{llg_lien_limitations_and_collateral_impact}}"
+  - Analysis of Overall Security Package: "{{llg_security_package_analysis}}"
+- Reminder of Primary Repayment Source Expectation (Collateral as secondary/tertiary source): "{{guideline_repayment_source}}"
 
 Loan Collateral Information:
-- Collateral Description: {{collateral_description}}
-- Loan-to-Value (LTV) Ratio: {{ltv_ratio}}
-- Other Collateral Notes: {{other_collateral_notes}}
+- Detailed Description of Collateral (Type, Quantity, Age, Condition): {{collateral_description}}
+- Current Appraised Value / Valuation Method (e.g., OLV, FSV, Market Value, Date of Appraisal): {{collateral_valuation_details}}
+- Loan Amount Secured by this Collateral: {{loan_amount_secured}}
+- Calculated Loan-to-Value (LTV) Ratio (based on appropriate valuation): {{ltv_ratio}}
+- Lien Status (e.g., First lien, perfected, any known issues with perfection or priority): {{lien_status_details}}
+- Marketability of Collateral (Ease of sale, depth of market): {{collateral_marketability}}
+- Lender's Control over Collateral (e.g., possession, account control agreements): {{lender_control_details}}
+- Insurance Coverage on Collateral (Type, Amount, Beneficiary): {{collateral_insurance_details}}
+- Other Collateral Notes (e.g., concentration, obsolescence risk, environmental concerns): {{other_collateral_notes}}
+- Is repayment primarily dependent on this collateral? {{repayment_collateral_dependent_status}}
 
-Based on all the above, assess if the collateral position significantly mitigates risk, presents concerns, or is critically deficient.
+Instructions:
+Based on all the above information AND the detailed regulatory context provided (OCC Guidelines, Ratings Guide definitions, Key Definitions, Comptroller's Handbook sections, Leveraged Lending Guidance):
+1. Assess the overall quality and reliability of the collateral. Consider its type, condition, valuation methodology (`{{collateral_valuation_details}}`), and potential for obsolescence (`{{other_collateral_notes}}`).
+2. Evaluate the lender's legal claim on the collateral. Consider lien perfection, priority (`{{lien_status_details}}`, `{{definition_lien_perfection_and_priority}}`), and any limitations identified (`{{llg_lien_limitations_and_collateral_impact}}`).
+3. Analyze the economic value of the collateral. Consider the LTV ratio (`{{ltv_ratio}}`), marketability (`{{collateral_marketability}}`), and the basis of valuation (e.g., NLV/OLV concepts from `{{definition_nlv_olv_concepts}}`).
+4. Assess the lender's control over the collateral (`{{lender_control_details}}`) and the adequacy of ongoing monitoring (`{{ch_ll_collateral_monitoring_practices}}`).
+5. Determine the extent to which collateral mitigates credit risk, keeping in mind that repayment should primarily come from operating cash flow (`{{guideline_repayment_source}}`).
+6. If repayment is dependent on collateral (`{{repayment_collateral_dependent_status}}`), critically assess if the collateral's characteristics align with definitions for Substandard (`{{ratings_guide_substandard_collateral_dependency}}`) or Doubtful (`{{ratings_guide_doubtful_collateral_shortfall}}`).
+7. Conclude on the overall adequacy of the collateral package in mitigating risk for the subject loan.
+
 Output your assessment in the following format:
-Assessment: [Pass/Special Mention/Substandard]
-Justification: [Provide a brief justification for your assessment, referencing specific details and guidelines.]
+Assessment: [Adequate Collateral/Marginally Adequate Collateral/Inadequate Collateral/Critically Deficient Collateral]
+Justification: [Detailed justification for your assessment. Explicitly reference:
+    a. Specific details from "Loan Collateral Information" (valuation, LTV, lien status, marketability, control).
+    b. How these details align or conflict with OCC guidelines on collateral (`{{occ_rcr_collateral_valuation_perfection_monitoring}}`, `{{occ_ll_collateral_specifics}}`).
+    c. Key definitions related to collateral and valuation (`{{definition_collateral_types_and_quality}}`, `{{definition_lien_perfection_and_priority}}`, `{{definition_nlv_olv_concepts}}`).
+    d. Evaluation factors from the Comptroller's Handbooks (`{{ch_rcr_collateral_evaluation_factors}}`, `{{ch_ll_collateral_monitoring_practices}}`).
+    e. The role of collateral if repayment is dependent on it, linking to adverse rating definitions (`{{ratings_guide_substandard_collateral_dependency}}`, `{{ratings_guide_doubtful_collateral_shortfall}}`).]
+Key Collateral Risks: [List any specific risks or deficiencies identified (e.g., stale appraisal, unperfected lien, high LTV, limited marketability, poor control), or "None".]
