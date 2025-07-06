@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 import logging
 
+
 class CatalystAgent:
     def __init__(self, config_path="catalyst_config.json"):
         self.config = self.load_config(config_path)
@@ -27,7 +28,7 @@ class CatalystAgent:
     def setup_logger(self):
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         ch = logging.StreamHandler()
         ch.setFormatter(formatter)
         logger.addHandler(ch)
@@ -72,7 +73,9 @@ class CatalystAgent:
         return self.market_data
 
     def load_company_financials(self, company_id):
-        company_financials = self.fetch_data(f"{self.company_financials_url}/{company_id}")
+        company_financials = self.fetch_data(
+            f"{self.company_financials_url}/{company_id}"
+        )
         if company_financials:
             self.company_financials = company_financials
             self.logger.info(f"Loaded company financials for {company_id}")
@@ -81,7 +84,9 @@ class CatalystAgent:
         return self.company_financials
 
     def load_industry_reports(self, industry):
-        industry_reports = self.fetch_data(self.industry_reports_url, params={"industry": industry})
+        industry_reports = self.fetch_data(
+            self.industry_reports_url, params={"industry": industry}
+        )
         if industry_reports:
             self.industry_reports = industry_reports
             self.logger.info(f"Loaded industry reports for {industry}")
@@ -100,7 +105,9 @@ class CatalystAgent:
 
     def analyze_news_sentiment(self):
         # Placeholder: Call NLP service to analyze news sentiment
-        sentiment_data = self.fetch_data(self.nlp_url + "/sentiment", params={"text": "news"})
+        sentiment_data = self.fetch_data(
+            self.nlp_url + "/sentiment", params={"text": "news"}
+        )
         if sentiment_data and "sentiment" in sentiment_data:
             return sentiment_data["sentiment"]
         else:
@@ -109,7 +116,10 @@ class CatalystAgent:
 
     def get_client_connections(self):
         # Placeholder: Call Knowledge Graph to get client connections
-        connections = self.fetch_data(self.knowledge_graph_url + "/connections", params={"client_id": self.client_data.get("client_id")})
+        connections = self.fetch_data(
+            self.knowledge_graph_url + "/connections",
+            params={"client_id": self.client_data.get("client_id")},
+        )
         if connections:
             return connections
         else:
@@ -127,14 +137,23 @@ class CatalystAgent:
         else:
             return []
 
-    def generate_report_summary(self, opportunities, client_data, deal_structure, recommended_products):
+    def generate_report_summary(
+        self, opportunities, client_data, deal_structure, recommended_products
+    ):
         # Placeholder: Call NLP service to generate report summary
-        summary_data = self.fetch_data(self.nlp_url + "/summary", params={"data": json.dumps({
-            "opportunities": opportunities,
-            "client_data": client_data,
-            "deal_structure": deal_structure,
-            "recommended_products": recommended_products
-        })})
+        summary_data = self.fetch_data(
+            self.nlp_url + "/summary",
+            params={
+                "data": json.dumps(
+                    {
+                        "opportunities": opportunities,
+                        "client_data": client_data,
+                        "deal_structure": deal_structure,
+                        "recommended_products": recommended_products,
+                    }
+                )
+            },
+        )
         if summary_data and "summary" in summary_data:
             return summary_data["summary"]
         else:
@@ -145,22 +164,38 @@ class CatalystAgent:
         news_sentiment = self.analyze_news_sentiment()
         client_connections = self.get_client_connections()
         if news_sentiment > 0.7 and client_connections:
-            return [{"opportunity_type": "strategic_alliance", "rationale": "Positive market sentiment and strong client connections"}]
+            return [
+                {
+                    "opportunity_type": "strategic_alliance",
+                    "rationale": "Positive market sentiment and strong client connections",
+                }
+            ]
         return []
 
     def structure_deal(self, opportunity):
         client_needs = self.get_client_needs()
         product_recommendation = self.recommend_products(client_needs)
-        return {"opportunity": opportunity, "solution": product_recommendation, "negotiation_strategy": "relationship-focused"}
+        return {
+            "opportunity": opportunity,
+            "solution": product_recommendation,
+            "negotiation_strategy": "relationship-focused",
+        }
 
-    def generate_report(self, opportunities, client_data, deal_structure, recommended_products):
-        report_summary = self.generate_report_summary(opportunities, client_data, deal_structure, recommended_products)
-        return {"summary": report_summary, "details": {
-            "opportunities": opportunities,
-            "client_data": client_data,
-            "deal_structure": deal_structure,
-            "recommended_products": recommended_products
-        }}
+    def generate_report(
+        self, opportunities, client_data, deal_structure, recommended_products
+    ):
+        report_summary = self.generate_report_summary(
+            opportunities, client_data, deal_structure, recommended_products
+        )
+        return {
+            "summary": report_summary,
+            "details": {
+                "opportunities": opportunities,
+                "client_data": client_data,
+                "deal_structure": deal_structure,
+                "recommended_products": recommended_products,
+            },
+        }
 
     def run(self, client_id, company_id, industry):
         self.load_client_data(client_id)
@@ -173,10 +208,13 @@ class CatalystAgent:
         if opportunities:
             deal_structure = self.structure_deal(opportunities[0])
             recommended_products = deal_structure.get("solution", [])
-            report = self.generate_report(opportunities, self.client_data, deal_structure, recommended_products)
+            report = self.generate_report(
+                opportunities, self.client_data, deal_structure, recommended_products
+            )
             return report
         else:
             return {"message": "No opportunities identified."}
+
 
 if __name__ == "__main__":
     agent = CatalystAgent()

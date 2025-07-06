@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 
 from cacm_adk_core.context.shared_context import SharedContext
 
+
 class TestSharedContext(unittest.TestCase):
 
     def test_initialization(self):
@@ -50,7 +51,7 @@ class TestSharedContext(unittest.TestCase):
         context.set_data("my_key", "actual_value")
         self.assertEqual(context.get_data("my_key"), "actual_value")
 
-        complex_data = {"a": 1, "b": [1,2,3]}
+        complex_data = {"a": 1, "b": [1, 2, 3]}
         context.set_data("complex", complex_data)
         self.assertEqual(context.get_data("complex"), complex_data)
 
@@ -63,9 +64,12 @@ class TestSharedContext(unittest.TestCase):
         context.add_knowledge_base_reference("kb:company_v1")
         self.assertEqual(context.get_all_knowledge_base_references(), ["kb:company_v1"])
         context.add_knowledge_base_reference("kb:market_data_v2")
-        self.assertEqual(sorted(context.get_all_knowledge_base_references()), sorted(["kb:company_v1", "kb:market_data_v2"]))
+        self.assertEqual(
+            sorted(context.get_all_knowledge_base_references()),
+            sorted(["kb:company_v1", "kb:market_data_v2"]),
+        )
 
-    @patch('logging.Logger.info') # Patching the logger directly on the class
+    @patch("logging.Logger.info")  # Patching the logger directly on the class
     def test_log_context_summary(self, mock_logger_info):
         context = SharedContext("test_cacm_log_summary")
         context.add_document_reference("TEST_DOC", "uri://test_doc")
@@ -88,20 +92,27 @@ class TestSharedContext(unittest.TestCase):
         found_data_store_key = False
 
         for call_args in mock_logger_info.call_args_list:
-            log_message = call_args[0][0] # First argument of the call
+            log_message = call_args[0][0]  # First argument of the call
             if context.get_session_id() in log_message:
                 found_session_id = True
             if "TEST_DOC" in log_message and "uri://test_doc" in log_message:
                 found_doc_ref = True
             if "test_param" in log_message and "test_value" in log_message:
                 found_global_param = True
-            if "test_data_key" in log_message: # The value itself isn't in the keys list log line
+            if (
+                "test_data_key" in log_message
+            ):  # The value itself isn't in the keys list log line
                 found_data_store_key = True
 
         self.assertTrue(found_session_id, "Session ID not found in log summary.")
         self.assertTrue(found_doc_ref, "Document reference not found in log summary.")
-        self.assertTrue(found_global_param, "Global parameter not found in log summary.")
-        self.assertTrue(found_data_store_key, "Data store key not found in log summary.")
+        self.assertTrue(
+            found_global_param, "Global parameter not found in log summary."
+        )
+        self.assertTrue(
+            found_data_store_key, "Data store key not found in log summary."
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

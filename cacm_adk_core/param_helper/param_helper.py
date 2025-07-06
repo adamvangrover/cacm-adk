@@ -1,10 +1,12 @@
 # cacm_adk_core/param_helper/param_helper.py
 
+
 class ParamHelper:
     """
     Assists in defining, validating, and suggesting parameters for
     model components or other configurable elements.
     """
+
     def __init__(self):
         pass
 
@@ -16,7 +18,8 @@ class ParamHelper:
         # Placeholder for actual recommendation logic
         return {"learning_rate": 0.01, "epochs": 100}
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     helper = ParamHelper()
     params = helper.get_param_recommendations("NeuralNetwork")
     print(f"Recommended params: {params}")
