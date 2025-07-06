@@ -80,10 +80,13 @@ import json
 import argparse
 import os
 import logging
-from datetime import datetime, timezone # Ensure timezone for consistency
+from datetime import datetime, timezone  # Ensure timezone for consistency
 
 # Setup basic Python logging for the script's own messages
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(script_level_log)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(script_level_log)s - %(levelname)s - %(message)s",
+)
 
 # Imports from the data mesh ontology framework (framework.py)
 from framework import (
@@ -95,7 +98,7 @@ from framework import (
     FederatedLearningNode,
     OntologyElement,
     FrameworkLogger,
-    VersionControl
+    VersionControl,
 )
 
 # --- Global Framework Component Instances ---
@@ -112,8 +115,14 @@ def initialize_framework_components():
 
     framework_logger = FrameworkLogger(log_file="ingestion_framework_activity.log")
     version_control = VersionControl(logger=framework_logger)
-    knowledge_store = KnowledgeStore(logger_instance=framework_logger, version_control_instance=version_control)
-    ml_guidance = MachineLearningGuidance(knowledge_store=knowledge_store, logger=framework_logger, version_control=version_control)
+    knowledge_store = KnowledgeStore(
+        logger_instance=framework_logger, version_control_instance=version_control
+    )
+    ml_guidance = MachineLearningGuidance(
+        knowledge_store=knowledge_store,
+        logger=framework_logger,
+        version_control=version_control,
+    )
 
     federated_infra_id = str(uuid.uuid4())
     federated_infra = FederatedLearningInfra(
@@ -122,7 +131,7 @@ def initialize_framework_components():
         description="FL infrastructure instance configured by ingested definitions.",
         ml_guidance=ml_guidance,
         logger=framework_logger,
-        version_control=version_control
+        version_control=version_control,
     )
     knowledge_store.add_element(federated_infra)
 
@@ -135,23 +144,36 @@ def ingest_data_artifacts(file_path: str):
         logging.error("KnowledgeStore not initialized. Cannot ingest DataArtifacts.")
         return
     try:
-        with open(file_path, 'r') as f: artifacts_data_list = json.load(f)
+        with open(file_path, "r") as f:
+            artifacts_data_list = json.load(f)
         if not isinstance(artifacts_data_list, list):
-            logging.error(f"Invalid format in {file_path}. Expected a list."); return
+            logging.error(f"Invalid format in {file_path}. Expected a list.")
+            return
         ingested_count = 0
         for artifact_data in artifacts_data_list:
             try:
-                if 'id' not in artifact_data:
-                    logging.warning(f"DataArtifact data missing 'id': {artifact_data.get('name', 'Unknown')}")
+                if "id" not in artifact_data:
+                    logging.warning(
+                        f"DataArtifact data missing 'id': {artifact_data.get('name', 'Unknown')}"
+                    )
                 artifact_instance = DataArtifact(**artifact_data)
                 knowledge_store.register_artifact(artifact_instance)
                 ingested_count += 1
-                logging.info(f"DataArtifact '{artifact_instance.name}' (ID: {artifact_instance.id}) submitted for registration.")
+                logging.info(
+                    f"DataArtifact '{artifact_instance.name}' (ID: {artifact_instance.id}) submitted for registration."
+                )
             except Exception as e:
-                logging.error(f"Failed to create/register DataArtifact (name: {artifact_data.get('name', 'Unknown')}): {e}", exc_info=True)
-        logging.info(f"Attempted ingestion of {ingested_count}/{len(artifacts_data_list)} DataArtifacts from {file_path}.")
+                logging.error(
+                    f"Failed to create/register DataArtifact (name: {artifact_data.get('name', 'Unknown')}): {e}",
+                    exc_info=True,
+                )
+        logging.info(
+            f"Attempted ingestion of {ingested_count}/{len(artifacts_data_list)} DataArtifacts from {file_path}."
+        )
     except Exception as e:
-        logging.error(f"Error during DataArtifact ingestion from {file_path}: {e}", exc_info=True)
+        logging.error(
+            f"Error during DataArtifact ingestion from {file_path}: {e}", exc_info=True
+        )
 
 
 def ingest_ml_model(file_path: str):
@@ -160,66 +182,102 @@ def ingest_ml_model(file_path: str):
         logging.error("MachineLearningGuidance not initialized. Cannot ingest MLModel.")
         return
     try:
-        with open(file_path, 'r') as f: model_data = json.load(f)
+        with open(file_path, "r") as f:
+            model_data = json.load(f)
         if not isinstance(model_data, dict):
-            logging.error(f"Invalid format in {file_path}. Expected a single object."); return
+            logging.error(f"Invalid format in {file_path}. Expected a single object.")
+            return
         try:
-            if 'id' not in model_data:
-                 logging.warning(f"MLModel data missing 'id': {model_data.get('name', 'Unknown')}")
+            if "id" not in model_data:
+                logging.warning(
+                    f"MLModel data missing 'id': {model_data.get('name', 'Unknown')}"
+                )
             model_instance = MLModel(**model_data)
             ml_guidance.register_model(model_instance)
-            logging.info(f"MLModel '{model_instance.name}' (ID: {model_instance.id}) submitted for registration.")
+            logging.info(
+                f"MLModel '{model_instance.name}' (ID: {model_instance.id}) submitted for registration."
+            )
         except Exception as e:
-            logging.error(f"Failed to create/register MLModel (name: {model_data.get('name', 'Unknown')}): {e}", exc_info=True)
+            logging.error(
+                f"Failed to create/register MLModel (name: {model_data.get('name', 'Unknown')}): {e}",
+                exc_info=True,
+            )
     except Exception as e:
-        logging.error(f"Error during MLModel ingestion from {file_path}: {e}", exc_info=True)
+        logging.error(
+            f"Error during MLModel ingestion from {file_path}: {e}", exc_info=True
+        )
 
 
 def ingest_federated_setup(file_path: str):
     """Loads a Federated Learning setup definition and configures it."""
     global federated_infra
     if not federated_infra:
-        logging.error("FederatedLearningInfra not initialized. Cannot ingest FL setup."); return
+        logging.error("FederatedLearningInfra not initialized. Cannot ingest FL setup.")
+        return
     if not ml_guidance:
-        logging.error("MachineLearningGuidance not initialized. Cannot fully configure FL setup."); return
+        logging.error(
+            "MachineLearningGuidance not initialized. Cannot fully configure FL setup."
+        )
+        return
     try:
-        with open(file_path, 'r') as f: fl_setup_data = json.load(f)
+        with open(file_path, "r") as f:
+            fl_setup_data = json.load(f)
         if not isinstance(fl_setup_data, dict):
-            logging.error(f"Invalid format in {file_path}. Expected a single object."); return
-        fl_setup_name = fl_setup_data.get('name', 'Unnamed FL Setup')
+            logging.error(f"Invalid format in {file_path}. Expected a single object.")
+            return
+        fl_setup_name = fl_setup_data.get("name", "Unnamed FL Setup")
         logging.info(f"Processing Federated Learning Setup: {fl_setup_name}")
 
         original_infra_id = federated_infra.id
-        new_infra_id = fl_setup_data.get('id')
+        new_infra_id = fl_setup_data.get("id")
         if new_infra_id and federated_infra.id != new_infra_id:
-            logging.warning(f"Updating global FL Infra ID from '{original_infra_id}' to '{new_infra_id}' based on input file.")
+            logging.warning(
+                f"Updating global FL Infra ID from '{original_infra_id}' to '{new_infra_id}' based on input file."
+            )
             if knowledge_store and original_infra_id in knowledge_store.elements:
-                 del knowledge_store.elements[original_infra_id] # Remove old ID from KS if present
+                del knowledge_store.elements[
+                    original_infra_id
+                ]  # Remove old ID from KS if present
             federated_infra.id = new_infra_id
 
-        federated_infra.name = fl_setup_data.get('name', federated_infra.name)
-        federated_infra.description = fl_setup_data.get('metadata', {}).get('description', federated_infra.description)
-        federated_infra.version = fl_setup_data.get('version', federated_infra.version)
+        federated_infra.name = fl_setup_data.get("name", federated_infra.name)
+        federated_infra.description = fl_setup_data.get("metadata", {}).get(
+            "description", federated_infra.description
+        )
+        federated_infra.version = fl_setup_data.get("version", federated_infra.version)
         federated_infra.updated_at = datetime.now(timezone.utc)
 
-        global_model_id = fl_setup_data.get('global_model_id')
+        global_model_id = fl_setup_data.get("global_model_id")
         if global_model_id:
             if ml_guidance.get_model(global_model_id):
                 federated_infra.current_global_model_id = global_model_id
             else:
-                logging.error(f"Global Model ID '{global_model_id}' in FL setup '{fl_setup_name}' not found in MLGuidance.")
+                logging.error(
+                    f"Global Model ID '{global_model_id}' in FL setup '{fl_setup_name}' not found in MLGuidance."
+                )
         else:
             logging.warning(f"No 'global_model_id' in FL setup file: {file_path}")
-        federated_infra.aggregation_strategy = fl_setup_data.get('aggregation_strategy', federated_infra.aggregation_strategy)
+        federated_infra.aggregation_strategy = fl_setup_data.get(
+            "aggregation_strategy", federated_infra.aggregation_strategy
+        )
 
-        data_distribution_plan = fl_setup_data.get('data_distribution_plan_by_category', {})
+        data_distribution_plan = fl_setup_data.get(
+            "data_distribution_plan_by_category", {}
+        )
         if data_distribution_plan:
-            logging.info(f"FL Data Distribution Plan for '{federated_infra.name}': {json.dumps(data_distribution_plan, indent=2)}")
+            logging.info(
+                f"FL Data Distribution Plan for '{federated_infra.name}': {json.dumps(data_distribution_plan, indent=2)}"
+            )
 
-        if knowledge_store: knowledge_store.add_element(federated_infra) # Re-register to update
-        logging.info(f"Federated Learning Setup '{federated_infra.name}' (ID: {federated_infra.id}) configured/updated.")
+        if knowledge_store:
+            knowledge_store.add_element(federated_infra)  # Re-register to update
+        logging.info(
+            f"Federated Learning Setup '{federated_infra.name}' (ID: {federated_infra.id}) configured/updated."
+        )
     except Exception as e:
-        logging.error(f"Error during FL setup ingestion from {file_path}: {e}", exc_info=True)
+        logging.error(
+            f"Error during FL setup ingestion from {file_path}: {e}", exc_info=True
+        )
 
 
 def main():
@@ -239,14 +297,29 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="Ingest expertise definitions (JSON files) into the Data Mesh Ontology Framework.",
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument('--artifacts_file', type=str, help="Path to the JSON file containing DataArtifact definitions.")
-    parser.add_argument('--model_file', type=str, help="Path to the JSON file containing an MLModel definition.")
-    parser.add_argument('--fl_setup_file', type=str, help="Path to the JSON file containing a Federated Learning setup definition.")
-    parser.add_argument('--expertise_id', type=str,
-                        help="Optional expertise ID. If provided, attempts to load conventionally named files\n"
-                             "(e.g., '{expertise_id}_data_artifacts.json') if specific paths are not set.")
+    parser.add_argument(
+        "--artifacts_file",
+        type=str,
+        help="Path to the JSON file containing DataArtifact definitions.",
+    )
+    parser.add_argument(
+        "--model_file",
+        type=str,
+        help="Path to the JSON file containing an MLModel definition.",
+    )
+    parser.add_argument(
+        "--fl_setup_file",
+        type=str,
+        help="Path to the JSON file containing a Federated Learning setup definition.",
+    )
+    parser.add_argument(
+        "--expertise_id",
+        type=str,
+        help="Optional expertise ID. If provided, attempts to load conventionally named files\n"
+        "(e.g., '{expertise_id}_data_artifacts.json') if specific paths are not set.",
+    )
 
     args = parser.parse_args()
 
@@ -255,7 +328,9 @@ def main():
     fl_setup_fpath = args.fl_setup_file
 
     if args.expertise_id:
-        logging.info(f"Expertise ID '{args.expertise_id}' provided. Constructing default filenames if specific paths are not set.")
+        logging.info(
+            f"Expertise ID '{args.expertise_id}' provided. Constructing default filenames if specific paths are not set."
+        )
         artifacts_fpath = artifacts_fpath or f"{args.expertise_id}_data_artifacts.json"
         model_fpath = model_fpath or f"{args.expertise_id}_ml_model.json"
         fl_setup_fpath = fl_setup_fpath or f"{args.expertise_id}_federated_setup.json"
@@ -266,9 +341,11 @@ def main():
         # This specific check might be redundant if argparse requires at least one of our defined args,
         # or if we only proceed if at least one path is valid.
         # However, if all paths resolved to None (e.g. only --expertise_id given but it was empty), this is a fallback.
-        logging.info("No input files were specified or could be derived. To run, provide file paths or an expertise_id.")
-        if not any(vars(args).values()): # Check if any arguments were actually passed
-             parser.print_help()
+        logging.info(
+            "No input files were specified or could be derived. To run, provide file paths or an expertise_id."
+        )
+        if not any(vars(args).values()):  # Check if any arguments were actually passed
+            parser.print_help()
         return
 
     initialize_framework_components()
@@ -278,33 +355,46 @@ def main():
     if artifacts_fpath and os.path.exists(artifacts_fpath):
         logging.info(f"--- Starting DataArtifact Ingestion from {artifacts_fpath} ---")
         ingest_data_artifacts(artifacts_fpath)
-    elif args.artifacts_file : # File was explicitly specified but not found
-        logging.warning(f"Specified DataArtifacts file not found: {args.artifacts_file} (Skipping)")
-    elif artifacts_fpath : # File was derived from expertise_id but not found
-        logging.info(f"DataArtifacts file derived from expertise_id not found: {artifacts_fpath} (Skipping)")
-
+    elif args.artifacts_file:  # File was explicitly specified but not found
+        logging.warning(
+            f"Specified DataArtifacts file not found: {args.artifacts_file} (Skipping)"
+        )
+    elif artifacts_fpath:  # File was derived from expertise_id but not found
+        logging.info(
+            f"DataArtifacts file derived from expertise_id not found: {artifacts_fpath} (Skipping)"
+        )
 
     # MLModel
     if model_fpath and os.path.exists(model_fpath):
         logging.info(f"--- Starting MLModel Ingestion from {model_fpath} ---")
         ingest_ml_model(model_fpath)
     elif args.model_file:
-        logging.warning(f"Specified MLModel file not found: {args.model_file} (Skipping)")
+        logging.warning(
+            f"Specified MLModel file not found: {args.model_file} (Skipping)"
+        )
     elif model_fpath:
-        logging.info(f"MLModel file derived from expertise_id not found: {model_fpath} (Skipping)")
+        logging.info(
+            f"MLModel file derived from expertise_id not found: {model_fpath} (Skipping)"
+        )
 
     # Federated Learning Setup
     if fl_setup_fpath and os.path.exists(fl_setup_fpath):
-        logging.info(f"--- Starting Federated Learning Setup Ingestion from {fl_setup_fpath} ---")
+        logging.info(
+            f"--- Starting Federated Learning Setup Ingestion from {fl_setup_fpath} ---"
+        )
         ingest_federated_setup(fl_setup_fpath)
     elif args.fl_setup_file:
-        logging.warning(f"Specified Federated Learning setup file not found: {args.fl_setup_file} (Skipping)")
+        logging.warning(
+            f"Specified Federated Learning setup file not found: {args.fl_setup_file} (Skipping)"
+        )
     elif fl_setup_fpath:
-        logging.info(f"Federated Learning setup file derived from expertise_id not found: {fl_setup_fpath} (Skipping)")
+        logging.info(
+            f"Federated Learning setup file derived from expertise_id not found: {fl_setup_fpath} (Skipping)"
+        )
 
     logging.info("Ingestion process finished.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This is the entry point when the script is run directly from the command line.
     main()

@@ -11,10 +11,13 @@ def log_human_feedback(feedback_data_path: str, structured_log_path: str) -> boo
     Returns:
         bool: True if logging was successful, False otherwise.
     """
-    print(f"Placeholder: Logging feedback from {feedback_data_path} to {structured_log_path}")
+    print(
+        f"Placeholder: Logging feedback from {feedback_data_path} to {structured_log_path}"
+    )
     pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Example usage
     # log_human_feedback("path/to/completed_feedback.json", "path/to/feedback_log.csv")
     pass
