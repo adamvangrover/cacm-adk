@@ -1,6 +1,7 @@
 import logging
-from typing import Dict, Any, List, Tuple
-import semantic_kernel as sk  # For the decorator
+from typing import Dict, Any, List, Tuple, Optional # Ensure Optional is imported
+from semantic_kernel.functions.kernel_function_decorator import kernel_function # Correct import
+
 
 # Assuming the ontology prefixes are known and consistent
 # These would typically be managed more centrally in a real application
@@ -35,13 +36,9 @@ class KGPopulationSkill:
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
 
-    @sk.kernel_function(
-        description="Generates RDF triples from structured company data.",
-        name="generate_rdf_triples",
-    )
-    async def generate_rdf_triples(
-        self, company_data: dict, company_uri_base: str = "http://example.com/entity/"
-    ) -> List[Tuple[str, str, str]]:
+    @kernel_function(description="Generates RDF triples from structured company data.", name="generate_rdf_triples")
+    async def generate_rdf_triples(self, company_data: dict, company_uri_base: str = "http://example.com/entity/") -> List[Tuple[str, str, str]]:
+
         """
         Generates a list of RDF triples from structured company data.
 

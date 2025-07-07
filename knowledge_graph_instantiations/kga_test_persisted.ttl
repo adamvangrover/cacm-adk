@@ -1,0 +1,7 @@
+@prefix ns1: <http://example.com/ontology/cacm_credit_ontology/0.3/properties/#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.com/entity/MAINTESTCO> a <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#Obligor> ;
+    rdfs:label "Main Test Corp from Turtle Input"^^xsd:string ;
+    ns1:hasTickerSymbol "MTCI"^^xsd:string .

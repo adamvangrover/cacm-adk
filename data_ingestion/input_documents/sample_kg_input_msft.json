@@ -1,0 +1,92 @@
+{
+  "company_info": {
+    "company_id_for_uri": "MSFT",
+    "company_name": "Microsoft Corp.",
+    "ticker_symbol": "MSFT",
+    "industry": "Technology Software",
+    "description": "Microsoft Corporation is a global technology leader that enables digital transformation for the era of an intelligent cloud and an intelligent edge."
+  },
+  "financial_statements": [
+    {
+      "statement_id_for_uri": "MSFT_FY2023_Annual",
+      "statement_type": "Annual Report Data",
+      "period_end_date": "2023-06-30",
+      "source_document_label": "MSFT Fiscal Year 2023 Annual Report Data",
+      "currency": "USD",
+      "items": [
+        {
+          "item_id_for_uri": "MSFT_FY2023_CurrentAssets",
+          "item_label": "Current Assets FY2023",
+          "item_type": "kgclass:BalanceSheetItem",
+          "value": 184257000000,
+          "value_datatype": "xsd:decimal"
+        },
+        {
+          "item_id_for_uri": "MSFT_FY2023_TotalRevenue",
+          "item_label": "Total Revenue FY2023",
+          "item_type": "kgclass:IncomeStatementItem",
+          "value": 211915000000,
+          "value_datatype": "xsd:decimal"
+        },
+        {
+          "item_id_for_uri": "MSFT_FY2023_NetIncome",
+          "item_label": "Net Income FY2023",
+          "item_type": "kgclass:IncomeStatementItem",
+          "value": 72361000000,
+          "value_datatype": "xsd:decimal"
+        }
+      ]
+    }
+  ],
+  "esg_metrics": [
+    {
+      "metric_id_for_uri": "MSFT_Scope1_2023",
+      "metric_type": "esg:CarbonEmission",
+      "metric_label": "MSFT Scope 1 GHG Emissions 2023",
+      "value": 150000,
+      "value_datatype": "xsd:decimal",
+      "unit": "Metric Tons CO2e",
+      "reporting_period": "2023",
+      "reporting_period_datatype": "xsd:gYear",
+      "emission_scope": "Scope 1",
+      "data_source_label": "Microsoft Sustainability Report 2023"
+    },
+    {
+      "metric_id_for_uri": "MSFT_BoardIndependence_2023",
+      "metric_type": "esg:BoardIndependenceRatio",
+      "metric_label": "MSFT Board Independence Ratio 2023",
+      "value": 0.85, # Example: 85%
+      "value_datatype": "xsd:float",
+      "unit": "%",
+      "reporting_period": "2023",
+      "reporting_period_datatype": "xsd:gYear",
+      "data_source_label": "Microsoft Proxy Statement 2023"
+    }
+  ],
+  "alternative_data": [
+    {
+      "data_id_for_uri": "MSFT_Sentiment_20240115_Twitter",
+      "data_type": "altdata:SocialMediaSentiment",
+      "data_label": "MSFT Twitter Sentiment 2024-01-15",
+      "sentiment_score": 0.65,
+      "sentiment_score_datatype": "xsd:float",
+      "sentiment_source_label": "Twitter Aggregate Feed",
+      "sentiment_date": "2024-01-15",
+      "sentiment_date_datatype": "xsd:date"
+    }
+  ],
+  "notes_for_skill": [
+    "This structure is a suggestion for KGPopulationSkill.",
+    "The skill will need to map 'item_type', 'metric_type', 'data_type' to actual RDF classes.",
+    "URIs for entities should be constructed using a base URI + *_id_for_uri fields (e.g., http://example.com/entity/MSFT).",
+    "Datatypes (e.g., xsd:decimal, xsd:gYear) are provided as hints for creating rdflib.Literal nodes."
+  ]
+}
+---
+*Self-reflect and double check: This JSON file provides a structured format for inputting data for KG population.
+    - It includes sections for company information, financial statement items, ESG metrics, and alternative data.
+    - Each object has fields like `*_id_for_uri` to help in constructing unique URIs.
+    - It specifies `item_type`, `metric_type`, `data_type` which the `KGPopulationSkill` will map to ontology classes.
+    - It includes `value_datatype` hints for creating typed literals.
+    - The `notes_for_skill` section provides guidance for the developer implementing the `KGPopulationSkill`.
+This file structure is reasonably comprehensive for initial population tasks and serves as a good example for step 1.2.1.*

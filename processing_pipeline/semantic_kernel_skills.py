@@ -422,14 +422,10 @@ Explanation:"""
                 )
                 self.llm_available = False  # Ensure fallback if any error during setup
         else:
-            self.logger.warning(
-                "CustomReportingSkills: Kernel not provided. Will use placeholders."
-            )
+            self.logger.warning("CustomReportingSkills: Kernel not provided. Will use placeholders.")
 
-    @kernel_function(
-        description="Generates a placeholder financial performance summary.",
-        name="generate_financial_summary",
-    )  # Using correct decorator
+    @kernel_function(description="Generates a placeholder financial performance summary.", name="generate_financial_summary")
+
     async def generate_financial_summary(self, financial_data: Dict[str, Any]) -> str:
         self.logger.info(f"CustomReportingSkills.generate_financial_summary called.")
 
@@ -565,41 +561,19 @@ Explanation:"""
         )
         current_ratio_val = "N/A"
         if isinstance(ratios_json_str, str):
-            try:
-                ratios_data = json.loads(ratios_json_str)
-                current_ratio_val = ratios_data.get(
-                    "current_ratio", "N/A (key missing)"
-                )
-            except json.JSONDecodeError:
-                current_ratio_val = "N/A (error parsing ratios JSON)"
-        else:
-            current_ratio_val = "N/A (invalid ratios input type)"
-        fin_sum_snippet = (
-            financial_summary_text[:30]
-            if isinstance(financial_summary_text, str)
-            else "N/A"
-        )
-        risk_sum_snippet = (
-            key_risks_summary_text[:30]
-            if isinstance(key_risks_summary_text, str)
-            else "N/A"
-        )
-        return (
-            f"[Placeholder: Overall Assessment. Based on Ratios (e.g., Current Ratio: {current_ratio_val}), "
-            f"Financial Summary ('{fin_sum_snippet}...'), and Risk Summary ('{risk_sum_snippet}...'). "
-            f"LLM generation was not available or failed.]"
-        )
+            try: ratios_data = json.loads(ratios_json_str); current_ratio_val = ratios_data.get("current_ratio", "N/A (key missing)")
+            except json.JSONDecodeError: current_ratio_val = "N/A (error parsing ratios JSON)"
+        else: current_ratio_val = "N/A (invalid ratios input type)"
+        fin_sum_snippet = financial_summary_text[:30] if isinstance(financial_summary_text, str) else "N/A"
+        risk_sum_snippet = key_risks_summary_text[:30] if isinstance(key_risks_summary_text, str) else "N/A"
+        return (f"[Placeholder: Overall Assessment. Based on Ratios (e.g., Current Ratio: {current_ratio_val}), "
+                f"Financial Summary ('{fin_sum_snippet}...'), and Risk Summary ('{risk_sum_snippet}...'). "
+                f"LLM generation was not available or failed.]")
 
-    @sk.kernel_function(
-        description="Generates an explanation for a given data point.",
-        name="generate_explanation",
-    )
-    async def generate_explanation(
-        self, data_point_name: str, data_point_value: str, context_description: str
-    ) -> str:
-        self.logger.info(
-            f"CustomReportingSkills.generate_explanation called for '{data_point_name}'."
-        )
+    @kernel_function(description="Generates an explanation for a given data point.", name="generate_explanation")
+    async def generate_explanation(self, data_point_name: str, data_point_value: str, context_description: str) -> str:
+        self.logger.info(f"CustomReportingSkills.generate_explanation called for '{data_point_name}'.")
+
 
         if not all([data_point_name, data_point_value, context_description]):
             self.logger.warning(
