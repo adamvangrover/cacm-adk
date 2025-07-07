@@ -1,10 +1,12 @@
 # cacm_adk_core/workflow_assistant/workflow_assistant.py
 
+
 class WorkflowAssistant:
     """
     Guides the user through predefined or custom authoring workflows,
     suggesting next steps and actions.
     """
+
     def __init__(self):
         pass
 
@@ -16,7 +18,8 @@ class WorkflowAssistant:
         # Placeholder for workflow logic
         return "Define model components"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     assistant = WorkflowAssistant()
     next_step = assistant.get_next_step({"current_stage": "ontology_selection"})
     print(f"Next step: {next_step}")

@@ -128,7 +128,7 @@ class KnowledgeGraphAgent(Agent):
             except Exception as e:
                 self.logger.error(f"Error loading KG file {effective_kg_file_path}: {e}")
                 # Non-fatal if we are primarily populating a new graph or querying an empty one
-                agent_final_status = "warning"
+                agent_final_status = "warning" 
                 agent_final_message = f"Warning: Error loading KG file {effective_kg_file_path}. Error: {e}. Proceeding with current graph content."
         else:
             self.logger.info(f"KG file {effective_kg_file_path} not found. Starting with an empty graph or only populated data.")
@@ -147,11 +147,11 @@ class KnowledgeGraphAgent(Agent):
                 # Create a temporary graph to parse the input Turtle data
                 temp_graph = Graph()
                 temp_graph.parse(data=rdf_turtle_data_to_load, format="turtle")
-
+                
                 # Merge the temporary graph into the main graph
                 for triple in temp_graph:
                     graph.add(triple)
-
+                
                 triples_added_from_population = len(graph) - count_before_load
                 population_status_summary = f"Success: Added {triples_added_from_population} new triples from provided Turtle data."
                 self.logger.info(population_status_summary)
@@ -224,11 +224,11 @@ class KnowledgeGraphAgent(Agent):
                 if not os.path.exists(kg_dir):
                     os.makedirs(kg_dir, exist_ok=True)
                     self.logger.info(f"Created directory for KG file: {kg_dir}")
-
+                
                 graph.serialize(destination=effective_kg_file_path, format="turtle")
                 persistence_summary = f"Success: Graph with {len(graph)} triples persisted to '{effective_kg_file_path}'."
                 self.logger.info(persistence_summary)
-                if agent_final_message == "KG operations completed." or agent_final_message == "KG population successful.":
+                if agent_final_message == "KG operations completed." or agent_final_message == "KG population successful.": 
                     agent_final_message = "KG population and persistence successful."
             except Exception as e_persist:
                 self.logger.exception(f"Error persisting graph to {effective_kg_file_path}: {e_persist}")
@@ -247,10 +247,10 @@ class KnowledgeGraphAgent(Agent):
             if rdf_turtle_data_to_load: parts.append("Population " + ("processed" if "Success" in population_status_summary else "failed/skipped"))
             if sparql_query: parts.append("Query " + ("processed" if "Success" in query_execution_summary else "failed/skipped"))
             if persist_changes and triples_added_from_population > 0 : parts.append("Persistence " + ("successful" if "Success" in persistence_summary else "failed"))
-
+            
             if not parts: agent_final_message = "No specific KG operations (load, populate, query, persist) were actively performed or requested with data."
             else: agent_final_message = "; ".join(parts) + "."
-
+        
         return {
             "status": agent_final_status,
             "agent_name": self.agent_name,
@@ -312,7 +312,7 @@ if __name__ == '__main__':
 
     with open(dummy_kg_file_for_test, "w") as f:
         f.write(dummy_base_kg_content)
-
+    
     # Clean up persisted file if it exists from a previous run
     if os.path.exists(persisted_kg_file_for_test):
         os.remove(persisted_kg_file_for_test)
@@ -333,7 +333,7 @@ if __name__ == '__main__':
         # or better, use a different path for persistence.
         # Let's assume for this test, if kg_file_path is given, it's also the target for persistence.
         # We'll use 'persisted_kg_file_for_test' for the output of this step.
-
+        
         # To test persistence to a *different* file than loaded, we'd need another input like 'persist_to_kg_file_path'.
         # The current refactor uses 'effective_kg_file_path' for both load and save if 'persist_changes' is true.
         # So, for Test 1, we'll load dummy, add turtle, and save back to dummy.
@@ -341,7 +341,7 @@ if __name__ == '__main__':
         # This requires a slight adjustment in how `effective_kg_file_path` is used for saving if a different output path is desired.
         # For now, the code saves to the same `effective_kg_file_path` it loaded from (or default).
         # To test persistence to a new file, we'll set kg_file_path to the new file and NOT load from it initially.
-
+        
         print("\n--- Test 1 (Modified): Populate from Turtle, Query, Persist to NEW file ---")
         inputs_test1_mod = {
             "kg_file_path": persisted_kg_file_for_test, # Target for persistence
@@ -369,7 +369,7 @@ if __name__ == '__main__':
         assert len(result_test2['data']['results']) > 0
         assert result_test2['data']['results'][0]['label'] == "Main Test Corp from Turtle Input"
         print("Test 2 - Assertions PASSED")
-
+        
         print("\n--- Test 3: Query only from original dummy file ---")
         query_for_dummy_in_file = """
              PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
