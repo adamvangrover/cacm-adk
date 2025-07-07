@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, List, Optional
-import semantic_kernel as sk # For the decorator
+from semantic_kernel.functions.kernel_function_decorator import kernel_function # Correct import
 
 class ESGAnalysisSkill:
     """
@@ -10,7 +10,7 @@ class ESGAnalysisSkill:
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
 
-    @sk.kernel_function(
+    @kernel_function(
         description="Summarizes ESG factors from Knowledge Graph query results.",
         name="summarize_esg_factors_from_kg"
     )

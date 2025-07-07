@@ -272,8 +272,7 @@ Explanation:"""
         else:
             self.logger.warning("CustomReportingSkills: Kernel not provided. Will use placeholders.")
 
-    @kernel_function(description="Generates a placeholder financial performance summary.", name="generate_financial_summary") # Using correct decorator
-
+    @kernel_function(description="Generates a placeholder financial performance summary.", name="generate_financial_summary")
     async def generate_financial_summary(self, financial_data: Dict[str, Any]) -> str:
         self.logger.info(f"CustomReportingSkills.generate_financial_summary called.")
         
@@ -377,7 +376,7 @@ Explanation:"""
                 f"Financial Summary ('{fin_sum_snippet}...'), and Risk Summary ('{risk_sum_snippet}...'). "
                 f"LLM generation was not available or failed.]")
 
-    @sk.kernel_function(description="Generates an explanation for a given data point.", name="generate_explanation")
+    @kernel_function(description="Generates an explanation for a given data point.", name="generate_explanation")
     async def generate_explanation(self, data_point_name: str, data_point_value: str, context_description: str) -> str:
         self.logger.info(f"CustomReportingSkills.generate_explanation called for '{data_point_name}'.")
 

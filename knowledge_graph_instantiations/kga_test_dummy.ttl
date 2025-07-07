@@ -1,0 +1,5 @@
+
+        @prefix kgclass: <http://example.com/ontology/cacm_credit_ontology/0.3/classes/#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        <http://example.com/entity/DUMMY_IN_FILE> rdf:type kgclass:Obligor ;
+                                                rdfs:label "Dummy Corp Loaded From File"^^xsd:string .
